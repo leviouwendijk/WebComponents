@@ -1,5 +1,5 @@
 {
-  "originHash" : "e87671639d5636f80ca349d7c8707270e93bfe8869bbd45ccc11c33c2d911a22",
+  "originHash" : "5408f9121d29e4b629049ed4a56db3f4fb82deb8147a1d02de8c91e1e5ea50e0",
   "pins" : [
     {
       "identity" : "constructors",
@@ -7,7 +7,7 @@
       "location" : "https://github.com/leviouwendijk/Constructors.git",
       "state" : {
         "branch" : "master",
-        "revision" : "7750f93f4e6084c8e9f2c46cdd2d6d9de197971c"
+        "revision" : "9ab440ac695a11d2cdb264fa4a00c33a7579ec7b"
       }
     },
     {

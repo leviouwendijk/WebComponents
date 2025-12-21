@@ -3,9 +3,9 @@ import HTML
 import CSS
 
 public struct StandardNavigationMenu: WebComponent {
-    public let navigation: NavigationInterface
+    public let navigation: NavigationStructure
 
-    public init(navigation: NavigationInterface) {
+    public init(navigation: NavigationStructure) {
         self.navigation = navigation
     }
 
