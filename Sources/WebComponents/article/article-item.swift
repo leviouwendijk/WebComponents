@@ -3,11 +3,11 @@ import HTML
 import Constructors
 import Path
 
-public struct ArticleItem: Sendable {
+public struct ArticleItem: ArticleEmitting {
     public var path: StandardPath
 
     public var title: String // document title, api title
-    public var summary: String // document intro, api description
+    public var definition: String // document intro, api description
 
     public var thumbnail_src: StandardPath? // api thumnail
 
@@ -21,18 +21,19 @@ public struct ArticleItem: Sendable {
 
     public var content: @Sendable () -> HTMLFragment 
     // public var references: [any Referencable]
+    // are now dynamically computed
 
     public init(
         path: StandardPath,
         title: String,
-        summary: String,
+        definition: String,
         thumbnail_src: StandardPath? = nil,
         content: @escaping @Sendable () -> HTMLFragment,
         // references: [any Referencable] = []
     ) {
         self.path = path
         self.title = title
-        self.summary = summary
+        self.definition = definition
         self.thumbnail_src = thumbnail_src
         self.content = content
         // self.references = references
@@ -41,8 +42,8 @@ public struct ArticleItem: Sendable {
 
 public extension ArticleItem {
     /// Standardized header block for every doc item:
-    /// - Renders `title` + `summary` once (no drift).
-    /// - Optional thumbnail rendered "wiki style" (to the right of the summary).
+    /// - Renders `title` + `definition` once (no drift).
+    /// - Optional thumbnail rendered "wiki style" (to the right of the definition).
     ///
     /// Usage:
     ///     let nodes = item.headerNodes()
@@ -67,9 +68,9 @@ public extension ArticleItem {
         if let thumb = self.thumbnail_src {
             nodes.append(
                 HTML.div(["class": "doc-lead doc-lead--with-thumb"]) {
-                    HTML.div(["class": "doc-lead__summary"]) {
-                        HTML.p(["class": "doc-summary"]) {
-                            HTML.text(self.summary)
+                    HTML.div(["class": "doc-lead__definition"]) {
+                        HTML.p(["class": "doc-definition"]) {
+                            HTML.text(self.definition)
                         }
                     }
 
@@ -83,8 +84,8 @@ public extension ArticleItem {
             )
         } else {
             nodes.append(
-                HTML.p(["class": "doc-summary"]) {
-                    HTML.text(self.summary)
+                HTML.p(["class": "doc-definition"]) {
+                    HTML.text(self.definition)
                 }
             )
         }
@@ -92,9 +93,34 @@ public extension ArticleItem {
         return nodes
     }
 
-    func article() -> HTMLFragment {
+    // possible convenience
+    func lead_and_content() -> HTMLFragment {
         return lead() + content()
     }
 }
 
+public extension ArticleItem {
+    // rendering full article with rich references
+    func article() -> HTMLFragment {
+        let base = lead() + content()
 
+        let refs = ReferenceCollector.collect(from: base)
+        guard !refs.isEmpty else { 
+            return base 
+        }
+
+        return base + [
+            // this can be further made flexibly rendered:
+            // since we may not always want this exact rendering style
+            // for now, ok
+            HTML.h2 { 
+                HTML.text("Referenties")
+            },
+            HTML.ul(["class": "refs-list"]) {
+                for ref in refs {
+                    ref
+                }
+            }
+        ]
+    }
+}
