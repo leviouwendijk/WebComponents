@@ -3,6 +3,15 @@ import HTML
 import Constructors
 import Path
 
+// next up:
+// do we want to use article item path
+// as the method of identifiers?
+// do we want to create PageTargets manually
+// so as to syntehsize our TOC?
+// or do we direclty synthesize
+// the TOC NavigationStructure from 
+// the ArticleItem
+
 public struct ArticleItem: ArticleEmitting {
     public var path: StandardPath
 
@@ -84,8 +93,12 @@ public extension ArticleItem {
             )
         } else {
             nodes.append(
-                HTML.p(["class": "doc-definition"]) {
-                    HTML.text(self.definition)
+                HTML.div(["class": "doc-lead doc-lead--with-thumb"]) {
+                    HTML.div(["class": "doc-lead__definition"]) {
+                        HTML.p(["class": "doc-definition"]) {
+                            HTML.text(self.definition)
+                        }
+                    }
                 }
             )
         }
