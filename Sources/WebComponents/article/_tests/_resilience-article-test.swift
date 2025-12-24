@@ -10,7 +10,7 @@ public enum _ArticleResiliencePillarRefsTest {
         //     ]
         // ),
         title: "Resilience Pillars — Reference Mentions (Pipeline Test)",
-        definition: "Testartikel: noemt alle ResiliencePillarRefs cases exact één keer, om de render + citation pipeline te valideren.",
+        definition: { return [ HTML.text("Testartikel: noemt alle ResiliencePillarRefs cases exact één keer, om de render + citation pipeline te valideren.") ] },
         thumbnail_src: .init(
             "assets", "images", "test-img",
             filetype: .photo(.jpeg)

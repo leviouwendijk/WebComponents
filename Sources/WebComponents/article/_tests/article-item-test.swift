@@ -11,7 +11,11 @@ public enum _ArticleTest {
         // ),
         title: "Klassiek Conditionering",
         // conditionerings-effect == een (leer-)effect in een organisme tegenover zijn omgeving -- scheppende verwachting, ofwel voorspellende werking over de omgeving, dan wel de uitkomst van eigen acties in de toekomst
-        definition: "Klassieke conditionering, (ook: Pavlov-effect), is een conditionerings-effect waarbij een (neutrale) prikkel een verbintenis krijgt met een specifiek gevolg.",
+        definition: { return [
+                HTML.text(
+                    "Klassieke conditionering, (ook: Pavlov-effect), is een conditionerings-effect waarbij een (neutrale) prikkel een verbintenis krijgt met een specifiek gevolg.")
+            ]
+        },
         thumbnail_src: .init(
             "assets", "images", "test-img",
             filetype: .photo(.jpeg)

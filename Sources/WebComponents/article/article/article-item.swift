@@ -3,40 +3,36 @@ import HTML
 import Constructors
 import Path
 
+// -------------------------------------
+// --------   **Classical conditioning**
+// |      |   
+// |      |   Classical conditioning is ..
+// |      |   this that and the other..
+// --------
+// -------------------------------------
 public struct ArticleItem: ArticleEmitting {
     // public var path: StandardPath
 
     public var title: String // document title, api title
-    public var definition: String // document intro, api description
-
+    // public var definition: String // document intro, api description
+    public var definition: @Sendable () -> HTMLFragment   // document intro, api description (RICH)
     public var thumbnail_src: StandardPath? // api thumnail
 
-    // -------------------------------------
-    // --------   **Classical conditioning**
-    // |      |   
-    // |      |   Classical conditioning is ..
-    // |      |   this that and the other..
-    // --------
-    // -------------------------------------
-
     public var content: @Sendable () -> HTMLFragment 
-    // public var references: [any Referencable]
-    // are now dynamically computed
 
     public init(
         // path: StandardPath,
         title: String,
-        definition: String,
+        // definition: String,
+        definition: @escaping @Sendable () -> HTMLFragment,
         thumbnail_src: StandardPath? = nil,
         content: @escaping @Sendable () -> HTMLFragment,
-        // references: [any Referencable] = []
     ) {
         // self.path = path
         self.title = title
         self.definition = definition
         self.thumbnail_src = thumbnail_src
         self.content = content
-        // self.references = references
     }
 }
 
@@ -70,7 +66,8 @@ public extension ArticleItem {
                 HTML.div(["class": "doc-lead doc-lead--with-thumb"]) {
                     HTML.div(["class": "doc-lead__definition"]) {
                         HTML.p(["class": "doc-definition"]) {
-                            HTML.text(self.definition)
+                            // HTML.text(self.definition)
+                            self.definition()
                         }
                     }
 
@@ -87,7 +84,8 @@ public extension ArticleItem {
                 HTML.div(["class": "doc-lead doc-lead--with-thumb"]) {
                     HTML.div(["class": "doc-lead__definition"]) {
                         HTML.p(["class": "doc-definition"]) {
-                            HTML.text(self.definition)
+                            // HTML.text(self.definition)
+                            self.definition()
                         }
                     }
                 }
