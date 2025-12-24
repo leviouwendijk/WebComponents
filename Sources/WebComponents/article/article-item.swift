@@ -117,12 +117,16 @@ public extension ArticleItem {
     func article() -> HTMLFragment {
         let base = lead() + content()
 
-        let refs = ReferenceCollector.collect(from: base)
+        let resolved = CitationResolver.resolve(from: base)
+        // let refs = ReferenceCollector.collect(from: base)
+        let refs = resolved.references
+
         guard !refs.isEmpty else { 
             return base 
         }
 
-        return base + [
+        // return base + [
+        return resolved.body + [
             // this can be further made flexibly rendered:
             // since we may not always want this exact rendering style
             // for now, ok

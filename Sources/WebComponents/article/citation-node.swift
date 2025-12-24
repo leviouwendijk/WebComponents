@@ -32,9 +32,25 @@ public struct Citation: HTMLNode {
         ).render(options: options, indent: indent)
     }
 
-    public func reference_node() -> Reference {
+    // public func reference_node() -> Reference {
+    //     var comments: [String] = []
+    //     if let c = comment { comments.append(c) }
+    //     return Reference(reference, comments: comments)
+    // }
+    public func reference_node(
+        index: Int,
+        pointers: [Int] = []
+    ) -> Reference {
         var comments: [String] = []
-        if let c = comment { comments.append(c) }
-        return Reference(reference, comments: comments)
+        if let c = comment, !c.isEmpty {
+            comments.append(c)
+        }
+
+        return Reference(
+            reference,
+            index: index,
+            pointers: pointers,
+            comments: comments
+        )
     }
 }

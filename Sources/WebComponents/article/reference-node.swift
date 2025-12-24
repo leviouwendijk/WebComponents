@@ -2,13 +2,30 @@ import HTML
 
 public struct Reference: HTMLNode {
     public let reference: any Referencable
+
+    // Primary label shown as [index] (we set it to pointers.first)
+    public let index: Int
+
+    // All citation occurrence numbers that point here (e.g. [1, 3])
+    public let pointers: [Int]
+
     public let comments: [String]
 
     public init(
         _ reference: any Referencable,
+        index: Int,
+        pointers: [Int] = [],
         comments: [String] = []
     ) {
         self.reference = reference
+        self.index = index
+
+        if pointers.isEmpty {
+            self.pointers = index > 0 ? [index] : []
+        } else {
+            self.pointers = pointers
+        }
+
         self.comments = comments
     }
 
@@ -22,9 +39,7 @@ public struct Reference: HTMLNode {
                 HTMLElement(
                     "div",
                     attrs: ["class": "ref-author"],
-                    children: [
-                        HTMLText(author)
-                    ]
+                    children: [HTMLText(author)]
                 )
             )
         }
@@ -34,9 +49,7 @@ public struct Reference: HTMLNode {
                 HTMLElement(
                     "div",
                     attrs: ["class": "ref-date"],
-                    children: [
-                        HTMLText(date)
-                    ]
+                    children: [HTMLText(date)]
                 )
             )
         }
@@ -46,9 +59,7 @@ public struct Reference: HTMLNode {
                 HTMLElement(
                     "div",
                     attrs: ["class": "ref-doi"],
-                    children: [
-                        HTMLText("DOI: \(doi)")
-                    ]
+                    children: [HTMLText("DOI: \(doi)")]
                 )
             )
         }
@@ -59,11 +70,14 @@ public struct Reference: HTMLNode {
                 attrs: ["class": "ref-title"],
                 children: [
                     HTMLElement(
+                        "span",
+                        attrs: ["class": "ref-index"],
+                        children: [HTMLText("[\(index)] ")]
+                    ),
+                    HTMLElement(
                         "a",
                         attrs: ["href": ref.url],
-                        children: [
-                            HTMLText(ref.title)
-                        ]
+                        children: [HTMLText(ref.title)]
                     )
                 ]
             )
@@ -79,42 +93,53 @@ public struct Reference: HTMLNode {
             )
         }
 
-        // for c in comments where !c.isEmpty {
-        //     children.append(
-        //         HTMLElement(
-        //             "div",
-        //             attrs: ["class": "ref-comment"],
-        //             children: [
-        //                 HTMLText(c)
-        //             ]
-        //         )
-        //     )
-        // }
+        // Pointers line: "Cited as: 1, 3" with backlinks to #cite-<n>
+        if pointers.count >= 2 {
+            var pointerNodes: [any HTMLNode] = [HTMLText("Cited as: ")]
+
+            for (i, n) in pointers.enumerated() {
+                if i != 0 {
+                    pointerNodes.append(HTMLText(", "))
+                }
+
+                pointerNodes.append(
+                    HTMLElement(
+                        "a",
+                        attrs: [
+                            "class": "ref-pointer",
+                            "href": "#cite-\(n)"
+                        ],
+                        children: [HTMLText("\(n)")]
+                    )
+                )
+            }
+
+            children.append(
+                HTMLElement(
+                    "div",
+                    attrs: ["class": "ref-pointers"],
+                    children: pointerNodes
+                )
+            )
+        }
 
         if !comments.isEmpty {
-            var commentItems: [any HTMLNode] = []
-
-            for c in comments where !c.isEmpty {
-                commentItems.append(
-                    HTMLElement(
-                        "div",
-                        attrs: ["class": "ref-comment__item"],
-                        children: [
+            children.append(
+                HTMLElement(
+                    "div",
+                    attrs: ["class": "ref-comment"],
+                    children: comments.enumerated().flatMap { (i, c) -> [any HTMLNode] in
+                        guard !c.isEmpty else { return [] }
+                        if i == 0 {
+                            return [HTMLText(c)]
+                        }
+                        return [
+                            HTMLElement("div", attrs: ["class": "ref-comment-sep"], children: []),
                             HTMLText(c)
                         ]
-                    )
+                    }
                 )
-            }
-
-            if !commentItems.isEmpty {
-                children.append(
-                    HTMLElement(
-                        "div",
-                        attrs: ["class": "ref-comment"],
-                        children: commentItems
-                    )
-                )
-            }
+            )
         }
 
         return HTMLElement(
@@ -126,83 +151,211 @@ public struct Reference: HTMLNode {
             children: children
         ).render(options: options, indent: indent)
     }
-
-    // public func render(options: HTMLRenderOptions, indent: Int) -> String {
-    //     let ref = reference
-
-    //     var children: [any HTMLNode] = []
-
-    //     children.append(
-    //         HTMLElement(
-    //             "span",
-    //             attrs: ["class": "ref-title"],
-    //             children: [
-    //                 HTMLElement(
-    //                     "a",
-    //                     attrs: ["href": ref.url],
-    //                     children: [
-    //                         HTMLText(ref.title)
-    //                     ]
-    //                 )
-    //             ]
-    //         )
-    //     )
-
-    //     if let author = ref.authorLine, !author.isEmpty {
-    //         children.append(
-    //             HTMLElement(
-    //                 "span",
-    //                 attrs: ["class": "ref-author"],
-    //                 children: [
-    //                     HTMLText(" — \(author)")
-    //                 ]
-    //             )
-    //         )
-    //     }
-
-    //     if let date = ref.dateISO8601, !date.isEmpty {
-    //         children.append(
-    //             HTMLElement(
-    //                 "span",
-    //                 attrs: ["class": "ref-date"],
-    //                 children: [
-    //                     HTMLText(" (\(date))")
-    //                 ]
-    //             )
-    //         )
-    //     }
-
-    //     if let doi = ref.doi, !doi.isEmpty {
-    //         children.append(
-    //             HTMLElement(
-    //                 "span",
-    //                 attrs: ["class": "ref-doi"],
-    //                 children: [
-    //                     HTMLText(" DOI: \(doi)")
-    //                 ]
-    //             )
-    //         )
-    //     }
-
-    //     for c in comments where !c.isEmpty {
-    //         children.append(
-    //             HTMLElement(
-    //                 "div",
-    //                 attrs: ["class": "ref-comment"],
-    //                 children: [
-    //                     HTMLText(c)
-    //                 ]
-    //             )
-    //         )
-    //     }
-
-    //     return HTMLElement(
-    //         "li",
-    //         attrs: [
-    //             "class": "ref-item",
-    //             "id": "ref-\(ref.public_name_or_id)"
-    //         ],
-    //         children: children
-    //     ).render(options: options, indent: indent)
-    // }
 }
+
+// public struct Reference: HTMLNode {
+//     public let reference: any Referencable
+//     public let comments: [String]
+
+//     public init(
+//         _ reference: any Referencable,
+//         comments: [String] = []
+//     ) {
+//         self.reference = reference
+//         self.comments = comments
+//     }
+
+//     public func render(options: HTMLRenderOptions, indent: Int) -> String {
+//         let ref = reference
+
+//         var meta: [any HTMLNode] = []
+
+//         if let author = ref.authorLine, !author.isEmpty {
+//             meta.append(
+//                 HTMLElement(
+//                     "div",
+//                     attrs: ["class": "ref-author"],
+//                     children: [
+//                         HTMLText(author)
+//                     ]
+//                 )
+//             )
+//         }
+
+//         if let date = ref.dateISO8601, !date.isEmpty {
+//             meta.append(
+//                 HTMLElement(
+//                     "div",
+//                     attrs: ["class": "ref-date"],
+//                     children: [
+//                         HTMLText(date)
+//                     ]
+//                 )
+//             )
+//         }
+
+//         if let doi = ref.doi, !doi.isEmpty {
+//             meta.append(
+//                 HTMLElement(
+//                     "div",
+//                     attrs: ["class": "ref-doi"],
+//                     children: [
+//                         HTMLText("DOI: \(doi)")
+//                     ]
+//                 )
+//             )
+//         }
+
+//         var children: [any HTMLNode] = [
+//             HTMLElement(
+//                 "div",
+//                 attrs: ["class": "ref-title"],
+//                 children: [
+//                     HTMLElement(
+//                         "a",
+//                         attrs: ["href": ref.url],
+//                         children: [
+//                             HTMLText(ref.title)
+//                         ]
+//                     )
+//                 ]
+//             )
+//         ]
+
+//         if !meta.isEmpty {
+//             children.append(
+//                 HTMLElement(
+//                     "div",
+//                     attrs: ["class": "ref-meta"],
+//                     children: meta
+//                 )
+//             )
+//         }
+
+//         // for c in comments where !c.isEmpty {
+//         //     children.append(
+//         //         HTMLElement(
+//         //             "div",
+//         //             attrs: ["class": "ref-comment"],
+//         //             children: [
+//         //                 HTMLText(c)
+//         //             ]
+//         //         )
+//         //     )
+//         // }
+
+//         if !comments.isEmpty {
+//             var commentItems: [any HTMLNode] = []
+
+//             for c in comments where !c.isEmpty {
+//                 commentItems.append(
+//                     HTMLElement(
+//                         "div",
+//                         attrs: ["class": "ref-comment__item"],
+//                         children: [
+//                             HTMLText(c)
+//                         ]
+//                     )
+//                 )
+//             }
+
+//             if !commentItems.isEmpty {
+//                 children.append(
+//                     HTMLElement(
+//                         "div",
+//                         attrs: ["class": "ref-comment"],
+//                         children: commentItems
+//                     )
+//                 )
+//             }
+//         }
+
+//         return HTMLElement(
+//             "li",
+//             attrs: [
+//                 "class": "ref-item",
+//                 "id": "ref-\(ref.public_name_or_id)"
+//             ],
+//             children: children
+//         ).render(options: options, indent: indent)
+//     }
+
+//     // public func render(options: HTMLRenderOptions, indent: Int) -> String {
+//     //     let ref = reference
+
+//     //     var children: [any HTMLNode] = []
+
+//     //     children.append(
+//     //         HTMLElement(
+//     //             "span",
+//     //             attrs: ["class": "ref-title"],
+//     //             children: [
+//     //                 HTMLElement(
+//     //                     "a",
+//     //                     attrs: ["href": ref.url],
+//     //                     children: [
+//     //                         HTMLText(ref.title)
+//     //                     ]
+//     //                 )
+//     //             ]
+//     //         )
+//     //     )
+
+//     //     if let author = ref.authorLine, !author.isEmpty {
+//     //         children.append(
+//     //             HTMLElement(
+//     //                 "span",
+//     //                 attrs: ["class": "ref-author"],
+//     //                 children: [
+//     //                     HTMLText(" — \(author)")
+//     //                 ]
+//     //             )
+//     //         )
+//     //     }
+
+//     //     if let date = ref.dateISO8601, !date.isEmpty {
+//     //         children.append(
+//     //             HTMLElement(
+//     //                 "span",
+//     //                 attrs: ["class": "ref-date"],
+//     //                 children: [
+//     //                     HTMLText(" (\(date))")
+//     //                 ]
+//     //             )
+//     //         )
+//     //     }
+
+//     //     if let doi = ref.doi, !doi.isEmpty {
+//     //         children.append(
+//     //             HTMLElement(
+//     //                 "span",
+//     //                 attrs: ["class": "ref-doi"],
+//     //                 children: [
+//     //                     HTMLText(" DOI: \(doi)")
+//     //                 ]
+//     //             )
+//     //         )
+//     //     }
+
+//     //     for c in comments where !c.isEmpty {
+//     //         children.append(
+//     //             HTMLElement(
+//     //                 "div",
+//     //                 attrs: ["class": "ref-comment"],
+//     //                 children: [
+//     //                     HTMLText(c)
+//     //                 ]
+//     //             )
+//     //         )
+//     //     }
+
+//     //     return HTMLElement(
+//     //         "li",
+//     //         attrs: [
+//     //             "class": "ref-item",
+//     //             "id": "ref-\(ref.public_name_or_id)"
+//     //         ],
+//     //         children: children
+//     //     ).render(options: options, indent: indent)
+//     // }
+// }
