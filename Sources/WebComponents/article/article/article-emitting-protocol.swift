@@ -5,9 +5,12 @@ public protocol ArticleEmitting: FacadeEmitting {
     // var path: StandardPath { get }
     var title: String { get }
     var definition: String { get }
+
     var content: @Sendable () -> HTMLFragment { get }
+    func lead() -> HTMLFragment
 
     func lead_and_content() -> HTMLFragment
+
     func article() -> HTMLFragment
     func article_data() -> ArticleItem.ReferenceResolved
 }
@@ -15,7 +18,6 @@ public protocol ArticleEmitting: FacadeEmitting {
 // public protocol ArticleDefining: ArticleEmitting {
 //     var article_item: ArticleItem
 // }
-
 
 // public enum _Test_MovationArticles: ArticleEmitting {
 //     case article_one
