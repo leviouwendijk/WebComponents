@@ -3,12 +3,12 @@ import HTML
 
 public enum _ArticleTest {
     public static let primary: ArticleItem = ArticleItem(
-        path: StandardPath(
-            [
-                "toepassing",
-                "primer.html"
-            ]
-        ),
+        // path: StandardPath(
+        //     [
+        //         "toepassing",
+        //         "primer.html"
+        //     ]
+        // ),
         title: "Klassiek Conditionering",
         // conditionerings-effect == een (leer-)effect in een organisme tegenover zijn omgeving -- scheppende verwachting, ofwel voorspellende werking over de omgeving, dan wel de uitkomst van eigen acties in de toekomst
         definition: "Klassieke conditionering, (ook: Pavlov-effect), is een conditionerings-effect waarbij een (neutrale) prikkel een verbintenis krijgt met een specifiek gevolg.",

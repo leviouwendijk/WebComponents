@@ -3,17 +3,8 @@ import HTML
 import Constructors
 import Path
 
-// next up:
-// do we want to use article item path
-// as the method of identifiers?
-// do we want to create PageTargets manually
-// so as to syntehsize our TOC?
-// or do we direclty synthesize
-// the TOC NavigationStructure from 
-// the ArticleItem
-
 public struct ArticleItem: ArticleEmitting {
-    public var path: StandardPath
+    // public var path: StandardPath
 
     public var title: String // document title, api title
     public var definition: String // document intro, api description
@@ -33,14 +24,14 @@ public struct ArticleItem: ArticleEmitting {
     // are now dynamically computed
 
     public init(
-        path: StandardPath,
+        // path: StandardPath,
         title: String,
         definition: String,
         thumbnail_src: StandardPath? = nil,
         content: @escaping @Sendable () -> HTMLFragment,
         // references: [any Referencable] = []
     ) {
-        self.path = path
+        // self.path = path
         self.title = title
         self.definition = definition
         self.thumbnail_src = thumbnail_src

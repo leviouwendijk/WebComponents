@@ -3,12 +3,12 @@ import HTML
 
 public enum _ArticleResiliencePillarRefsTest {
     public static let primary: ArticleItem = ArticleItem(
-        path: StandardPath(
-            [
-                "toepassing",
-                "resilience-pillar-refs-test.html"
-            ]
-        ),
+        // path: StandardPath(
+        //     [
+        //         "toepassing",
+        //         "resilience-pillar-refs-test.html"
+        //     ]
+        // ),
         title: "Resilience Pillars — Reference Mentions (Pipeline Test)",
         definition: "Testartikel: noemt alle ResiliencePillarRefs cases exact één keer, om de render + citation pipeline te valideren.",
         thumbnail_src: .init(
