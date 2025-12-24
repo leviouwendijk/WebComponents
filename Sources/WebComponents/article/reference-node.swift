@@ -2,66 +2,40 @@ import HTML
 
 public struct Reference: HTMLNode {
     public let reference: any Referencable
-
-    // Primary label shown as [index] (we set it to pointers.first)
-    public let index: Int
-
-    // All citation occurrence numbers that point here (e.g. [1, 3])
     public let pointers: [Int]
-
     public let comments: [String]
 
     public init(
         _ reference: any Referencable,
-        index: Int,
-        pointers: [Int] = [],
+        pointers: [Int],
         comments: [String] = []
     ) {
         self.reference = reference
-        self.index = index
-
-        if pointers.isEmpty {
-            self.pointers = index > 0 ? [index] : []
-        } else {
-            self.pointers = pointers
-        }
-
+        self.pointers = pointers
         self.comments = comments
     }
 
     public func render(options: HTMLRenderOptions, indent: Int) -> String {
         let ref = reference
 
+        let label: String = {
+            guard !pointers.isEmpty else { return "[]" }
+            let joined = pointers.map(String.init).joined(separator: ", ")
+            return "[\(joined)] "
+        }()
+
         var meta: [any HTMLNode] = []
 
         if let author = ref.authorLine, !author.isEmpty {
-            meta.append(
-                HTMLElement(
-                    "div",
-                    attrs: ["class": "ref-author"],
-                    children: [HTMLText(author)]
-                )
-            )
+            meta.append(HTMLElement("div", attrs: ["class": "ref-author"], children: [HTMLText(author)]))
         }
 
         if let date = ref.dateISO8601, !date.isEmpty {
-            meta.append(
-                HTMLElement(
-                    "div",
-                    attrs: ["class": "ref-date"],
-                    children: [HTMLText(date)]
-                )
-            )
+            meta.append(HTMLElement("div", attrs: ["class": "ref-date"], children: [HTMLText(date)]))
         }
 
         if let doi = ref.doi, !doi.isEmpty {
-            meta.append(
-                HTMLElement(
-                    "div",
-                    attrs: ["class": "ref-doi"],
-                    children: [HTMLText("DOI: \(doi)")]
-                )
-            )
+            meta.append(HTMLElement("div", attrs: ["class": "ref-doi"], children: [HTMLText("DOI: \(doi)")]))
         }
 
         var children: [any HTMLNode] = [
@@ -72,7 +46,7 @@ public struct Reference: HTMLNode {
                     HTMLElement(
                         "span",
                         attrs: ["class": "ref-index"],
-                        children: [HTMLText("[\(index)] ")]
+                        children: [HTMLText(label)]
                     ),
                     HTMLElement(
                         "a",
@@ -84,43 +58,7 @@ public struct Reference: HTMLNode {
         ]
 
         if !meta.isEmpty {
-            children.append(
-                HTMLElement(
-                    "div",
-                    attrs: ["class": "ref-meta"],
-                    children: meta
-                )
-            )
-        }
-
-        // Pointers line: "Cited as: 1, 3" with backlinks to #cite-<n>
-        if pointers.count >= 2 {
-            var pointerNodes: [any HTMLNode] = [HTMLText("Cited as: ")]
-
-            for (i, n) in pointers.enumerated() {
-                if i != 0 {
-                    pointerNodes.append(HTMLText(", "))
-                }
-
-                pointerNodes.append(
-                    HTMLElement(
-                        "a",
-                        attrs: [
-                            "class": "ref-pointer",
-                            "href": "#cite-\(n)"
-                        ],
-                        children: [HTMLText("\(n)")]
-                    )
-                )
-            }
-
-            children.append(
-                HTMLElement(
-                    "div",
-                    attrs: ["class": "ref-pointers"],
-                    children: pointerNodes
-                )
-            )
+            children.append(HTMLElement("div", attrs: ["class": "ref-meta"], children: meta))
         }
 
         if !comments.isEmpty {
@@ -130,9 +68,7 @@ public struct Reference: HTMLNode {
                     attrs: ["class": "ref-comment"],
                     children: comments.enumerated().flatMap { (i, c) -> [any HTMLNode] in
                         guard !c.isEmpty else { return [] }
-                        if i == 0 {
-                            return [HTMLText(c)]
-                        }
+                        if i == 0 { return [HTMLText(c)] }
                         return [
                             HTMLElement("div", attrs: ["class": "ref-comment-sep"], children: []),
                             HTMLText(c)

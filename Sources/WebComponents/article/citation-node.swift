@@ -48,7 +48,6 @@ public struct Citation: HTMLNode {
 
         return Reference(
             reference,
-            index: index,
             pointers: pointers,
             comments: comments
         )

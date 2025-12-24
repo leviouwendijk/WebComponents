@@ -128,13 +128,11 @@ public enum CitationResolver {
         for id in order {
             guard let ref = refByID[id] else { continue }
             let pointers = pointersByID[id] ?? []
-            let index = pointers.first ?? 0
             let comments = commentsByID[id] ?? []
 
             references.append(
                 Reference(
                     ref,
-                    index: index,
                     pointers: pointers,
                     comments: comments
                 )
