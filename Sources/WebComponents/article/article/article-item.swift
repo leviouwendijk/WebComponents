@@ -125,9 +125,7 @@ public extension ArticleItem {
                 HTML.text("Referenties")
             },
             HTML.ul(["class": "refs-list"]) {
-                for ref in refs {
-                    ref
-                }
+                refs
             }
         ]
     }
