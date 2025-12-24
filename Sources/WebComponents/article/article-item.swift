@@ -115,14 +115,14 @@ public extension ArticleItem {
 public extension ArticleItem {
     // rendering full article with rich references
     func article() -> HTMLFragment {
-        let base = lead() + content()
+        let input_state = lead_and_content()
 
-        let resolved = CitationResolver.resolve(from: base)
+        let resolved = CitationResolver.resolve(from: input_state)
         // let refs = ReferenceCollector.collect(from: base)
         let refs = resolved.references
 
         guard !refs.isEmpty else { 
-            return base 
+            return input_state
         }
 
         // return base + [
@@ -139,5 +139,10 @@ public extension ArticleItem {
                 }
             }
         ]
+    }
+
+    func article_data() -> Self.ReferenceResolved {
+        let input_state = lead_and_content()
+        return CitationResolver.resolve(from: input_state)
     }
 }

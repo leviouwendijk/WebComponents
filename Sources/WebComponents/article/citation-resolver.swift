@@ -1,22 +1,9 @@
 import HTML
 
 public enum CitationResolver {
-    public struct Output: Sendable {
-        public let body: HTMLFragment
-        public let references: [Reference]
-
-        public init(
-            body: HTMLFragment,
-            references: [Reference]
-        ) {
-            self.body = body
-            self.references = references
-        }
-    }
-
     public static func resolve(
         from nodes: HTMLFragment
-    ) -> Output {
+    ) -> ArticleItem.ReferenceResolved {
         // Every Citation occurrence gets a new number (1,2,3,...)
         var occurrence: Int = 0
 
@@ -166,6 +153,6 @@ public enum CitationResolver {
             )
         }
 
-        return Output(body: body, references: references)
+        return .init(body: body, references: references)
     }
 }
