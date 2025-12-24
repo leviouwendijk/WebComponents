@@ -64,7 +64,10 @@ public struct Reference: HTMLNode {
                 HTMLElement(
                     "div",
                     attrs: ["class": "ref-doi"],
-                    children: [HTMLText("DOI: \(doi)")]
+                    children: [
+                        // HTMLText("DOI: \(doi)")
+                        HTMLText(doi)
+                    ]
                 )
             )
         }
