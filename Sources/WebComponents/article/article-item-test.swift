@@ -11,7 +11,10 @@ public enum _ArticleTest {
         ),
         title: "Primer Gedrag",
         definition: "Om duidelijker te begrijpen hoe gedrag totstandkomt, gebruiken we de principes van klassieke en operante conditionering. Naar deze concepten zal herhaaldelijk worden gerefereerd.",
-        thumbnail_src: nil,
+        thumbnail_src: .init(
+            "assets", "images", "test-img",
+            filetype: .photo(.jpeg)
+        ),
         content: {
             return [
                 HTML.h3 {
