@@ -79,16 +79,42 @@ public struct Reference: HTMLNode {
             )
         }
 
-        for c in comments where !c.isEmpty {
-            children.append(
-                HTMLElement(
-                    "div",
-                    attrs: ["class": "ref-comment"],
-                    children: [
-                        HTMLText(c)
-                    ]
+        // for c in comments where !c.isEmpty {
+        //     children.append(
+        //         HTMLElement(
+        //             "div",
+        //             attrs: ["class": "ref-comment"],
+        //             children: [
+        //                 HTMLText(c)
+        //             ]
+        //         )
+        //     )
+        // }
+
+        if !comments.isEmpty {
+            var commentItems: [any HTMLNode] = []
+
+            for c in comments where !c.isEmpty {
+                commentItems.append(
+                    HTMLElement(
+                        "div",
+                        attrs: ["class": "ref-comment__item"],
+                        children: [
+                            HTMLText(c)
+                        ]
+                    )
                 )
-            )
+            }
+
+            if !commentItems.isEmpty {
+                children.append(
+                    HTMLElement(
+                        "div",
+                        attrs: ["class": "ref-comment"],
+                        children: commentItems
+                    )
+                )
+            }
         }
 
         return HTMLElement(
