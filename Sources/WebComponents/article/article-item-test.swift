@@ -10,13 +10,18 @@ public enum _ArticleTest {
             ]
         ),
         title: "Primer Gedrag",
-        definition: "Om duidelijker te begrijpen hoe gedrag totstandkomt, gebruiken we de principes van klassieke en operante conditionering. Naar deze concepten zal herhaaldelijk worden gerefereerd.",
+        definition: "Beginselen over hoe gedragsvorming werkt.",
         thumbnail_src: .init(
             "assets", "images", "test-img",
             filetype: .photo(.jpeg)
         ),
         content: {
             return [
+                HTML.p {
+                    HTML.text("Om duidelijker te begrijpen hoe gedrag totstandkomt, gebruiken we de principes van klassieke en operante conditionering. Naar deze concepten zal herhaaldelijk worden gerefereerd.")
+                },
+
+
                 HTML.h3 {
                     HTML.text("Associatie-principe")
                 },
