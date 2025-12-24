@@ -6,7 +6,11 @@ public struct ReferenceData {
     let doi: String?
 }
 
-public protocol Referencable: Sendable, RawRepresentable where RawValue == String {
+public protocol Referencable: 
+    Sendable,
+    Codable,
+    CaseIterable,
+    RawRepresentable where RawValue == String {
     // separate public name "(michael et al. 2019)" or numeric "[1]"
     // from the self.rawValue, which refers to our case name
     // case name is internal: beyond_cortisol may not be a nice reference to use publically

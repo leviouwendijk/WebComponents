@@ -11,4 +11,3 @@ public extension Referencable {
         HTML.cite(self)
     }
 }
-
