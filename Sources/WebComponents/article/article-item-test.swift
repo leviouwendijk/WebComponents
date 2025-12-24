@@ -206,5 +206,9 @@ public enum _TestRefs: String, Referencable {
     public var url: String {
         return "https://example.com"
     }
+
+    public var authorLine: String? { "John Doe et al." }
+    public var dateISO8601: String? { "2025-10-25" }
+    public var doi: String? { "DOI.10/213023" }
 }
 
