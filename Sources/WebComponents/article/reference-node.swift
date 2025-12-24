@@ -1,14 +1,27 @@
 import HTML
 
 public struct Reference: HTMLNode {
+    public struct Comment: Sendable {
+        public let pointers: [Int]
+        public let text: String
+
+        public init(
+            pointers: [Int],
+            text: String
+        ) {
+            self.pointers = pointers
+            self.text = text
+        }
+    }
+
     public let reference: any Referencable
     public let pointers: [Int]
-    public let comments: [String]
+    public let comments: [Comment]
 
     public init(
         _ reference: any Referencable,
         pointers: [Int],
-        comments: [String] = []
+        comments: [Comment] = []
     ) {
         self.reference = reference
         self.pointers = pointers
@@ -19,7 +32,7 @@ public struct Reference: HTMLNode {
         let ref = reference
 
         let label: String = {
-            guard !pointers.isEmpty else { return "[]" }
+            guard !pointers.isEmpty else { return "[] " }
             let joined = pointers.map(String.init).joined(separator: ", ")
             return "[\(joined)] "
         }()
@@ -27,15 +40,33 @@ public struct Reference: HTMLNode {
         var meta: [any HTMLNode] = []
 
         if let author = ref.authorLine, !author.isEmpty {
-            meta.append(HTMLElement("div", attrs: ["class": "ref-author"], children: [HTMLText(author)]))
+            meta.append(
+                HTMLElement(
+                    "div",
+                    attrs: ["class": "ref-author"],
+                    children: [HTMLText(author)]
+                )
+            )
         }
 
         if let date = ref.dateISO8601, !date.isEmpty {
-            meta.append(HTMLElement("div", attrs: ["class": "ref-date"], children: [HTMLText(date)]))
+            meta.append(
+                HTMLElement(
+                    "div",
+                    attrs: ["class": "ref-date"],
+                    children: [HTMLText(date)]
+                )
+            )
         }
 
         if let doi = ref.doi, !doi.isEmpty {
-            meta.append(HTMLElement("div", attrs: ["class": "ref-doi"], children: [HTMLText("DOI: \(doi)")]))
+            meta.append(
+                HTMLElement(
+                    "div",
+                    attrs: ["class": "ref-doi"],
+                    children: [HTMLText("DOI: \(doi)")]
+                )
+            )
         }
 
         var children: [any HTMLNode] = [
@@ -58,7 +89,13 @@ public struct Reference: HTMLNode {
         ]
 
         if !meta.isEmpty {
-            children.append(HTMLElement("div", attrs: ["class": "ref-meta"], children: meta))
+            children.append(
+                HTMLElement(
+                    "div",
+                    attrs: ["class": "ref-meta"],
+                    children: meta
+                )
+            )
         }
 
         if !comments.isEmpty {
@@ -66,12 +103,22 @@ public struct Reference: HTMLNode {
                 HTMLElement(
                     "div",
                     attrs: ["class": "ref-comment"],
-                    children: comments.enumerated().flatMap { (i, c) -> [any HTMLNode] in
-                        guard !c.isEmpty else { return [] }
-                        if i == 0 { return [HTMLText(c)] }
+                    children: comments.enumerated().flatMap { (i, item) -> [any HTMLNode] in
+                        if item.text.isEmpty { return [] }
+
+                        let prefix: String = {
+                            guard !item.pointers.isEmpty else { return "" }
+                            let joined = item.pointers.map(String.init).joined(separator: ", ")
+                            return "[\(joined)] "
+                        }()
+
+                        if i == 0 {
+                            return [HTMLText(prefix + item.text)]
+                        }
+
                         return [
                             HTMLElement("div", attrs: ["class": "ref-comment-sep"], children: []),
-                            HTMLText(c)
+                            HTMLText(prefix + item.text)
                         ]
                     }
                 )

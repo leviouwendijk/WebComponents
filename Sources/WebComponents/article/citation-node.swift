@@ -38,18 +38,23 @@ public struct Citation: HTMLNode {
     //     return Reference(reference, comments: comments)
     // }
     public func reference_node(
-        index: Int,
-        pointers: [Int] = []
+        pointers: [Int]
     ) -> Reference {
-        var comments: [String] = []
+        var items: [Reference.Comment] = []
+
         if let c = comment, !c.isEmpty {
-            comments.append(c)
+            items.append(
+                Reference.Comment(
+                    pointers: pointers,
+                    text: c
+                )
+            )
         }
 
         return Reference(
             reference,
             pointers: pointers,
-            comments: comments
+            comments: items
         )
     }
 }

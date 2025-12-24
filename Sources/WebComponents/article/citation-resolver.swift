@@ -30,8 +30,9 @@ public enum CitationResolver {
         // All occurrence numbers that point to a given reference id
         var pointersByID: [String: [Int]] = [:]
 
-        // Merged comment list per reference id
-        var commentsByID: [String: [String]] = [:]
+        // Comment text -> pointers (per reference id), keeping stable comment order
+        var commentOrderByID: [String: [String]] = [:]
+        var commentPointersByID: [String: [String: [Int]]] = [:]
 
         @inline(__always)
         func record(_ cite: Citation) -> (n: Int, id: String)? {
@@ -49,11 +50,21 @@ public enum CitationResolver {
             pointersByID[id, default: []].append(n)
 
             if let c = cite.comment, !c.isEmpty {
-                var list = commentsByID[id, default: []]
-                if !list.contains(c) {
-                    list.append(c)
-                    commentsByID[id] = list
+                // Track stable order of distinct comment strings for this reference.
+                if commentPointersByID[id]?[c] == nil {
+                    commentOrderByID[id, default: []].append(c)
                 }
+
+                var map = commentPointersByID[id, default: [:]]
+                var ptrs = map[c, default: []]
+
+                // Avoid accidental duplicates if the same node is visited twice.
+                if ptrs.last != n {
+                    ptrs.append(n)
+                }
+
+                map[c] = ptrs
+                commentPointersByID[id] = map
             }
 
             return (n, id)
@@ -127,14 +138,30 @@ public enum CitationResolver {
 
         for id in order {
             guard let ref = refByID[id] else { continue }
+
             let pointers = pointersByID[id] ?? []
-            let comments = commentsByID[id] ?? []
+
+            let commentOrder = commentOrderByID[id] ?? []
+            let commentMap = commentPointersByID[id] ?? [:]
+
+            var commentItems: [Reference.Comment] = []
+            commentItems.reserveCapacity(commentOrder.count)
+
+            for text in commentOrder {
+                let ptrs = commentMap[text] ?? []
+                commentItems.append(
+                    Reference.Comment(
+                        pointers: ptrs,
+                        text: text
+                    )
+                )
+            }
 
             references.append(
                 Reference(
                     ref,
                     pointers: pointers,
-                    comments: comments
+                    comments: commentItems
                 )
             )
         }
