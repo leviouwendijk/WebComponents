@@ -38,24 +38,30 @@ public struct Citation: HTMLNode {
     //     return Reference(reference, comments: comments)
     // }
 
-    // public func reference_node(
-    //     pointers: [Int]
-    // ) -> Reference {
-    //     var items: [Reference.Comment] = []
 
-    //     if let c = comment, !c.isEmpty {
-    //         items.append(
-    //             Reference.Comment(
-    //                 pointers: pointers,
-    //                 text: c
-    //             )
-    //         )
-    //     }
+    @available(
+        *, deprecated,
+        message:
+            "Use CitationResolver.resolve(from:) to build references (needs occurrence pointers + comment pointers)."
+    )
+    public func reference_node(
+        pointers: [Int]
+    ) -> Reference {
+        var items: [Reference.Comment] = []
 
-    //     return Reference(
-    //         reference,
-    //         pointers: pointers,
-    //         comments: items
-    //     )
-    // }
+        if let c = comment, !c.isEmpty {
+            items.append(
+                Reference.Comment(
+                    pointers: pointers,
+                    text: c
+                )
+            )
+        }
+
+        return Reference(
+            reference,
+            pointers: pointers,
+            comments: items
+        )
+    }
 }

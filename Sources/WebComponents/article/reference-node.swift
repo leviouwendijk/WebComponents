@@ -79,9 +79,18 @@ public struct Reference: HTMLNode {
                         attrs: ["class": "ref-index"],
                         children: [HTMLText(label)]
                     ),
+                    // HTMLElement(
+                    //     "a",
+                    //     attrs: ["href": ref.url],
+                    //     children: [HTMLText(ref.title)]
+                    // )
                     HTMLElement(
                         "a",
-                        attrs: ["href": ref.url],
+                        attrs: [
+                            "href": ref.url,
+                            "target": "_blank",
+                            "rel": "noopener noreferrer",
+                        ],
                         children: [HTMLText(ref.title)]
                     )
                 ]
