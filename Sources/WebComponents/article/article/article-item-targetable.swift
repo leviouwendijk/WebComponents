@@ -1,7 +1,7 @@
 /// Subprotocol for targets that should be expected to contain
 /// an `article_item` for certain page targets
 /// optional so as not to enforce it on all targets
-public protocol ArticleItemTargetable {
+public protocol ArticleItemIdentifying {
     var article_item: ArticleItem? { get }
 }
 
