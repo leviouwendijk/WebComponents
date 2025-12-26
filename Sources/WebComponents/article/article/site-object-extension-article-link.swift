@@ -18,7 +18,7 @@ public extension SiteObject where Page: ArticleItemIdentifying {
             return HTML.a(href) { label() }
         }
 
-        return ArticleItemElement.HoverCard.build(
+        return ArticleItemElement.HoverCard.html(
             href: href,
             label: label(),
             item: item
@@ -41,7 +41,7 @@ public extension SiteObject where Page: ArticleItemIdentifying {
             return HTML.a(href) { [HTML.text(href)] }
         }
 
-        return ArticleItemElement.HoverCard.build(
+        return ArticleItemElement.HoverCard.html(
             href: href,
             label: [HTML.text(item.title)],
             item: item
