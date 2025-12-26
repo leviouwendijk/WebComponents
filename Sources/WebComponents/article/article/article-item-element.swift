@@ -31,7 +31,7 @@ public enum ArticleItemElement {
             }
         }
 
-        public static func css() -> CSSStyleSheet {
+        public static func css(z_index: Int = 1000) -> CSSStyleSheet {
             CSSStyleSheet(
                 rules: [
                     // Anchor point for the absolute-positioned card
@@ -47,7 +47,7 @@ public enum ArticleItemElement {
                         CSS.decl("position", "absolute"),
                         CSS.decl("left", "0"),
                         CSS.decl("bottom", "calc(100% + 10px)"), // place above link with gap
-                        CSS.decl("z-index", "1000"),
+                        CSS.decl("z-index", "\(z_index)"),
 
                         CSS.decl("min-width", "260px"),
                         CSS.decl("max-width", "360px"),
