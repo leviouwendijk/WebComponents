@@ -18,14 +18,23 @@ public extension SiteObject where Page: ArticleItemIdentifying {
             return HTML.a(href) { label() }
         }
 
+        let thumb_src: String? = item.thumbnail_src.map { thumb in
+            Self.refer(
+                path: thumb,
+                absolute: absolute,
+                asRootPath: true
+            )
+        }
+
         return ArticleItemElement.HoverCard.html(
             href: href,
             label: label(),
-            item: item
+            title: item.title,
+            definition: item.definition,
+            thumbnail_src: thumb_src
         )
     }
 
-    /// Convenience: default label = article title if present, else href.
     static func hover_link(
         to page: Page,
         absolute: Bool = false,
@@ -41,10 +50,20 @@ public extension SiteObject where Page: ArticleItemIdentifying {
             return HTML.a(href) { [HTML.text(href)] }
         }
 
+        let thumb_src: String? = item.thumbnail_src.map { thumb in
+            Self.refer(
+                path: thumb,
+                absolute: absolute,
+                asRootPath: true
+            )
+        }
+
         return ArticleItemElement.HoverCard.html(
             href: href,
             label: [HTML.text(item.title)],
-            item: item
+            title: item.title,
+            definition: item.definition,
+            thumbnail_src: thumb_src
         )
     }
 }

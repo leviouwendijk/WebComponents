@@ -7,7 +7,9 @@ public enum ArticleItemElement {
         public static func html(
             href: String,
             label: HTMLFragment,
-            item: ArticleItem
+            title: String,
+            definition: @Sendable () -> HTMLFragment,
+            thumbnail_src: String? = nil
         ) -> any HTMLNode {
             HTML.span(["class": "hoverref"]) {
                 HTML.a(href, ["class": "hoverref__link"]) {
@@ -15,21 +17,48 @@ public enum ArticleItemElement {
                 }
 
                 HTML.span(["class": "hoverref__card"]) {
-                    if let thumb = item.thumbnail_src {
+                    if let thumb = thumbnail_src {
                         HTML.img(
-                            src: thumb.rendered(asRootPath: true),
-                            alt: item.title,
+                            src: thumb,
+                            alt: title,
                             ["class": "hoverref__thumb"]
                         )
                     }
 
                     HTML.span(["class": "hoverref__meta"]) {
-                        HTML.span(["class": "hoverref__title"]) { HTML.text(item.title) }
-                        HTML.span(["class": "hoverref__def"]) { item.definition() }
+                        HTML.span(["class": "hoverref__title"]) { HTML.text(title) }
+                        HTML.span(["class": "hoverref__def"]) { definition() }
                     }
                 }
             }
         }
+
+        // public static func html(
+        //     href: String,
+        //     label: HTMLFragment,
+        //     item: ArticleItem
+        // ) -> any HTMLNode {
+        //     HTML.span(["class": "hoverref"]) {
+        //         HTML.a(href, ["class": "hoverref__link"]) {
+        //             label
+        //         }
+
+        //         HTML.span(["class": "hoverref__card"]) {
+        //             if let thumb = item.thumbnail_src {
+        //                 HTML.img(
+        //                     src: thumb.rendered(asRootPath: true),
+        //                     alt: item.title,
+        //                     ["class": "hoverref__thumb"]
+        //                 )
+        //             }
+
+        //             HTML.span(["class": "hoverref__meta"]) {
+        //                 HTML.span(["class": "hoverref__title"]) { HTML.text(item.title) }
+        //                 HTML.span(["class": "hoverref__def"]) { item.definition() }
+        //             }
+        //         }
+        //     }
+        // }
 
         public static func css(z_index: Int = 1000) -> CSSStyleSheet {
             CSSStyleSheet(
