@@ -14,9 +14,10 @@ public extension SiteObject where Page: ArticleItemIdentifying {
             asRootPath: asRootPath
         )
 
-        guard let item = page.article_item else {
-            return HTML.a(href) { label() }
-        }
+        // guard let item = page.article_item else {
+        //     return HTML.a(href) { label() }
+        // }
+        let item = page.article_item
 
         let thumb_src: String? = item.thumbnail_src.map { thumb in
             Self.refer(
@@ -46,9 +47,10 @@ public extension SiteObject where Page: ArticleItemIdentifying {
             asRootPath: asRootPath
         )
 
-        guard let item = page.article_item else {
-            return HTML.a(href) { [HTML.text(href)] }
-        }
+        // guard let item = page.article_item else {
+        //     return HTML.a(href) { [HTML.text(href)] }
+        // }
+        let item = page.article_item
 
         let thumb_src: String? = item.thumbnail_src.map { thumb in
             Self.refer(

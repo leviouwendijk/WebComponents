@@ -2,7 +2,8 @@
 /// an `article_item` for certain page targets
 /// optional so as not to enforce it on all targets
 public protocol ArticleItemIdentifying {
-    var article_item: ArticleItem? { get }
+    // var article_item: ArticleItem? { get }
+    var article_item: ArticleItem { get }
 }
 
 // import Constructors
