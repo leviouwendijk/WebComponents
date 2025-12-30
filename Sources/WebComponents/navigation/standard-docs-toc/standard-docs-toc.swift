@@ -66,17 +66,12 @@ extension StandardDocsTOC {
     public func tocRenderCategory(
         _ node: NavigationNode
     ) -> any HTMLNode {
-        // Your CSS collapses `.toc-category ul` via max-height: 0 and relies on JS.
-        // Since we want static outcome (everything visible), we override with inline style.
-        // Also keep `h3.expanded` so the chevron rotates per your CSS.
-        let childrenStyle = "max-height: none; overflow: visible;"
-
         return HTML.el("li", ["class": "toc-category"]) {
-            HTML.h3(["class": "expanded"]) {
+            HTML.h3 {
                 HTML.text(node.label)
             }
 
-            HTML.el("ul", ["style": childrenStyle]) {
+            HTML.el("ul") {
                 tocRenderNodes(node.children, level: 0)
             }
         }
@@ -102,8 +97,9 @@ extension StandardDocsTOC {
     ) -> any HTMLNode {
         let hasChildren = node.hasChildren
 
-        // If it has children, use `.submenu` and keep it open by adding `expanded` on the li.
-        let liClass = hasChildren ? "expanded" : ""
+        // Optional: keep ancestors of the selected page open on first render
+        let shouldExpand = hasChildren && nodeContainsSelected(node)
+        let liClass = shouldExpand ? "expanded" : ""
 
         return HTML.el("li", liClass.isEmpty ? [:] : ["class": liClass]) {
             if let path = node.path {
@@ -115,16 +111,28 @@ extension StandardDocsTOC {
                     HTML.a(path, ["class": aClass]) { HTML.text(node.label) }
                 }
             } else {
-                // Rare, but keeps structure sane if you ever have non-leaf labels.
                 HTML.span { HTML.text(node.label) }
             }
 
             if hasChildren {
-                HTML.el("ul", ["class": "submenu", "style": "display: block;"]) {
+                // No inline display style; CSS/JS controls it
+                HTML.el("ul", ["class": "submenu"]) {
                     tocRenderNodes(node.children, level: level + 1)
                 }
             }
         }
+    }
+
+    private func nodeContainsSelected(_ node: NavigationNode) -> Bool {
+        if let path = node.path, isSelected(path: path) {
+            return true
+        }
+        for child in node.children {
+            if nodeContainsSelected(child) {
+                return true
+            }
+        }
+        return false
     }
 
     private func isSelected(path: String) -> Bool {
