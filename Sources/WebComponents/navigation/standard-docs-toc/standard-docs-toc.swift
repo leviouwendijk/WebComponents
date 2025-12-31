@@ -68,8 +68,13 @@ extension StandardDocsTOC {
     ) -> any HTMLNode {
         return HTML.el("li", ["class": "toc-category"]) {
             HTML.h3 {
-                HTML.text(node.label)
+                HTML.button(["type": "button", "class": "toc-toggle"]) {
+                    HTML.text(node.label)
+                }
             }
+            // HTML.h3 {
+            //     HTML.text(node.label)
+            // }
 
             HTML.el("ul") {
                 tocRenderNodes(node.children, level: 0)
