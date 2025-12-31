@@ -66,16 +66,17 @@ extension StandardDocsTOC {
     public func tocRenderCategory(
         _ node: NavigationNode
     ) -> any HTMLNode {
-        return HTML.el("li", ["class": "toc-category"]) {
+        return HTML.el("li", 
+            [
+                "class": "toc-category",
+                "data-toc-category": node.label.lowercased()
+            ]
+        ) {
             HTML.h3 {
                 HTML.button(["type": "button", "class": "toc-toggle"]) {
                     HTML.text(node.label)
                 }
             }
-            // HTML.h3 {
-            //     HTML.text(node.label)
-            // }
-
             HTML.el("ul") {
                 tocRenderNodes(node.children, level: 0)
             }
