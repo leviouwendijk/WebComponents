@@ -73,9 +73,9 @@ extension StandardDocsTOC {
             ]
         ) {
             HTML.h3 {
-                HTML.button(["type": "button", "class": "toc-toggle"]) {
+                // HTML.button(["type": "button", "class": "toc-toggle"]) {
                     HTML.text(node.label)
-                }
+                // }
             }
             HTML.el("ul") {
                 tocRenderNodes(node.children, level: 0)
