@@ -182,15 +182,20 @@ extension FlowDiagram {
 
                 CSS.rule(
                     ".wc-flow__box",
-                    CSS.decl("background", "var(--card-bg-color, #fff)"),
+                    CSS.decl("background", "var(--background-color, #fff)"),
+                    CSS.decl("color", "var(--text-color, #0f172a)"),
                     CSS.decl("border", "1px solid var(--border-color, rgba(0,0,0,0.12))"),
                     CSS.decl("border-radius", "14px"),
                     CSS.decl("box-shadow", "var(--shadow-soft, 0 12px 28px rgba(0,0,0,0.08))"),
                     CSS.decl("padding", "14px 16px"),
                     CSS.decl("min-width", "160px"),
-                    CSS.decl("max-width", "320px"),
+                    CSS.decl("max-width", "320px")
+                ),
 
-                    CSS.decl("color", "var(--text-color, #0f172a)")
+                CSS.rule(
+                    ".dark-mode .wc-flow__box",
+                    CSS.decl(
+                        "background", "var(--submenu-bg-color, var(--background-color, #1e1e1e))")
                 ),
 
                 CSS.rule(
