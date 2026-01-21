@@ -182,8 +182,8 @@ extension FlowDiagram {
 
                 CSS.rule(
                     ".wc-flow__box",
-                    CSS.decl("background", "var(--surface-strong, #fff)"),
-                    CSS.decl("border", "1px solid var(--border-subtle, rgba(0,0,0,0.12))"),
+                    CSS.decl("background", "var(--card-bg-color, #fff)"),
+                    CSS.decl("border", "1px solid var(--border-color, rgba(0,0,0,0.12))"),
                     CSS.decl("border-radius", "14px"),
                     CSS.decl("box-shadow", "var(--shadow-soft, 0 12px 28px rgba(0,0,0,0.08))"),
                     CSS.decl("padding", "14px 16px"),
@@ -229,7 +229,10 @@ extension FlowDiagram {
                     CSS.decl("display", "inline-block"),
                     CSS.decl("width", "54px"),
                     CSS.decl("height", "2px"),
-                    CSS.decl("background", "var(--border-strong, rgba(15, 23, 42, 0.35))"),
+
+                    CSS.decl("color", "var(--flow-arrow-color, var(--text-color, #0f172a))"),
+
+                    CSS.decl("background", "currentColor"),
                     CSS.decl("border-radius", "999px")
                 ),
 
@@ -244,7 +247,7 @@ extension FlowDiagram {
                     CSS.decl("height", "0"),
                     CSS.decl("border-top", "7px solid transparent"),
                     CSS.decl("border-bottom", "7px solid transparent"),
-                    CSS.decl("border-left", "10px solid var(--border-strong, rgba(15, 23, 42, 0.35))")
+                    CSS.decl("border-left", "10px solid currentColor")
                 ),
 
                 CSS.rule(
@@ -255,11 +258,14 @@ extension FlowDiagram {
                 CSS.rule(
                     ".wc-flow__arrow-label",
                     CSS.decl("font-size", "0.9rem"),
-                    CSS.decl("color", "var(--muted, rgba(15, 23, 42, 0.62))"),
+                    CSS.decl(
+                        "color",
+                        "var(--flow-label-color, var(--ref-meta-text-color, var(--text-color, #0f172a)))"
+                    ),
                     CSS.decl("line-height", "1.15"),
                     CSS.decl("text-align", "center"),
                     CSS.decl("max-width", "180px")
-                ),
+                )
             ],
             media: [
                 CSS.media(
