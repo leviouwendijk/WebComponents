@@ -307,10 +307,9 @@ extension FlowDiagram {
                     ),
                     CSS.rule(
                         ".wc-flow__arrow",
-                        CSS.decl("width", "42px")
+                        CSS.decl("width", "32px")
                     ),
 
-                    // shrink boxes
                     CSS.rule(
                         ".wc-flow__box",
                         CSS.decl("min-width", "132px"),
@@ -324,7 +323,7 @@ extension FlowDiagram {
                     ),
                     CSS.rule(
                         ".wc-flow__arrow-wrap",
-                        CSS.decl("min-width", "40px")
+                        CSS.decl("min-width", "30px")
                     ),
                     CSS.rule(
                         ".wc-flow__box-inner, .wc-flow__arrow-label",
