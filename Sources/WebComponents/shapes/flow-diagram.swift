@@ -287,6 +287,19 @@ extension FlowDiagram {
             ],
             media: [
                 CSS.media(
+                    "(max-width: 900px)",
+                    CSS.rule(
+                        ".wc-flow__box",
+                        CSS.decl("min-width", "148px"),
+                        CSS.decl("max-width", "280px")
+                    ),
+                    CSS.rule(
+                        ".wc-flow__arrow",
+                        CSS.decl("width", "48px")
+                    )
+                ),
+
+                CSS.media(
                     "(max-width: 640px)",
                     CSS.rule(
                         ".wc-flow",
@@ -295,6 +308,27 @@ extension FlowDiagram {
                     CSS.rule(
                         ".wc-flow__arrow",
                         CSS.decl("width", "42px")
+                    ),
+
+                    // shrink boxes
+                    CSS.rule(
+                        ".wc-flow__box",
+                        CSS.decl("min-width", "132px"),
+                        CSS.decl("max-width", "240px"),
+                        CSS.decl("padding", "12px 12px")
+                    ),
+                    CSS.rule(
+                        ".wc-flow__box-inner",
+                        CSS.decl("min-height", "48px"),
+                        CSS.decl("gap", "5px")
+                    ),
+                    CSS.rule(
+                        ".wc-flow__arrow-wrap",
+                        CSS.decl("min-width", "40px")
+                    ),
+                    CSS.rule(
+                        ".wc-flow__box-inner, .wc-flow__arrow-label",
+                        CSS.decl("font-size", "0.95rem")
                     )
                 )
             ]
