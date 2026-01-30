@@ -116,6 +116,24 @@ public struct MatrixDiagram: WebComponent {
                             )
                         }
                     }
+
+                    if showsCrosshair {
+                        let dataColStart = (hasRowHeaders ? 2 : 1)
+                        let dataColEnd   = dataColStart + columns
+
+                        let dataRowStart = (hasColHeaders ? 2 : 1)
+                        let dataRowEnd   = dataRowStart + rows
+
+                        HTML.div(
+                            HTML.attrs(
+                                .class(["wc-matrix__crosshair"]),
+                                [
+                                    "style":
+                                        "grid-column: \(dataColStart) / \(dataColEnd); grid-row: \(dataRowStart) / \(dataRowEnd);"
+                                ]
+                            )
+                        ) { [] }
+                    }
                 }
 
                 if let xAxisLabel {
@@ -260,8 +278,47 @@ extension MatrixDiagram {
                     CSS.decl("color", "var(--ref-meta-text-color, var(--text-color, #0f172a))")
                 ),
 
+                // CSS.rule(
+                //     ".wc-matrix--crosshair::before",
+                //     CSS.decl("content", "\"\""),
+                //     CSS.decl("position", "absolute"),
+                //     CSS.decl("left", "50%"),
+                //     CSS.decl("top", "0"),
+                //     CSS.decl("transform", "translateX(-50%)"),
+                //     CSS.decl("width", "1px"),
+                //     CSS.decl("height", "100%"),
+                //     CSS.decl("background", "var(--border-color, rgba(0,0,0,0.12))"),
+                //     CSS.decl("pointer-events", "none")
+                // ),
+
+                // CSS.rule(
+                //     ".wc-matrix--crosshair::after",
+                //     CSS.decl("content", "\"\""),
+                //     CSS.decl("position", "absolute"),
+                //     CSS.decl("left", "0"),
+                //     CSS.decl("top", "50%"),
+                //     CSS.decl("transform", "translateY(-50%)"),
+                //     CSS.decl("width", "100%"),
+                //     CSS.decl("height", "1px"),
+                //     CSS.decl("background", "var(--border-color, rgba(0,0,0,0.12))"),
+                //     CSS.decl("pointer-events", "none")
+                // ),
+
                 CSS.rule(
-                    ".wc-matrix--crosshair::before",
+                    ".wc-matrix__cell",
+                    CSS.decl("position", "relative"),
+                    CSS.decl("z-index", "1")
+                ),
+
+                CSS.rule(
+                    ".wc-matrix__crosshair",
+                    CSS.decl("position", "relative"),
+                    CSS.decl("pointer-events", "none"),
+                    CSS.decl("z-index", "0")
+                ),
+
+                CSS.rule(
+                    ".wc-matrix__crosshair::before",
                     CSS.decl("content", "\"\""),
                     CSS.decl("position", "absolute"),
                     CSS.decl("left", "50%"),
@@ -269,12 +326,11 @@ extension MatrixDiagram {
                     CSS.decl("transform", "translateX(-50%)"),
                     CSS.decl("width", "1px"),
                     CSS.decl("height", "100%"),
-                    CSS.decl("background", "var(--border-color, rgba(0,0,0,0.12))"),
-                    CSS.decl("pointer-events", "none")
+                    CSS.decl("background", "var(--border-color, rgba(0,0,0,0.12))")
                 ),
 
                 CSS.rule(
-                    ".wc-matrix--crosshair::after",
+                    ".wc-matrix__crosshair::after",
                     CSS.decl("content", "\"\""),
                     CSS.decl("position", "absolute"),
                     CSS.decl("left", "0"),
@@ -282,8 +338,7 @@ extension MatrixDiagram {
                     CSS.decl("transform", "translateY(-50%)"),
                     CSS.decl("width", "100%"),
                     CSS.decl("height", "1px"),
-                    CSS.decl("background", "var(--border-color, rgba(0,0,0,0.12))"),
-                    CSS.decl("pointer-events", "none")
+                    CSS.decl("background", "var(--border-color, rgba(0,0,0,0.12))")
                 ),
 
                 CSS.rule(
