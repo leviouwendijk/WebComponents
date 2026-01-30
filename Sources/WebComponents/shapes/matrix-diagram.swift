@@ -117,23 +117,23 @@ public struct MatrixDiagram: WebComponent {
                         }
                     }
 
-                    if showsCrosshair {
-                        let dataColStart = (hasRowHeaders ? 2 : 1)
-                        let dataColEnd   = dataColStart + columns
+                    // if showsCrosshair {
+                    //     let dataColStart = (hasRowHeaders ? 2 : 1)
+                    //     let dataColEnd   = dataColStart + columns
 
-                        let dataRowStart = (hasColHeaders ? 2 : 1)
-                        let dataRowEnd   = dataRowStart + rows
+                    //     let dataRowStart = (hasColHeaders ? 2 : 1)
+                    //     let dataRowEnd   = dataRowStart + rows
 
-                        HTML.div(
-                            HTML.attrs(
-                                .class(["wc-matrix__crosshair"]),
-                                [
-                                    "style":
-                                        "grid-column: \(dataColStart) / \(dataColEnd); grid-row: \(dataRowStart) / \(dataRowEnd);"
-                                ]
-                            )
-                        ) { [] }
-                    }
+                    //     HTML.div(
+                    //         HTML.attrs(
+                    //             .class(["wc-matrix__crosshair"]),
+                    //             [
+                    //                 "style":
+                    //                     "grid-column: \(dataColStart) / \(dataColEnd); grid-row: \(dataRowStart) / \(dataRowEnd);"
+                    //             ]
+                    //         )
+                    //     ) { [] }
+                    // }
                 }
 
                 if let xAxisLabel {
