@@ -2,58 +2,7 @@ import Constructors
 import HTML
 import CSS
 
-public enum BoxAlign: Sendable { 
-    case center
-    case start
-}
-
-public enum Item: Sendable {
-    case box(Box)
-    case arrow(Arrow)
-}
-
-public struct Box: Sendable {
-    public let classes: [String]
-    public let attrs: HTMLAttribute
-    public let align: BoxAlign
-    public let content: @Sendable () -> HTMLFragment
-
-    public init(
-        classes: [String] = [],
-        attrs: HTMLAttribute = HTMLAttribute(),
-        align: BoxAlign = .center,
-        content: @escaping @Sendable () -> HTMLFragment
-    ) {
-        self.classes = classes
-        self.attrs = attrs
-        self.align = align
-        self.content = content
-    }
-}
-
-public struct Arrow: Sendable {
-    public let classes: [String]
-    public let attrs: HTMLAttribute
-    public let label: String?
-
-    public init(
-        classes: [String] = [],
-        attrs: HTMLAttribute = HTMLAttribute(),
-        label: String? = nil
-    ) {
-        self.classes = classes
-        self.attrs = attrs
-        self.label = label
-    }
-}
-
 public struct FlowDiagram: WebComponent {
-    public enum Axis: Sendable {
-        case row
-        case column
-    }
-
-
     public let axis: Axis
     public let classes: [String]
     public let attrs: HTMLAttribute
