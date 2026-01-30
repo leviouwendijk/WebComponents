@@ -233,6 +233,34 @@ extension MatrixDiagram {
                 ),
 
                 CSS.rule(
+                    ".wc-matrix__cell--header",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("justify-content", "center")
+                ),
+
+                CSS.rule(
+                    ".wc-flow__box.wc-matrix__label",
+                    CSS.decl("background", "transparent"),
+                    CSS.decl("border", "0"),
+                    CSS.decl("box-shadow", "none"),
+                    CSS.decl("padding", "0"),
+                    CSS.decl("min-width", "auto"),
+                    CSS.decl("max-width", "none")
+                ),
+
+                CSS.rule(
+                    ".wc-flow__box.wc-matrix__label .wc-flow__box-inner",
+                    CSS.decl("min-height", "0"),
+                    CSS.decl("gap", "4px")
+                ),
+
+                CSS.rule(
+                    ".wc-flow__box.wc-matrix__label .wc-flow__box-inner span",
+                    CSS.decl("color", "var(--ref-meta-text-color, var(--text-color, #0f172a))")
+                ),
+
+                CSS.rule(
                     ".wc-matrix--crosshair::before",
                     CSS.decl("content", "\"\""),
                     CSS.decl("position", "absolute"),
@@ -325,4 +353,3 @@ extension MatrixDiagram {
         )
     }
 }
-
