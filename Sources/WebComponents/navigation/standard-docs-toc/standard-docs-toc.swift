@@ -2,7 +2,7 @@ import Constructors
 import HTML
 import CSS
 
-public struct StandardDocsTOC: WebComponent {
+public struct StandardDocsTOC: ReusableComponent {
     public let navigation: NavigationStructure
     public let title: String
     public let currentPath: String?
@@ -17,16 +17,12 @@ public struct StandardDocsTOC: WebComponent {
         self.currentPath = currentPath
     }
 
-    public func html() -> [any HTMLNode] {
-        [
-            toc_html()
-        ]
-    }
-
-    public func styles() -> [CSSStyleSheet] {
-        // Keep docs styling in the site (DocsHondenmeestersSite.Style.Toc.build()).
-        // Return [] here so WebComponents stays site-agnostic.
-        []
+    public var nodes: ReusableComponentNodes {
+        .body(
+            [
+                toc_html()
+            ]
+        )
     }
 }
 

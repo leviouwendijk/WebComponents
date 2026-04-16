@@ -10,6 +10,10 @@ public protocol ArticleEmitting: FacadeEmitting {
 
     func article() -> HTMLFragment
     func article_data() -> ArticleItem.ReferenceResolved
+
+    // new:
+    func toc_entries() -> [HeadingResolver.Entry]
+    func article_with_toc() -> HTMLFragment
 }
 
 // public protocol ArticleDefining: ArticleEmitting {

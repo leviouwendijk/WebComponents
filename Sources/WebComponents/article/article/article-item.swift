@@ -133,3 +133,41 @@ public extension ArticleItem {
         return CitationResolver.resolve(from: input_state)
     }
 }
+
+// renewed
+extension ArticleItem {
+    public func toc_entries() -> [HeadingResolver.Entry] {
+        HeadingResolver.resolve(from: lead_and_content()).entries
+    }
+
+    // public func article_with_toc() -> HTMLFragment {
+    //     let headings = HeadingResolver.resolve(from: lead_and_content())
+    //     let toc = ArticleInnerTOC(entries: headings.entries).html()
+    //     let resolved = CitationResolver.resolve(from: headings.body)
+
+    //     guard !resolved.references.isEmpty else {
+    //         return lead() + toc + content()
+    //     }
+
+    //     return lead() + toc + content() + [
+    //         HTML.h2 { HTML.text("Referenties") },
+    //         HTML.ul(["class": "refs-list"]) { resolved.references }
+    //     ]
+    // }
+    public func article_with_toc() -> HTMLFragment {
+        let headings = HeadingResolver.resolve(from: lead_and_content())
+        let toc = ArticleInnerTOC(
+            entries: headings.entries
+        ).nodes.body
+        let resolved = CitationResolver.resolve(from: headings.body)
+
+        guard !resolved.references.isEmpty else {
+            return lead() + toc + content()
+        }
+
+        return lead() + toc + content() + [
+            HTML.h2 { HTML.text("Referenties") },
+            HTML.ul(["class": "refs-list"]) { resolved.references }
+        ]
+    }
+}
