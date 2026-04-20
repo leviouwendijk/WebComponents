@@ -535,22 +535,29 @@ public extension SiteNotifier {
 
                 CSS.rule(
                     s.notice,
-                    CSS.decl("width", "min(100%, 640px)"),
+                    CSS.decl("--wc-site-notifier-ring", "rgba(255,255,255,.16)"),
+                    CSS.decl("--wc-site-notifier-glow", "rgba(0,0,0,0)"),
+                    CSS.decl("--wc-site-notifier-icon-bg", "rgba(255,255,255,.72)"),
+                    CSS.decl("--wc-site-notifier-icon-color", "#090302"),
+                    CSS.decl("width", "min(100%, 680px)"),
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "auto minmax(0, 1fr) auto"),
                     CSS.decl("align-items", "start"),
-                    CSS.decl("gap", ".8rem"),
-                    CSS.decl("padding", "1rem"),
-                    CSS.decl("border", "1px solid rgba(255,255,255,.16)"),
+                    CSS.decl("gap", ".85rem"),
+                    CSS.decl("padding", ".95rem 1rem"),
+                    CSS.decl("border", "1px solid rgba(255,255,255,.12)"),
                     CSS.decl("border-radius", "18px"),
-                    CSS.decl("background", "rgba(20, 12, 10, .92)"),
+                    CSS.decl("background", "rgba(9, 3, 2, .93)"),
                     CSS.decl("color", "#fff"),
-                    CSS.decl("box-shadow", "0 18px 48px rgba(0,0,0,.22)"),
-                    CSS.decl("backdrop-filter", "blur(10px) saturate(135%)"),
-                    CSS.decl("-webkit-backdrop-filter", "blur(10px) saturate(135%)"),
+                    CSS.decl(
+                        "box-shadow",
+                        "inset 0 0 0 1px var(--wc-site-notifier-ring), 0 18px 48px rgba(0,0,0,.28), 0 0 28px var(--wc-site-notifier-glow)"
+                    ),
+                    CSS.decl("backdrop-filter", "blur(14px)"),
+                    CSS.decl("-webkit-backdrop-filter", "blur(14px)"),
                     CSS.decl("opacity", "0"),
-                    CSS.decl("transform", "translateY(1rem) scale(.985)"),
-                    CSS.decl("transition", "opacity 180ms ease, transform 220ms cubic-bezier(.2, .9, .22, 1)"),
+                    CSS.decl("transform", "translateY(.6rem) scale(.985)"),
+                    CSS.decl("transition", "opacity 240ms ease, transform 320ms cubic-bezier(.2, .9, .22, 1)"),
                     CSS.decl("pointer-events", "auto")
                 ),
 
@@ -563,20 +570,93 @@ public extension SiteNotifier {
                 CSS.rule(
                     CSSSelector.class("\(s.notice.rawValue).is-leaving"),
                     CSS.decl("opacity", "0"),
-                    CSS.decl("transform", "translateY(.65rem) scale(.985)")
+                    CSS.decl("transform", "translateY(.75rem) scale(.985)")
+                ),
+
+                CSS.rule(
+                    CSSSelector.class("\(s.notice.rawValue)--success"),
+                    CSS.decl("--wc-site-notifier-ring", "rgba(88, 214, 141, .42)"),
+                    CSS.decl("--wc-site-notifier-glow", "rgba(88, 214, 141, .08)"),
+                    CSS.decl("--wc-site-notifier-icon-bg", "#58d68d"),
+                    CSS.decl("--wc-site-notifier-icon-color", "#052915")
+                ),
+
+                CSS.rule(
+                    CSSSelector.class("\(s.notice.rawValue)--warning"),
+                    CSS.decl("--wc-site-notifier-ring", "rgba(255, 199, 77, .46)"),
+                    CSS.decl("--wc-site-notifier-glow", "rgba(255, 199, 77, .08)"),
+                    CSS.decl("--wc-site-notifier-icon-bg", "#ffc74d"),
+                    CSS.decl("--wc-site-notifier-icon-color", "#2d1d00")
+                ),
+
+                CSS.rule(
+                    CSSSelector.class("\(s.notice.rawValue)--error"),
+                    CSS.decl("--wc-site-notifier-ring", "rgba(255, 112, 112, .48)"),
+                    CSS.decl("--wc-site-notifier-glow", "rgba(255, 112, 112, .09)"),
+                    CSS.decl("--wc-site-notifier-icon-bg", "#ff7070"),
+                    CSS.decl("--wc-site-notifier-icon-color", "#330707")
+                ),
+
+                CSS.rule(
+                    CSSSelector.class("\(s.notice.rawValue)--loading"),
+                    CSS.decl("--wc-site-notifier-ring", "rgba(255,255,255,.22)"),
+                    CSS.decl("--wc-site-notifier-glow", "rgba(255,255,255,.04)"),
+                    CSS.decl("--wc-site-notifier-icon-bg", "transparent"),
+                    CSS.decl("--wc-site-notifier-icon-color", "#ffffff")
                 ),
 
                 CSS.rule(
                     s.icon,
-                    CSS.decl("display", "grid"),
+                    CSS.decl("display", "inline-grid"),
                     CSS.decl("place-items", "center"),
-                    CSS.decl("width", "2rem"),
-                    CSS.decl("height", "2rem"),
+                    CSS.decl("width", "1.35rem"),
+                    CSS.decl("height", "1.35rem"),
+                    CSS.decl("margin-top", ".02rem"),
                     CSS.decl("border-radius", "999px"),
-                    CSS.decl("background", "rgba(255,255,255,.12)"),
-                    CSS.decl("font-size", ".9rem"),
+                    CSS.decl("font-size", ".86rem"),
                     CSS.decl("font-weight", "850"),
-                    CSS.decl("line-height", "1")
+                    CSS.decl("line-height", "1"),
+                    CSS.decl("color", "var(--wc-site-notifier-icon-color)"),
+                    CSS.decl("background", "var(--wc-site-notifier-icon-bg)")
+                ),
+
+                CSS.rule(
+                    CSSSelector.class("\(s.icon.rawValue)--success"),
+                    CSS.decl("background", "#58d68d"),
+                    CSS.decl("color", "#052915")
+                ),
+
+                CSS.rule(
+                    CSSSelector.class("\(s.icon.rawValue)--warning"),
+                    CSS.decl("width", "1.45rem"),
+                    CSS.decl("height", "1.32rem"),
+                    CSS.decl("padding-top", ".16rem"),
+                    CSS.decl("border-radius", "0"),
+                    CSS.decl("clip-path", "polygon(50% 4%, 96% 92%, 4% 92%)"),
+                    CSS.decl("background", "#ffc74d"),
+                    CSS.decl("color", "#2d1d00"),
+                    CSS.decl("font-size", ".76rem")
+                ),
+
+                CSS.rule(
+                    CSSSelector.class("\(s.icon.rawValue)--error"),
+                    CSS.decl("background", "#ff7070"),
+                    CSS.decl("color", "#330707"),
+                    CSS.decl("font-size", "1rem")
+                ),
+
+                CSS.rule(
+                    CSSSelector.class("\(s.icon.rawValue)--loading"),
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("background", "transparent"),
+                    CSS.decl("border", "2px solid rgba(255,255,255,.32)"),
+                    CSS.decl("border-top-color", "rgba(255,255,255,.9)"),
+                    CSS.decl("animation", "wc-site-notifier-spin .8s linear infinite")
+                ),
+
+                CSS.rule(
+                    "@keyframes wc-site-notifier-spin",
+                    CSS.decl("to", "rotate: 360deg")
                 ),
 
                 CSS.rule(
