@@ -809,8 +809,23 @@ public extension SiteNotifier {
                     CSS.decl("align-items", "start"),
                     CSS.decl("gap", "1rem"),
                     CSS.decl("padding", "1.1rem 1.15rem .8rem"),
-                    CSS.decl("border-bottom", "1px solid rgba(255,255,255,.1)")
+                    CSS.decl("border-bottom", "1px solid rgba(255,255,255,.1)"),
+                    CSS.decl("background", "transparent"),
+                    CSS.decl("height", "auto"),
+                    CSS.decl("position", "static"),
+                    CSS.decl("top", "auto"),
+                    CSS.decl("z-index", "auto")
                 ),
+
+                // CSS.rule(
+                //     s.historyPanelHeader,
+                //     CSS.decl("display", "flex"),
+                //     CSS.decl("justify-content", "space-between"),
+                //     CSS.decl("align-items", "start"),
+                //     CSS.decl("gap", "1rem"),
+                //     CSS.decl("padding", "1.1rem 1.15rem .8rem"),
+                //     CSS.decl("border-bottom", "1px solid rgba(255,255,255,.1)")
+                // ),
 
                 CSS.rule(
                     s.historyPanelEyebrow,
