@@ -1033,13 +1033,13 @@ public extension SiteNotifier {
                 ),
 
                 CSS.rule(
-                    CSSSelector.raw(".\\(s.historyItem.rawValue)--success .\\(s.historyItemIcon.rawValue)"),
+                    CSSSelector.raw(".\(s.historyItem.rawValue)--success .\(s.historyItemIcon.rawValue)"),
                     CSS.decl("background", "#58d68d"),
                     CSS.decl("color", "#052915")
                 ),
 
                 CSS.rule(
-                    CSSSelector.raw(".\\(s.historyItem.rawValue)--warning .\\(s.historyItemIcon.rawValue)"),
+                    CSSSelector.raw(".\(s.historyItem.rawValue)--warning .\(s.historyItemIcon.rawValue)"),
                     CSS.decl("width", "1.45rem"),
                     CSS.decl("height", "1.32rem"),
                     CSS.decl("padding-top", ".16rem"),
@@ -1051,19 +1051,19 @@ public extension SiteNotifier {
                 ),
 
                 CSS.rule(
-                    CSSSelector.raw(".\\(s.historyItem.rawValue)--error .\\(s.historyItemIcon.rawValue)"),
+                    CSSSelector.raw(".\(s.historyItem.rawValue)--error .\(s.historyItemIcon.rawValue)"),
                     CSS.decl("background", "#ff7070"),
                     CSS.decl("color", "#330707"),
                     CSS.decl("font-size", "1rem")
                 ),
 
                 CSS.rule(
-                    CSSSelector.raw(".\\(s.historyItem.rawValue)--loading .\\(s.historyItemIcon.rawValue)"),
+                    CSSSelector.raw(".\(s.historyItem.rawValue)--loading .\(s.historyItemIcon.rawValue)"),
                     CSS.decl("box-sizing", "border-box"),
                     CSS.decl("background", "transparent"),
                     CSS.decl("border", "2px solid rgba(255,255,255,.32)"),
                     CSS.decl("border-top-color", "rgba(255,255,255,.9)"),
-                    CSS.decl("animation", "hm-notification-spin .8s linear infinite")
+                    CSS.decl("animation", "wc-site-notifier-spin .8s linear infinite")
                 ),
 
                 CSS.rule(
