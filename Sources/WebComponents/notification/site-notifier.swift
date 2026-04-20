@@ -894,6 +894,92 @@ public extension SiteNotifier {
                 ),
 
                 CSS.rule(
+                    s.historyPanelList,
+                    CSS.decl("overflow", "auto"),
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", ".65rem"),
+                    CSS.decl("padding", "1rem 1.15rem")
+                ),
+
+                CSS.rule(
+                    s.historyEmpty,
+                    CSS.decl("padding", "1.2rem"),
+                    CSS.decl("border", "1px dashed rgba(255,255,255,.18)"),
+                    CSS.decl("border-radius", "18px"),
+                    CSS.decl("color", "rgba(255,255,255,.68)"),
+                    CSS.decl("font-size", ".9rem"),
+                    CSS.decl("text-align", "center")
+                ),
+
+                CSS.rule(
+                    s.historyItem,
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "auto minmax(0, 1fr)"),
+                    CSS.decl("gap", ".7rem"),
+                    CSS.decl("padding", ".85rem"),
+                    CSS.decl("border", "1px solid rgba(255,255,255,.12)"),
+                    CSS.decl("border-radius", "18px"),
+                    CSS.decl("background", "rgba(255,255,255,.055)")
+                ),
+
+                CSS.rule(
+                    s.historyItemIcon,
+                    CSS.decl("display", "inline-grid"),
+                    CSS.decl("place-items", "center"),
+                    CSS.decl("width", "1.35rem"),
+                    CSS.decl("height", "1.35rem"),
+                    CSS.decl("margin-top", ".02rem"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "rgba(255,255,255,.72)"),
+                    CSS.decl("color", "#090302"),
+                    CSS.decl("font-size", ".86rem"),
+                    CSS.decl("font-weight", "850"),
+                    CSS.decl("line-height", "1")
+                ),
+
+                CSS.rule(
+                    CSSSelector.raw(".\\(s.historyItem.rawValue)--success .\\(s.historyItemIcon.rawValue)"),
+                    CSS.decl("background", "#58d68d"),
+                    CSS.decl("color", "#052915")
+                ),
+
+                CSS.rule(
+                    CSSSelector.raw(".\\(s.historyItem.rawValue)--warning .\\(s.historyItemIcon.rawValue)"),
+                    CSS.decl("width", "1.45rem"),
+                    CSS.decl("height", "1.32rem"),
+                    CSS.decl("padding-top", ".16rem"),
+                    CSS.decl("border-radius", "0"),
+                    CSS.decl("clip-path", "polygon(50% 4%, 96% 92%, 4% 92%)"),
+                    CSS.decl("background", "#ffc74d"),
+                    CSS.decl("color", "#2d1d00"),
+                    CSS.decl("font-size", ".76rem")
+                ),
+
+                CSS.rule(
+                    CSSSelector.raw(".\\(s.historyItem.rawValue)--error .\\(s.historyItemIcon.rawValue)"),
+                    CSS.decl("background", "#ff7070"),
+                    CSS.decl("color", "#330707"),
+                    CSS.decl("font-size", "1rem")
+                ),
+
+                CSS.rule(
+                    CSSSelector.raw(".\\(s.historyItem.rawValue)--loading .\\(s.historyItemIcon.rawValue)"),
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("background", "transparent"),
+                    CSS.decl("border", "2px solid rgba(255,255,255,.32)"),
+                    CSS.decl("border-top-color", "rgba(255,255,255,.9)"),
+                    CSS.decl("animation", "hm-notification-spin .8s linear infinite")
+                ),
+
+                CSS.rule(
+                    s.historyItemHead,
+                    CSS.decl("display", "flex"),
+                    CSS.decl("justify-content", "space-between"),
+                    CSS.decl("gap", ".75rem"),
+                    CSS.decl("align-items", "baseline")
+                ),
+
+                CSS.rule(
                     s.historyItemTitle,
                     CSS.decl("margin", "0"),
                     CSS.decl("font-size", ".9rem"),
