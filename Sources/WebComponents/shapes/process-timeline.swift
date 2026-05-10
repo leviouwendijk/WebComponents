@@ -176,7 +176,7 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                             HTML.div(
                                 [
                                     "class": ClassName.rail,
-                                    "aria-hidden": "true"
+                                    "aria-hidden": "true",
                                 ]
                             ) {
                                 HTML.span(HTMLAttribute.class(ClassName.index)) {
@@ -210,24 +210,42 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                                         for section in step.sections {
                                             HTML.div(HTMLAttribute.class(ClassName.section)) {
                                                 if let label = section.label, !label.isEmpty {
-                                                    HTML.div(HTMLAttribute.class(ClassName.sectionLabel)) {
+                                                    HTML.div(
+                                                        HTMLAttribute.class(ClassName.sectionLabel)
+                                                    ) {
                                                         HTML.text(label)
                                                     }
                                                 }
 
                                                 HTML.div(HTMLAttribute.class(ClassName.items)) {
                                                     for item in section.items {
-                                                        HTML.div(HTMLAttribute.class(ClassName.item)) {
-                                                            HTML.span(HTMLAttribute.class(ClassName.itemMark)) {}
+                                                        HTML.div(
+                                                            HTMLAttribute.class(ClassName.item)
+                                                        ) {
+                                                            HTML.span(
+                                                                HTMLAttribute.class(
+                                                                    ClassName.itemMark)
+                                                            ) {}
 
-                                                            HTML.div(HTMLAttribute.class(ClassName.itemBody)) {
-                                                                if let title = item.title, !title.isEmpty {
-                                                                    HTML.strong(HTMLAttribute.class(ClassName.itemTitle)) {
+                                                            HTML.div(
+                                                                HTMLAttribute.class(
+                                                                    ClassName.itemBody)
+                                                            ) {
+                                                                if let title = item.title,
+                                                                    !title.isEmpty
+                                                                {
+                                                                    HTML.strong(
+                                                                        HTMLAttribute.class(
+                                                                            ClassName.itemTitle)
+                                                                    ) {
                                                                         HTML.text(title)
                                                                     }
                                                                 }
 
-                                                                HTML.div(HTMLAttribute.class(ClassName.itemText)) {
+                                                                HTML.div(
+                                                                    HTMLAttribute.class(
+                                                                        ClassName.itemText)
+                                                                ) {
                                                                     item.body()
                                                                 }
                                                             }
@@ -242,41 +260,81 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                                 if !step.annotations.isEmpty {
                                     HTML.div(HTMLAttribute.class(ClassName.annotations)) {
                                         for section in step.annotations {
-                                            HTML.div(HTMLAttribute.class(ClassName.annotationSection)) {
-                                                HTML.div(HTMLAttribute.class(ClassName.annotationHeader)) {
-                                                    HTML.div(HTMLAttribute.class(ClassName.annotationLabel)) {
+                                            HTML.div(
+                                                HTMLAttribute.class(ClassName.annotationSection)
+                                            ) {
+                                                HTML.div(
+                                                    HTMLAttribute.class(ClassName.annotationHeader)
+                                                ) {
+                                                    HTML.div(
+                                                        HTMLAttribute.class(
+                                                            ClassName.annotationLabel)
+                                                    ) {
                                                         HTML.text(section.label)
                                                     }
 
                                                     let intro = section.intro()
 
                                                     if !intro.isEmpty {
-                                                        HTML.div(HTMLAttribute.class(ClassName.annotationIntro)) {
+                                                        HTML.div(
+                                                            HTMLAttribute.class(
+                                                                ClassName.annotationIntro)
+                                                        ) {
                                                             intro
                                                         }
                                                     }
                                                 }
 
-                                                HTML.div(HTMLAttribute.class(ClassName.annotationGrid)) {
+                                                HTML.div(
+                                                    HTMLAttribute.class(ClassName.annotationGrid)
+                                                ) {
                                                     for annotation in section.annotations {
-                                                        HTML.div(HTMLAttribute.class(ClassName.annotation)) {
-                                                            if let token = annotation.token, !token.isEmpty {
-                                                                HTML.el("code", HTMLAttribute.class(ClassName.annotationToken)) {
+                                                        HTML.div(
+                                                            HTMLAttribute.class(
+                                                                ClassName.annotation)
+                                                        ) {
+                                                            if let token = annotation.token,
+                                                                !token.isEmpty
+                                                            {
+                                                                HTML.el(
+                                                                    "code",
+                                                                    HTMLAttribute.class(
+                                                                        ClassName.annotationToken)
+                                                                ) {
                                                                     HTML.text(token)
                                                                 }
                                                             }
 
-                                                            HTML.div(HTMLAttribute.class(ClassName.annotationBody)) {
-                                                                if let title = annotation.title, !title.isEmpty {
-                                                                    HTML.div(HTMLAttribute.class(ClassName.annotationTitle)) {
+                                                            HTML.div(
+                                                                HTMLAttribute.class(
+                                                                    ClassName.annotationBody)
+                                                            ) {
+                                                                if let title = annotation.title,
+                                                                    !title.isEmpty
+                                                                {
+                                                                    HTML.div(
+                                                                        HTMLAttribute.class(
+                                                                            ClassName
+                                                                                .annotationTitle)
+                                                                    ) {
                                                                         HTML.text(title)
                                                                     }
                                                                 }
 
                                                                 if !annotation.meta.isEmpty {
-                                                                    HTML.div(HTMLAttribute.class(ClassName.annotationMeta)) {
-                                                                        for meta in annotation.meta {
-                                                                            HTML.span(HTMLAttribute.class(ClassName.annotationMetaItem)) {
+                                                                    HTML.div(
+                                                                        HTMLAttribute.class(
+                                                                            ClassName.annotationMeta
+                                                                        )
+                                                                    ) {
+                                                                        for meta in annotation.meta
+                                                                        {
+                                                                            HTML.span(
+                                                                                HTMLAttribute.class(
+                                                                                    ClassName
+                                                                                        .annotationMetaItem
+                                                                                )
+                                                                            ) {
                                                                                 HTML.text(meta)
                                                                             }
                                                                         }
@@ -286,7 +344,11 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                                                                 let body = annotation.body()
 
                                                                 if !body.isEmpty {
-                                                                    HTML.div(HTMLAttribute.class(ClassName.annotationText)) {
+                                                                    HTML.div(
+                                                                        HTMLAttribute.class(
+                                                                            ClassName.annotationText
+                                                                        )
+                                                                    ) {
                                                                         body
                                                                     }
                                                                 }
@@ -326,12 +388,19 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
             rules: [
                 CSS.rule(
                     ".\(ClassName.root)",
-                    CSS.decl("--wc-process-timeline-card-bg", "var(--surface-strong, var(--background-color, #ffffff))"),
-                    CSS.decl("--wc-process-timeline-card-soft-bg", "var(--surface-soft, rgba(15, 23, 42, 0.035))"),
-                    CSS.decl("--wc-process-timeline-border", "var(--border-color, rgba(15, 23, 42, 0.12))"),
-                    CSS.decl("--wc-process-timeline-text", "var(--text-color, #0f172a)"),
-                    CSS.decl("--wc-process-timeline-muted", "var(--ref-meta-text-color, rgba(15, 23, 42, 0.62))"),
-                    CSS.decl("--wc-process-timeline-accent", "var(--link-color, var(--accent, #2563eb))"),
+                    CSS.decl(
+                        "--wc-process-timeline-card-bg",
+                        "var(--surface-strong, var(--background-color, #ffffff))"),
+                    CSS.decl("--wc-process-timeline-card-soft-bg", "var(--gray-50, #f7f7f5)"),
+                    CSS.decl("--wc-process-timeline-border", "rgba(24, 24, 22, 0.14)"),
+                    CSS.decl("--wc-process-timeline-border-strong", "rgba(24, 24, 22, 0.28)"),
+                    CSS.decl(
+                        "--wc-process-timeline-text", "var(--text-color, var(--gray-900, #171717))"),
+                    CSS.decl(
+                        "--wc-process-timeline-muted",
+                        "var(--ref-meta-text-color, rgba(24, 24, 22, 0.62))"),
+                    CSS.decl("--wc-process-timeline-accent", "var(--gray-800, #2b2b28)"),
+                    CSS.decl("--wc-process-timeline-accent-soft", "rgba(24, 24, 22, 0.055)"),
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "1fr"),
                     CSS.decl("gap", "28px"),
@@ -368,7 +437,10 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("width", "2px"),
                     CSS.decl("transform", "translateX(-50%)"),
                     CSS.decl("border-radius", "999px"),
-                    CSS.decl("background", "linear-gradient(to bottom, var(--wc-process-timeline-accent), color-mix(in srgb, var(--wc-process-timeline-accent) 18%, transparent))")
+                    CSS.decl(
+                        "background",
+                        "linear-gradient(to bottom, var(--wc-process-timeline-accent), color-mix(in srgb, var(--wc-process-timeline-accent) 18%, transparent))"
+                    )
                 ),
 
                 CSS.rule(
@@ -396,13 +468,13 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("height", "48px"),
                     CSS.decl("border-radius", "999px"),
                     CSS.decl("background", "var(--wc-process-timeline-card-bg)"),
-                    CSS.decl("border", "2px solid var(--wc-process-timeline-accent)"),
-                    CSS.decl("box-shadow", "0 10px 26px rgba(15, 23, 42, 0.10)"),
+                    CSS.decl("border", "1px solid var(--wc-process-timeline-border-strong)"),
+                    CSS.decl("box-shadow", "0 10px 24px rgba(24, 24, 22, 0.08)"),
                     CSS.decl("color", "var(--wc-process-timeline-accent)"),
-                    CSS.decl("font-size", "0.86rem"),
+                    CSS.decl("font-size", "0.82rem"),
                     CSS.decl("font-weight", "800"),
                     CSS.decl("line-height", "1"),
-                    CSS.decl("letter-spacing", "0.03em"),
+                    CSS.decl("letter-spacing", "0.035em"),
                     CSS.decl("font-variant-numeric", "tabular-nums")
                 ),
 
@@ -415,8 +487,11 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("padding", "18px 20px 20px"),
                     CSS.decl("border", "1px solid var(--wc-process-timeline-border)"),
                     CSS.decl("border-radius", "20px"),
-                    CSS.decl("background", "linear-gradient(180deg, color-mix(in srgb, var(--wc-process-timeline-card-bg) 96%, var(--wc-process-timeline-accent)), var(--wc-process-timeline-card-bg))"),
-                    CSS.decl("box-shadow", "0 16px 38px rgba(15, 23, 42, 0.08)"),
+                    CSS.decl(
+                        "background",
+                        "linear-gradient(180deg, rgba(24, 24, 22, 0.018), transparent 38%), var(--wc-process-timeline-card-bg)"
+                    ),
+                    CSS.decl("box-shadow", "0 16px 38px rgba(24, 24, 22, 0.07)"),
                     CSS.decl("overflow", "hidden")
                 ),
 
@@ -426,7 +501,10 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("position", "absolute"),
                     CSS.decl("inset", "0 auto 0 0"),
                     CSS.decl("width", "4px"),
-                    CSS.decl("background", "linear-gradient(to bottom, var(--wc-process-timeline-accent), transparent)")
+                    CSS.decl(
+                        "background",
+                        "linear-gradient(to bottom, rgba(24, 24, 22, 0.72), rgba(24, 24, 22, 0.08))"
+                    )
                 ),
 
                 CSS.rule(
@@ -510,9 +588,15 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("gap", "10px"),
                     CSS.decl("align-items", "start"),
                     CSS.decl("padding", "10px 12px"),
-                    CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-process-timeline-border) 72%, transparent)"),
+                    CSS.decl(
+                        "border",
+                        "1px solid color-mix(in srgb, var(--wc-process-timeline-border) 72%, transparent)"
+                    ),
                     CSS.decl("border-radius", "14px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--wc-process-timeline-card-soft-bg) 68%, transparent)")
+                    CSS.decl(
+                        "background",
+                        "color-mix(in srgb, var(--wc-process-timeline-card-soft-bg) 68%, transparent)"
+                    )
                 ),
 
                 CSS.rule(
@@ -523,7 +607,10 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("margin-top", "0.48em"),
                     CSS.decl("border-radius", "999px"),
                     CSS.decl("background", "var(--wc-process-timeline-accent)"),
-                    CSS.decl("box-shadow", "0 0 0 4px color-mix(in srgb, var(--wc-process-timeline-accent) 14%, transparent)")
+                    CSS.decl(
+                        "box-shadow",
+                        "0 0 0 4px color-mix(in srgb, var(--wc-process-timeline-accent) 14%, transparent)"
+                    )
                 ),
 
                 CSS.rule(
@@ -566,9 +653,9 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("display", "grid"),
                     CSS.decl("gap", "10px"),
                     CSS.decl("padding", "12px"),
-                    CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-process-timeline-accent) 24%, var(--wc-process-timeline-border))"),
+                    CSS.decl("border", "1px solid var(--wc-process-timeline-border)"),
                     CSS.decl("border-radius", "16px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--wc-process-timeline-accent) 7%, transparent)")
+                    CSS.decl("background", "var(--wc-process-timeline-accent-soft)")
                 ),
 
                 CSS.rule(
@@ -583,7 +670,7 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("padding", "0.26rem 0.6rem"),
                     CSS.decl("border-radius", "999px"),
                     CSS.decl("background", "var(--wc-process-timeline-card-bg)"),
-                    CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-process-timeline-accent) 32%, var(--wc-process-timeline-border))"),
+                    CSS.decl("border", "1px solid var(--wc-process-timeline-border-strong)"),
                     CSS.decl("color", "var(--wc-process-timeline-accent)"),
                     CSS.decl("font-size", "0.76rem"),
                     CSS.decl("font-weight", "800"),
@@ -618,9 +705,14 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("gap", "10px"),
                     CSS.decl("align-items", "start"),
                     CSS.decl("padding", "10px"),
-                    CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-process-timeline-border) 80%, transparent)"),
+                    CSS.decl(
+                        "border",
+                        "1px solid color-mix(in srgb, var(--wc-process-timeline-border) 80%, transparent)"
+                    ),
                     CSS.decl("border-radius", "13px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--wc-process-timeline-card-bg) 82%, transparent)")
+                    CSS.decl(
+                        "background",
+                        "color-mix(in srgb, var(--wc-process-timeline-card-bg) 82%, transparent)")
                 ),
 
                 CSS.rule(
@@ -631,8 +723,8 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("min-width", "3.4em"),
                     CSS.decl("padding", "0.28rem 0.48rem"),
                     CSS.decl("border-radius", "9px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--wc-process-timeline-accent) 10%, var(--wc-process-timeline-card-bg))"),
-                    CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-process-timeline-accent) 26%, var(--wc-process-timeline-border))"),
+                    CSS.decl("background", "rgba(24, 24, 22, 0.055)"),
+                    CSS.decl("border", "1px solid var(--wc-process-timeline-border)"),
                     CSS.decl("color", "var(--wc-process-timeline-text)"),
                     CSS.decl("font-size", "0.84rem"),
                     CSS.decl("font-weight", "800"),
@@ -685,7 +777,7 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.annotationText) p",
                     CSS.decl("margin", "0")
-                )
+                ),
             ],
             media: [
                 CSS.media(
