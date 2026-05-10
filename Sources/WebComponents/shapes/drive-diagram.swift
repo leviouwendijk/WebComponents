@@ -5,54 +5,185 @@ import CSS
 public struct DriveDiagram: ReusableComponent, Sendable {
     private enum ClassName {
         static let root = "wc-drive-diagram"
-        static let visual = "wc-drive-diagram__visual"
+        static let svg = "wc-drive-diagram__svg"
         static let card = "wc-drive-diagram__card"
-        static let demotivator = "wc-drive-diagram__card--demotivator"
-        static let motivator = "wc-drive-diagram__card--motivator"
+        static let cardText = "wc-drive-diagram__card-text"
         static let subject = "wc-drive-diagram__subject"
-        static let vector = "wc-drive-diagram__vector"
-        static let awayA = "wc-drive-diagram__vector--away-a"
-        static let awayB = "wc-drive-diagram__vector--away-b"
-        static let towardA = "wc-drive-diagram__vector--toward-a"
-        static let towardB = "wc-drive-diagram__vector--toward-b"
-        static let arc = "wc-drive-diagram__arc"
+        static let arrow = "wc-drive-diagram__arrow"
+        static let ray = "wc-drive-diagram__ray"
+        static let forceArc = "wc-drive-diagram__force-arc"
+        static let markerHead = "wc-drive-diagram__marker-head"
         static let caption = "wc-drive-diagram__caption"
     }
 
+    public let id: String
     public let caption: String?
 
     public init(
+        id: String = "drive-diagram",
         caption: String? = nil
     ) {
+        self.id = id
         self.caption = caption
     }
 
     public var nodes: ReusableComponentNodes {
+        let markerID = "\(id)-arrowhead"
+
         return .body(
             [
                 HTML.figure(HTMLAttribute.class(ClassName.root)) {
-                    HTML.div(
+                    HTML.el(
+                        "svg",
                         [
-                            "class": ClassName.visual,
+                            "class": ClassName.svg,
+                            "viewBox": "0 0 860 420",
                             "role": "img",
                             "aria-label": "Drijfveren: demotivatoren stoten gedrag af, motivatoren trekken gedrag aan."
                         ]
                     ) {
-                        HTML.div(HTMLAttribute.class([ClassName.card, ClassName.demotivator])) {
+                        HTML.el("defs") {
+                            HTML.el(
+                                "marker",
+                                [
+                                    "id": markerID,
+                                    "viewBox": "0 0 10 10",
+                                    "refX": "9",
+                                    "refY": "5",
+                                    "markerWidth": "8",
+                                    "markerHeight": "8",
+                                    "orient": "auto-start-reverse"
+                                ]
+                            ) {
+                                HTML.el(
+                                    "path",
+                                    [
+                                        "class": ClassName.markerHead,
+                                        "d": "M 0 0 L 10 5 L 0 10 z"
+                                    ]
+                                ) {}
+                            }
+                        }
+
+                        HTML.el(
+                            "rect",
+                            [
+                                "class": ClassName.card,
+                                "x": "88",
+                                "y": "58",
+                                "width": "238",
+                                "height": "70",
+                                "rx": "6"
+                            ]
+                        ) {}
+
+                        HTML.el(
+                            "text",
+                            [
+                                "class": ClassName.cardText,
+                                "x": "207",
+                                "y": "94",
+                                "text-anchor": "middle",
+                                "dominant-baseline": "middle"
+                            ]
+                        ) {
                             HTML.text("Demotivator")
                         }
 
-                        HTML.div(HTMLAttribute.class([ClassName.card, ClassName.motivator])) {
+                        HTML.el(
+                            "rect",
+                            [
+                                "class": ClassName.card,
+                                "x": "534",
+                                "y": "58",
+                                "width": "238",
+                                "height": "70",
+                                "rx": "6"
+                            ]
+                        ) {}
+
+                        HTML.el(
+                            "text",
+                            [
+                                "class": ClassName.cardText,
+                                "x": "653",
+                                "y": "94",
+                                "text-anchor": "middle",
+                                "dominant-baseline": "middle"
+                            ]
+                        ) {
                             HTML.text("Motivator")
                         }
 
-                        HTML.span(HTMLAttribute.class([ClassName.vector, ClassName.awayA])) {}
-                        HTML.span(HTMLAttribute.class([ClassName.vector, ClassName.awayB])) {}
-                        HTML.span(HTMLAttribute.class([ClassName.vector, ClassName.towardA])) {}
-                        HTML.span(HTMLAttribute.class([ClassName.vector, ClassName.towardB])) {}
-                        HTML.span(HTMLAttribute.class(ClassName.arc)) {}
+                        HTML.el(
+                            "path",
+                            [
+                                "class": "\(ClassName.arrow) \(ClassName.forceArc)",
+                                "d": "M 323 118 C 318 174 281 218 226 230"
+                            ]
+                        ) {}
 
-                        HTML.div(HTMLAttribute.class(ClassName.subject)) {}
+                        HTML.el(
+                            "path",
+                            [
+                                "class": ClassName.arrow,
+                                "d": "M 292 194 L 342 232",
+                                "marker-end": "url(#\(markerID))"
+                            ]
+                        ) {}
+
+                        HTML.el(
+                            "path",
+                            [
+                                "class": ClassName.arrow,
+                                "d": "M 338 214 L 386 252",
+                                "marker-end": "url(#\(markerID))"
+                            ]
+                        ) {}
+
+                        HTML.el(
+                            "path",
+                            [
+                                "class": ClassName.arrow,
+                                "d": "M 502 252 L 571 184",
+                                "marker-end": "url(#\(markerID))"
+                            ]
+                        ) {}
+
+                        HTML.el(
+                            "path",
+                            [
+                                "class": ClassName.arrow,
+                                "d": "M 469 228 L 542 156",
+                                "marker-end": "url(#\(markerID))"
+                            ]
+                        ) {}
+
+                        HTML.el(
+                            "path",
+                            [
+                                "class": ClassName.ray,
+                                "d": "M 388 158 L 354 124"
+                            ]
+                        ) {}
+
+                        HTML.el(
+                            "path",
+                            [
+                                "class": ClassName.ray,
+                                "d": "M 572 124 L 606 158"
+                            ]
+                        ) {}
+
+                        HTML.el(
+                            "circle",
+                            [
+                                "class": ClassName.subject,
+                                "cx": "430",
+                                "cy": "270",
+                                "r": "28"
+                            ]
+                        ) {}
                     }
 
                     if let caption, !caption.isEmpty {
@@ -62,7 +193,9 @@ public struct DriveDiagram: ReusableComponent, Sendable {
                     }
                 }
             ],
-            stylesheets: [Self.css()]
+            stylesheets: [
+                Self.css()
+            ]
         )
     }
 
@@ -75,124 +208,67 @@ public struct DriveDiagram: ReusableComponent, Sendable {
             rules: [
                 CSS.rule(
                     ".\(ClassName.root)",
-                    CSS.decl("margin", "22px 0 28px"),
-                    CSS.decl("padding", "0")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.visual)",
-                    CSS.decl("position", "relative"),
-                    CSS.decl("min-height", "360px"),
-                    CSS.decl("border-bottom", "1px solid var(--border-color, rgba(255,255,255,0.75))"),
+                    CSS.decl("margin", "26px 0 30px"),
+                    CSS.decl("padding", "0"),
                     CSS.decl("color", "var(--text-color, #f4f4f4)")
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.svg)",
+                    CSS.decl("display", "block"),
+                    CSS.decl("width", "100%"),
+                    CSS.decl("height", "auto"),
+                    CSS.decl("max-width", "860px"),
+                    CSS.decl("margin", "0 auto"),
+                    CSS.decl("overflow", "visible"),
+                    CSS.decl("border-bottom", "1px solid var(--border-color, rgba(255,255,255,0.65))")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.card)",
-                    CSS.decl("position", "absolute"),
-                    CSS.decl("top", "48px"),
-                    CSS.decl("display", "grid"),
-                    CSS.decl("place-items", "center"),
-                    CSS.decl("width", "min(30%, 292px)"),
-                    CSS.decl("min-height", "76px"),
-                    CSS.decl("padding", "12px 18px"),
-                    CSS.decl("border", "2px solid currentColor"),
-                    CSS.decl("border-radius", "6px"),
-                    CSS.decl("font", "700 clamp(1.45rem, 3vw, 2.15rem)/1.1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"),
-                    CSS.decl("letter-spacing", "0.03em"),
-                    CSS.decl("background", "var(--background-color, #171717)")
+                    CSS.decl("fill", "transparent"),
+                    CSS.decl("stroke", "currentColor"),
+                    CSS.decl("stroke-width", "2"),
+                    CSS.decl("vector-effect", "non-scaling-stroke")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.demotivator)",
-                    CSS.decl("left", "10%")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.motivator)",
-                    CSS.decl("right", "10%")
+                    ".\(ClassName.cardText)",
+                    CSS.decl("fill", "currentColor"),
+                    CSS.decl("font-family", "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"),
+                    CSS.decl("font-size", "30px"),
+                    CSS.decl("font-weight", "700"),
+                    CSS.decl("letter-spacing", "0.04em")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.subject)",
-                    CSS.decl("position", "absolute"),
-                    CSS.decl("left", "50%"),
-                    CSS.decl("bottom", "78px"),
-                    CSS.decl("width", "58px"),
-                    CSS.decl("height", "58px"),
-                    CSS.decl("transform", "translateX(-50%)"),
-                    CSS.decl("border-radius", "999px"),
-                    CSS.decl("background", "currentColor")
+                    CSS.decl("fill", "currentColor")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.vector)",
-                    CSS.decl("position", "absolute"),
-                    CSS.decl("display", "block"),
-                    CSS.decl("height", "2px"),
-                    CSS.decl("background", "currentColor"),
-                    CSS.decl("border-radius", "999px"),
-                    CSS.decl("transform-origin", "50% 50%")
+                    ".\(ClassName.arrow), .\(ClassName.ray), .\(ClassName.forceArc)",
+                    CSS.decl("fill", "none"),
+                    CSS.decl("stroke", "currentColor"),
+                    CSS.decl("stroke-width", "2"),
+                    CSS.decl("stroke-linecap", "round"),
+                    CSS.decl("stroke-linejoin", "round"),
+                    CSS.decl("vector-effect", "non-scaling-stroke")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.vector)::after",
-                    CSS.decl("content", "\"\""),
-                    CSS.decl("position", "absolute"),
-                    CSS.decl("right", "-1px"),
-                    CSS.decl("top", "50%"),
-                    CSS.decl("transform", "translateY(-50%)"),
-                    CSS.decl("width", "0"),
-                    CSS.decl("height", "0"),
-                    CSS.decl("border-top", "7px solid transparent"),
-                    CSS.decl("border-bottom", "7px solid transparent"),
-                    CSS.decl("border-left", "10px solid currentColor")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.awayA)",
-                    CSS.decl("left", "35%"),
-                    CSS.decl("top", "205px"),
-                    CSS.decl("width", "76px"),
-                    CSS.decl("transform", "rotate(32deg)")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.awayB)",
-                    CSS.decl("left", "40%"),
-                    CSS.decl("top", "235px"),
-                    CSS.decl("width", "66px"),
-                    CSS.decl("transform", "rotate(48deg)")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.towardA)",
-                    CSS.decl("right", "36%"),
-                    CSS.decl("top", "215px"),
-                    CSS.decl("width", "96px"),
-                    CSS.decl("transform", "rotate(-42deg)")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.towardB)",
-                    CSS.decl("right", "34%"),
-                    CSS.decl("top", "245px"),
-                    CSS.decl("width", "114px"),
-                    CSS.decl("transform", "rotate(-42deg)")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.arc)",
-                    CSS.decl("position", "absolute"),
-                    CSS.decl("left", "25%"),
-                    CSS.decl("top", "92px"),
-                    CSS.decl("width", "220px"),
-                    CSS.decl("height", "150px"),
-                    CSS.decl("border-right", "2px solid currentColor"),
-                    CSS.decl("border-bottom", "2px solid currentColor"),
-                    CSS.decl("border-radius", "0 0 120px 0"),
-                    CSS.decl("transform", "rotate(10deg)"),
+                    ".\(ClassName.forceArc)",
                     CSS.decl("opacity", "0.9")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.ray)",
+                    CSS.decl("opacity", "0.85")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.markerHead)",
+                    CSS.decl("fill", "currentColor")
                 ),
 
                 CSS.rule(
@@ -206,33 +282,12 @@ public struct DriveDiagram: ReusableComponent, Sendable {
                 CSS.media(
                     "(max-width: 720px)",
                     CSS.rule(
-                        ".\(ClassName.visual)",
-                        CSS.decl("min-height", "310px")
+                        ".\(ClassName.root)",
+                        CSS.decl("margin", "18px 0 22px")
                     ),
                     CSS.rule(
-                        ".\(ClassName.card)",
-                        CSS.decl("top", "32px"),
-                        CSS.decl("width", "38%"),
-                        CSS.decl("min-height", "58px"),
-                        CSS.decl("font-size", "clamp(1rem, 4vw, 1.35rem)")
-                    ),
-                    CSS.rule(
-                        ".\(ClassName.demotivator)",
-                        CSS.decl("left", "2%")
-                    ),
-                    CSS.rule(
-                        ".\(ClassName.motivator)",
-                        CSS.decl("right", "2%")
-                    ),
-                    CSS.rule(
-                        ".\(ClassName.subject)",
-                        CSS.decl("bottom", "58px"),
-                        CSS.decl("width", "48px"),
-                        CSS.decl("height", "48px")
-                    ),
-                    CSS.rule(
-                        ".\(ClassName.arc)",
-                        CSS.decl("display", "none")
+                        ".\(ClassName.cardText)",
+                        CSS.decl("font-size", "28px")
                     )
                 )
             ]
