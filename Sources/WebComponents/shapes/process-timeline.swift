@@ -26,6 +26,22 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
         static let itemBody = "wc-process-timeline__item-body"
         static let itemTitle = "wc-process-timeline__item-title"
         static let itemText = "wc-process-timeline__item-text"
+
+        static let annotations = "wc-process-timeline__annotations"
+        static let annotationSection = "wc-process-timeline__annotation-section"
+        static let annotationHeader = "wc-process-timeline__annotation-header"
+        static let annotationLabel = "wc-process-timeline__annotation-label"
+        static let annotationIntro = "wc-process-timeline__annotation-intro"
+        static let annotationGrid = "wc-process-timeline__annotation-grid"
+        static let annotation = "wc-process-timeline__annotation"
+        static let annotationToken = "wc-process-timeline__annotation-token"
+        static let annotationBody = "wc-process-timeline__annotation-body"
+        static let annotationTitle = "wc-process-timeline__annotation-title"
+        static let annotationMeta = "wc-process-timeline__annotation-meta"
+        static let annotationMetaItem = "wc-process-timeline__annotation-meta-item"
+        static let annotationText = "wc-process-timeline__annotation-text"
+
+        static let caption = "wc-process-timeline__caption"
     }
 
     public struct Item: Sendable {
@@ -65,22 +81,60 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
         }
     }
 
+    public struct Annotation: Sendable {
+        public let token: String?
+        public let title: String?
+        public let meta: [String]
+        public let body: @Sendable () -> HTMLFragment
+
+        public init(
+            token: String? = nil,
+            title: String? = nil,
+            meta: [String] = [],
+            body: @escaping @Sendable () -> HTMLFragment
+        ) {
+            self.token = token
+            self.title = title
+            self.meta = meta
+            self.body = body
+        }
+    }
+
+    public struct AnnotationSection: Sendable {
+        public let label: String
+        public let intro: @Sendable () -> HTMLFragment
+        public let annotations: [Annotation]
+
+        public init(
+            label: String,
+            intro: @escaping @Sendable () -> HTMLFragment = { [] },
+            annotations: [Annotation]
+        ) {
+            self.label = label
+            self.intro = intro
+            self.annotations = annotations
+        }
+    }
+
     public struct Step: Sendable {
         public let eyebrow: String?
         public let title: String
         public let definition: @Sendable () -> HTMLFragment
         public let sections: [Section]
+        public let annotations: [AnnotationSection]
 
         public init(
             eyebrow: String? = nil,
             title: String,
             definition: @escaping @Sendable () -> HTMLFragment = { [] },
-            sections: [Section] = []
+            sections: [Section] = [],
+            annotations: [AnnotationSection] = []
         ) {
             self.eyebrow = eyebrow
             self.title = title
             self.definition = definition
             self.sections = sections
+            self.annotations = annotations
         }
     }
 
@@ -175,6 +229,66 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
 
                                                                 HTML.div(HTMLAttribute.class(ClassName.itemText)) {
                                                                     item.body()
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if !step.annotations.isEmpty {
+                                    HTML.div(HTMLAttribute.class(ClassName.annotations)) {
+                                        for section in step.annotations {
+                                            HTML.div(HTMLAttribute.class(ClassName.annotationSection)) {
+                                                HTML.div(HTMLAttribute.class(ClassName.annotationHeader)) {
+                                                    HTML.div(HTMLAttribute.class(ClassName.annotationLabel)) {
+                                                        HTML.text(section.label)
+                                                    }
+
+                                                    let intro = section.intro()
+
+                                                    if !intro.isEmpty {
+                                                        HTML.div(HTMLAttribute.class(ClassName.annotationIntro)) {
+                                                            intro
+                                                        }
+                                                    }
+                                                }
+
+                                                HTML.div(HTMLAttribute.class(ClassName.annotationGrid)) {
+                                                    for annotation in section.annotations {
+                                                        HTML.div(HTMLAttribute.class(ClassName.annotation)) {
+                                                            if let token = annotation.token, !token.isEmpty {
+                                                                HTML.el("code", HTMLAttribute.class(ClassName.annotationToken)) {
+                                                                    HTML.text(token)
+                                                                }
+                                                            }
+
+                                                            HTML.div(HTMLAttribute.class(ClassName.annotationBody)) {
+                                                                if let title = annotation.title, !title.isEmpty {
+                                                                    HTML.div(HTMLAttribute.class(ClassName.annotationTitle)) {
+                                                                        HTML.text(title)
+                                                                    }
+                                                                }
+
+                                                                if !annotation.meta.isEmpty {
+                                                                    HTML.div(HTMLAttribute.class(ClassName.annotationMeta)) {
+                                                                        for meta in annotation.meta {
+                                                                            HTML.span(HTMLAttribute.class(ClassName.annotationMetaItem)) {
+                                                                                HTML.text(meta)
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                let body = annotation.body()
+
+                                                                if !body.isEmpty {
+                                                                    HTML.div(HTMLAttribute.class(ClassName.annotationText)) {
+                                                                        body
+                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -438,6 +552,139 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.itemText) p",
                     CSS.decl("margin", "0")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotations)",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "12px"),
+                    CSS.decl("padding-top", "2px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotationSection)",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "10px"),
+                    CSS.decl("padding", "12px"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-process-timeline-accent) 24%, var(--wc-process-timeline-border))"),
+                    CSS.decl("border-radius", "16px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-process-timeline-accent) 7%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotationHeader)",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "4px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotationLabel)",
+                    CSS.decl("width", "fit-content"),
+                    CSS.decl("padding", "0.26rem 0.6rem"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "var(--wc-process-timeline-card-bg)"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-process-timeline-accent) 32%, var(--wc-process-timeline-border))"),
+                    CSS.decl("color", "var(--wc-process-timeline-accent)"),
+                    CSS.decl("font-size", "0.76rem"),
+                    CSS.decl("font-weight", "800"),
+                    CSS.decl("line-height", "1"),
+                    CSS.decl("letter-spacing", "0.05em"),
+                    CSS.decl("text-transform", "uppercase")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotationIntro)",
+                    CSS.decl("color", "var(--wc-process-timeline-muted)"),
+                    CSS.decl("font-size", "0.92rem"),
+                    CSS.decl("line-height", "1.45")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotationIntro) p",
+                    CSS.decl("margin", "0")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotationGrid)",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "repeat(auto-fit, minmax(210px, 1fr))"),
+                    CSS.decl("gap", "8px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotation)",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "auto minmax(0, 1fr)"),
+                    CSS.decl("gap", "10px"),
+                    CSS.decl("align-items", "start"),
+                    CSS.decl("padding", "10px"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-process-timeline-border) 80%, transparent)"),
+                    CSS.decl("border-radius", "13px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-process-timeline-card-bg) 82%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotationToken)",
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("justify-content", "center"),
+                    CSS.decl("min-width", "3.4em"),
+                    CSS.decl("padding", "0.28rem 0.48rem"),
+                    CSS.decl("border-radius", "9px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-process-timeline-accent) 10%, var(--wc-process-timeline-card-bg))"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-process-timeline-accent) 26%, var(--wc-process-timeline-border))"),
+                    CSS.decl("color", "var(--wc-process-timeline-text)"),
+                    CSS.decl("font-size", "0.84rem"),
+                    CSS.decl("font-weight", "800"),
+                    CSS.decl("line-height", "1.1"),
+                    CSS.decl("white-space", "nowrap")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotationBody)",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "4px"),
+                    CSS.decl("min-width", "0")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotationTitle)",
+                    CSS.decl("font-size", "0.9rem"),
+                    CSS.decl("font-weight", "760"),
+                    CSS.decl("line-height", "1.25"),
+                    CSS.decl("color", "var(--wc-process-timeline-text)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotationMeta)",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("flex-wrap", "wrap"),
+                    CSS.decl("gap", "4px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotationMetaItem)",
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("padding", "0.18rem 0.42rem"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "var(--wc-process-timeline-card-soft-bg)"),
+                    CSS.decl("color", "var(--wc-process-timeline-muted)"),
+                    CSS.decl("font-size", "0.72rem"),
+                    CSS.decl("font-weight", "650"),
+                    CSS.decl("line-height", "1.1")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotationText)",
+                    CSS.decl("font-size", "0.9rem"),
+                    CSS.decl("line-height", "1.42"),
+                    CSS.decl("color", "var(--wc-process-timeline-muted)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.annotationText) p",
+                    CSS.decl("margin", "0")
                 )
             ],
             media: [
@@ -480,6 +727,14 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.rule(
                         ".\(ClassName.item)",
                         CSS.decl("padding", "9px 10px")
+                    ),
+                    CSS.rule(
+                        ".\(ClassName.annotation)",
+                        CSS.decl("grid-template-columns", "1fr")
+                    ),
+                    CSS.rule(
+                        ".\(ClassName.annotationToken)",
+                        CSS.decl("width", "fit-content")
                     )
                 )
             ]
