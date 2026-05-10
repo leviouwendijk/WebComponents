@@ -390,22 +390,89 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     ".\(ClassName.root)",
                     CSS.decl(
                         "--wc-process-timeline-card-bg",
-                        "var(--surface-strong, var(--background-color, #ffffff))"),
-                    CSS.decl("--wc-process-timeline-card-soft-bg", "var(--gray-50, #f7f7f5)"),
-                    CSS.decl("--wc-process-timeline-border", "rgba(24, 24, 22, 0.14)"),
-                    CSS.decl("--wc-process-timeline-border-strong", "rgba(24, 24, 22, 0.28)"),
+                        "var(--surface-strong, var(--background-color, #ffffff))"
+                    ),
                     CSS.decl(
-                        "--wc-process-timeline-text", "var(--text-color, var(--gray-900, #171717))"),
+                        "--wc-process-timeline-card-soft-bg",
+                        "color-mix(in srgb, var(--background-color, #ffffff) 94%, var(--text-color, #111827) 6%)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-panel-bg",
+                        "color-mix(in srgb, var(--background-color, #ffffff) 90%, var(--text-color, #111827) 10%)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-border",
+                        "color-mix(in srgb, var(--text-color, #111827) 14%, transparent)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-border-strong",
+                        "color-mix(in srgb, var(--text-color, #111827) 24%, transparent)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-text",
+                        "var(--text-color, #111827)"
+                    ),
                     CSS.decl(
                         "--wc-process-timeline-muted",
-                        "var(--ref-meta-text-color, rgba(24, 24, 22, 0.62))"),
-                    CSS.decl("--wc-process-timeline-accent", "var(--gray-800, #2b2b28)"),
-                    CSS.decl("--wc-process-timeline-accent-soft", "rgba(24, 24, 22, 0.055)"),
+                        "color-mix(in srgb, var(--wc-process-timeline-text) 62%, transparent)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-accent",
+                        "color-mix(in srgb, var(--wc-process-timeline-text) 78%, var(--background-color, #ffffff) 22%)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-accent-soft",
+                        "color-mix(in srgb, var(--wc-process-timeline-text) 6%, transparent)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-shadow",
+                        "0 16px 38px color-mix(in srgb, var(--wc-process-timeline-text) 9%, transparent)"
+                    ),
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "1fr"),
                     CSS.decl("gap", "28px"),
                     CSS.decl("margin", "22px 0 30px"),
                     CSS.decl("color", "var(--wc-process-timeline-text)")
+                ),
+
+                CSS.rule(
+                    ".dark-mode .\(ClassName.root)",
+                    CSS.decl(
+                        "--wc-process-timeline-card-bg",
+                        "color-mix(in srgb, var(--background-color, #171717) 94%, var(--text-color, #f4f4f4) 6%)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-card-soft-bg",
+                        "color-mix(in srgb, var(--background-color, #171717) 88%, var(--text-color, #f4f4f4) 12%)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-panel-bg",
+                        "color-mix(in srgb, var(--background-color, #171717) 84%, var(--text-color, #f4f4f4) 16%)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-border",
+                        "color-mix(in srgb, var(--text-color, #f4f4f4) 14%, transparent)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-border-strong",
+                        "color-mix(in srgb, var(--text-color, #f4f4f4) 24%, transparent)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-muted",
+                        "color-mix(in srgb, var(--wc-process-timeline-text) 66%, transparent)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-accent",
+                        "color-mix(in srgb, var(--wc-process-timeline-text) 74%, var(--background-color, #171717) 26%)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-accent-soft",
+                        "color-mix(in srgb, var(--wc-process-timeline-text) 8%, transparent)"
+                    ),
+                    CSS.decl(
+                        "--wc-process-timeline-shadow",
+                        "0 18px 44px rgba(0, 0, 0, 0.34)"
+                    )
                 ),
 
                 CSS.rule(
@@ -439,7 +506,7 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("border-radius", "999px"),
                     CSS.decl(
                         "background",
-                        "linear-gradient(to bottom, var(--wc-process-timeline-accent), color-mix(in srgb, var(--wc-process-timeline-accent) 18%, transparent))"
+                        "linear-gradient(to bottom, var(--wc-process-timeline-border-strong), color-mix(in srgb, var(--wc-process-timeline-border-strong) 22%, transparent))"
                     )
                 ),
 
@@ -454,7 +521,7 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("transform", "translateX(-50%)"),
                     CSS.decl("border-left", "6px solid transparent"),
                     CSS.decl("border-right", "6px solid transparent"),
-                    CSS.decl("border-top", "9px solid var(--wc-process-timeline-accent)")
+                    CSS.decl("border-top", "9px solid var(--wc-process-timeline-border-strong)")
                 ),
 
                 CSS.rule(
@@ -469,7 +536,7 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("border-radius", "999px"),
                     CSS.decl("background", "var(--wc-process-timeline-card-bg)"),
                     CSS.decl("border", "1px solid var(--wc-process-timeline-border-strong)"),
-                    CSS.decl("box-shadow", "0 10px 24px rgba(24, 24, 22, 0.08)"),
+                    CSS.decl("box-shadow", "var(--wc-process-timeline-shadow)"),
                     CSS.decl("color", "var(--wc-process-timeline-accent)"),
                     CSS.decl("font-size", "0.82rem"),
                     CSS.decl("font-weight", "800"),
@@ -489,9 +556,9 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("border-radius", "20px"),
                     CSS.decl(
                         "background",
-                        "linear-gradient(180deg, rgba(24, 24, 22, 0.018), transparent 38%), var(--wc-process-timeline-card-bg)"
+                        "linear-gradient(180deg, var(--wc-process-timeline-accent-soft), transparent 42%), var(--wc-process-timeline-card-bg)"
                     ),
-                    CSS.decl("box-shadow", "0 16px 38px rgba(24, 24, 22, 0.07)"),
+                    CSS.decl("box-shadow", "var(--wc-process-timeline-shadow)"),
                     CSS.decl("overflow", "hidden")
                 ),
 
@@ -500,10 +567,10 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("content", "\"\""),
                     CSS.decl("position", "absolute"),
                     CSS.decl("inset", "0 auto 0 0"),
-                    CSS.decl("width", "4px"),
+                    CSS.decl("width", "3px"),
                     CSS.decl(
                         "background",
-                        "linear-gradient(to bottom, rgba(24, 24, 22, 0.72), rgba(24, 24, 22, 0.08))"
+                        "linear-gradient(to bottom, var(--wc-process-timeline-border-strong), transparent)"
                     )
                 ),
 
@@ -593,10 +660,7 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                         "1px solid color-mix(in srgb, var(--wc-process-timeline-border) 72%, transparent)"
                     ),
                     CSS.decl("border-radius", "14px"),
-                    CSS.decl(
-                        "background",
-                        "color-mix(in srgb, var(--wc-process-timeline-card-soft-bg) 68%, transparent)"
-                    )
+                    CSS.decl("background", "var(--wc-process-timeline-card-soft-bg)")
                 ),
 
                 CSS.rule(
@@ -609,7 +673,7 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("background", "var(--wc-process-timeline-accent)"),
                     CSS.decl(
                         "box-shadow",
-                        "0 0 0 4px color-mix(in srgb, var(--wc-process-timeline-accent) 14%, transparent)"
+                        "0 0 0 4px color-mix(in srgb, var(--wc-process-timeline-accent) 12%, transparent)"
                     )
                 ),
 
@@ -710,9 +774,7 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                         "1px solid color-mix(in srgb, var(--wc-process-timeline-border) 80%, transparent)"
                     ),
                     CSS.decl("border-radius", "13px"),
-                    CSS.decl(
-                        "background",
-                        "color-mix(in srgb, var(--wc-process-timeline-card-bg) 82%, transparent)")
+                    CSS.decl("background", "var(--wc-process-timeline-panel-bg)")
                 ),
 
                 CSS.rule(
@@ -723,7 +785,7 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                     CSS.decl("min-width", "3.4em"),
                     CSS.decl("padding", "0.28rem 0.48rem"),
                     CSS.decl("border-radius", "9px"),
-                    CSS.decl("background", "rgba(24, 24, 22, 0.055)"),
+                    CSS.decl("background", "var(--wc-process-timeline-card-soft-bg)"),
                     CSS.decl("border", "1px solid var(--wc-process-timeline-border)"),
                     CSS.decl("color", "var(--wc-process-timeline-text)"),
                     CSS.decl("font-size", "0.84rem"),
