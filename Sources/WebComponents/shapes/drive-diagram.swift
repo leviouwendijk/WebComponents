@@ -152,11 +152,11 @@ public struct DriveDiagram: ReusableComponent, Sendable {
                         }
 
                         HTML.div(HTMLAttribute.class([ClassName.label, ClassName.avoidLabel])) {
-                            HTML.text("vermijden")
+                            HTML.text("vermijding")
                         }
 
                         HTML.div(HTMLAttribute.class([ClassName.label, ClassName.approachLabel])) {
-                            HTML.text("toenaderen")
+                            HTML.text("toenadering")
                         }
                     }
 
