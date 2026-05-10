@@ -6,7 +6,7 @@ public struct DriveDiagram: ReusableComponent, Sendable {
     private enum ClassName {
         static let root = "wc-drive-diagram"
         static let stage = "wc-drive-diagram__stage"
-        static let fieldLayer = "wc-drive-diagram__field-layer"
+        static let layer = "wc-drive-diagram__layer"
 
         static let node = "wc-drive-diagram__node"
         static let demotivator = "wc-drive-diagram__node--demotivator"
@@ -15,11 +15,16 @@ public struct DriveDiagram: ReusableComponent, Sendable {
         static let nodeSubtitle = "wc-drive-diagram__node-subtitle"
 
         static let dog = "wc-drive-diagram__dog"
-        static let field = "wc-drive-diagram__field"
-        static let repulsionEdge = "wc-drive-diagram__repulsion-edge"
-        static let movement = "wc-drive-diagram__movement"
-        static let repulsion = "wc-drive-diagram__movement--repulsion"
-        static let attraction = "wc-drive-diagram__movement--attraction"
+        static let dogDot = "wc-drive-diagram__dog-dot"
+        static let dogLabel = "wc-drive-diagram__dog-label"
+
+        static let label = "wc-drive-diagram__label"
+        static let avoidLabel = "wc-drive-diagram__label--avoid"
+        static let approachLabel = "wc-drive-diagram__label--approach"
+
+        static let path = "wc-drive-diagram__path"
+        static let repel = "wc-drive-diagram__path--repel"
+        static let attract = "wc-drive-diagram__path--attract"
         static let markerHead = "wc-drive-diagram__marker-head"
 
         static let caption = "wc-drive-diagram__caption"
@@ -42,12 +47,18 @@ public struct DriveDiagram: ReusableComponent, Sendable {
         return .body(
             [
                 HTML.figure(HTMLAttribute.class(ClassName.root)) {
-                    HTML.div(HTMLAttribute.class(ClassName.stage)) {
+                    HTML.div(
+                        [
+                            "class": ClassName.stage,
+                            "role": "img",
+                            "aria-label": "Drijfveren: de hond beweegt weg van afstoters en naar aantrekkers."
+                        ]
+                    ) {
                         HTML.el(
                             "svg",
                             [
-                                "class": ClassName.fieldLayer,
-                                "viewBox": "0 0 1000 460",
+                                "class": ClassName.layer,
+                                "viewBox": "0 0 1000 420",
                                 "aria-hidden": "true"
                             ]
                         ) {
@@ -74,21 +85,12 @@ public struct DriveDiagram: ReusableComponent, Sendable {
                                 }
                             }
 
-                            // Demotivator boundary: one simple curved “repelling edge”.
+                            // Afstoter: movement away from the demotivator.
                             HTML.el(
                                 "path",
                                 [
-                                    "class": "\(ClassName.field) \(ClassName.repulsionEdge)",
-                                    "d": "M 390 104 C 410 198 360 284 270 322"
-                                ]
-                            ) {}
-
-                            // Movement away from the demotivator.
-                            HTML.el(
-                                "path",
-                                [
-                                    "class": "\(ClassName.field) \(ClassName.movement) \(ClassName.repulsion)",
-                                    "d": "M 378 188 C 410 214 438 242 462 278",
+                                    "class": "\(ClassName.path) \(ClassName.repel)",
+                                    "d": "M 310 186 C 366 210 408 242 444 292",
                                     "marker-end": "url(#\(markerID))"
                                 ]
                             ) {}
@@ -96,18 +98,18 @@ public struct DriveDiagram: ReusableComponent, Sendable {
                             HTML.el(
                                 "path",
                                 [
-                                    "class": "\(ClassName.field) \(ClassName.movement) \(ClassName.repulsion)",
-                                    "d": "M 332 284 C 372 316 416 338 462 350",
+                                    "class": "\(ClassName.path) \(ClassName.repel)",
+                                    "d": "M 260 244 C 326 284 382 310 448 326",
                                     "marker-end": "url(#\(markerID))"
                                 ]
                             ) {}
 
-                            // Movement toward the motivator.
+                            // Aantrekker: movement toward the motivator.
                             HTML.el(
                                 "path",
                                 [
-                                    "class": "\(ClassName.field) \(ClassName.movement) \(ClassName.attraction)",
-                                    "d": "M 535 326 L 664 205",
+                                    "class": "\(ClassName.path) \(ClassName.attract)",
+                                    "d": "M 552 292 C 600 244 646 210 704 186",
                                     "marker-end": "url(#\(markerID))"
                                 ]
                             ) {}
@@ -115,20 +117,9 @@ public struct DriveDiagram: ReusableComponent, Sendable {
                             HTML.el(
                                 "path",
                                 [
-                                    "class": "\(ClassName.field) \(ClassName.movement) \(ClassName.attraction)",
-                                    "d": "M 558 352 L 735 205",
+                                    "class": "\(ClassName.path) \(ClassName.attract)",
+                                    "d": "M 552 326 C 624 308 684 276 742 244",
                                     "marker-end": "url(#\(markerID))"
-                                ]
-                            ) {}
-
-                            // Dog / behaving organism.
-                            HTML.el(
-                                "circle",
-                                [
-                                    "class": ClassName.dog,
-                                    "cx": "500",
-                                    "cy": "350",
-                                    "r": "31"
                                 ]
                             ) {}
                         }
@@ -151,6 +142,21 @@ public struct DriveDiagram: ReusableComponent, Sendable {
                             HTML.div(HTMLAttribute.class(ClassName.nodeSubtitle)) {
                                 HTML.text("aantrekker")
                             }
+                        }
+
+                        HTML.div(HTMLAttribute.class(ClassName.dog)) {
+                            HTML.div(HTMLAttribute.class(ClassName.dogDot)) {}
+                            HTML.div(HTMLAttribute.class(ClassName.dogLabel)) {
+                                HTML.text("hond")
+                            }
+                        }
+
+                        HTML.div(HTMLAttribute.class([ClassName.label, ClassName.avoidLabel])) {
+                            HTML.text("afstand maken")
+                        }
+
+                        HTML.div(HTMLAttribute.class([ClassName.label, ClassName.approachLabel])) {
+                            HTML.text("toegang zoeken")
                         }
                     }
 
@@ -187,12 +193,12 @@ public struct DriveDiagram: ReusableComponent, Sendable {
                     CSS.decl("width", "100%"),
                     CSS.decl("max-width", "1000px"),
                     CSS.decl("margin", "0 auto"),
-                    CSS.decl("aspect-ratio", "1000 / 460"),
+                    CSS.decl("aspect-ratio", "1000 / 420"),
                     CSS.decl("border-bottom", "1px solid var(--border-color, rgba(255,255,255,0.65))")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.fieldLayer)",
+                    ".\(ClassName.layer)",
                     CSS.decl("position", "absolute"),
                     CSS.decl("inset", "0"),
                     CSS.decl("display", "block"),
@@ -221,14 +227,14 @@ public struct DriveDiagram: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(ClassName.demotivator)",
-                    CSS.decl("left", "11%"),
-                    CSS.decl("top", "10%")
+                    CSS.decl("left", "7%"),
+                    CSS.decl("top", "12%")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.motivator)",
-                    CSS.decl("right", "11%"),
-                    CSS.decl("top", "10%")
+                    CSS.decl("right", "7%"),
+                    CSS.decl("top", "12%")
                 ),
 
                 CSS.rule(
@@ -249,11 +255,59 @@ public struct DriveDiagram: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(ClassName.dog)",
-                    CSS.decl("fill", "currentColor")
+                    CSS.decl("position", "absolute"),
+                    CSS.decl("z-index", "2"),
+                    CSS.decl("left", "50%"),
+                    CSS.decl("top", "72%"),
+                    CSS.decl("display", "flex"),
+                    CSS.decl("flex-direction", "column"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("gap", "0.4rem"),
+                    CSS.decl("transform", "translate(-50%, -50%)")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.field)",
+                    ".\(ClassName.dogDot)",
+                    CSS.decl("width", "clamp(34px, 6vw, 58px)"),
+                    CSS.decl("height", "clamp(34px, 6vw, 58px)"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "currentColor")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.dogLabel)",
+                    CSS.decl("font-size", "0.8rem"),
+                    CSS.decl("line-height", "1"),
+                    CSS.decl("font-weight", "650"),
+                    CSS.decl("opacity", "0.68")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.label)",
+                    CSS.decl("position", "absolute"),
+                    CSS.decl("z-index", "2"),
+                    CSS.decl("font-size", "clamp(0.78rem, 1.5vw, 0.95rem)"),
+                    CSS.decl("font-weight", "650"),
+                    CSS.decl("opacity", "0.72"),
+                    CSS.decl("white-space", "nowrap")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.avoidLabel)",
+                    CSS.decl("left", "32%"),
+                    CSS.decl("top", "54%"),
+                    CSS.decl("transform", "translateX(-50%)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.approachLabel)",
+                    CSS.decl("right", "29%"),
+                    CSS.decl("top", "54%"),
+                    CSS.decl("transform", "translateX(50%)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.path)",
                     CSS.decl("fill", "none"),
                     CSS.decl("stroke", "currentColor"),
                     CSS.decl("stroke-width", "2"),
@@ -263,12 +317,12 @@ public struct DriveDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.repulsionEdge)",
-                    CSS.decl("opacity", "0.74")
+                    ".\(ClassName.repel)",
+                    CSS.decl("opacity", "0.72")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.movement)",
+                    ".\(ClassName.attract)",
                     CSS.decl("opacity", "0.95")
                 ),
 
@@ -288,22 +342,22 @@ public struct DriveDiagram: ReusableComponent, Sendable {
                 CSS.media(
                     "(max-width: 720px)",
                     CSS.rule(
-                        ".\(ClassName.root)",
-                        CSS.decl("margin", "18px 0 22px")
-                    ),
-                    CSS.rule(
                         ".\(ClassName.node)",
-                        CSS.decl("width", "31%"),
+                        CSS.decl("width", "32%"),
                         CSS.decl("padding", "0.55rem 0.7rem"),
                         CSS.decl("border-width", "1px")
                     ),
                     CSS.rule(
                         ".\(ClassName.demotivator)",
-                        CSS.decl("left", "8%")
+                        CSS.decl("left", "4%")
                     ),
                     CSS.rule(
                         ".\(ClassName.motivator)",
-                        CSS.decl("right", "8%")
+                        CSS.decl("right", "4%")
+                    ),
+                    CSS.rule(
+                        ".\(ClassName.label)",
+                        CSS.decl("display", "none")
                     )
                 )
             ]
