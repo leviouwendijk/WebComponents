@@ -111,6 +111,21 @@ public struct BoxContentTimeline: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.boxCell) .\(FlowBox.selectors.box.rawValue)",
+                    CSS.decl("width", "min(100%, var(--wc-box-content-timeline-box-width, 320px))"),
+                    CSS.decl("min-width", "min(100%, var(--wc-box-content-timeline-box-min-width, 260px))"),
+                    CSS.decl("max-width", "100%"),
+                    CSS.decl("box-sizing", "border-box")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.boxCell) .\(FlowBox.selectors.boxInner.rawValue)",
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("justify-content", "center"),
+                    CSS.decl("text-align", "center")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.contentCell)",
                     CSS.decl("min-width", "0")
                 ),
