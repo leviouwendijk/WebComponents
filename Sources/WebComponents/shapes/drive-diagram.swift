@@ -152,11 +152,11 @@ public struct DriveDiagram: ReusableComponent, Sendable {
                         }
 
                         HTML.div(HTMLAttribute.class([ClassName.label, ClassName.avoidLabel])) {
-                            HTML.text("afstand maken")
+                            HTML.text("vermijden")
                         }
 
                         HTML.div(HTMLAttribute.class([ClassName.label, ClassName.approachLabel])) {
-                            HTML.text("toegang zoeken")
+                            HTML.text("toenaderen")
                         }
                     }
 
@@ -285,25 +285,35 @@ public struct DriveDiagram: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.label)",
                     CSS.decl("position", "absolute"),
-                    CSS.decl("z-index", "2"),
-                    CSS.decl("font-size", "clamp(0.78rem, 1.5vw, 0.95rem)"),
+                    CSS.decl("z-index", "3"),
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("justify-content", "center"),
+                    CSS.decl("padding", "0.28rem 0.55rem"),
+                    CSS.decl("border", "1px solid var(--border-color, rgba(255,255,255,0.22))"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "var(--background-color, #171717)"),
+                    CSS.decl("box-shadow", "0 1px 2px rgba(0,0,0,0.18)"),
+                    CSS.decl("font-size", "clamp(0.72rem, 1.25vw, 0.9rem)"),
+                    CSS.decl("line-height", "1"),
                     CSS.decl("font-weight", "650"),
-                    CSS.decl("opacity", "0.72"),
-                    CSS.decl("white-space", "nowrap")
+                    CSS.decl("opacity", "0.9"),
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("pointer-events", "none")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.avoidLabel)",
-                    CSS.decl("left", "32%"),
-                    CSS.decl("top", "54%"),
+                    CSS.decl("left", "31%"),
+                    CSS.decl("top", "67%"),
                     CSS.decl("transform", "translateX(-50%)")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.approachLabel)",
-                    CSS.decl("right", "29%"),
-                    CSS.decl("top", "54%"),
-                    CSS.decl("transform", "translateX(50%)")
+                    CSS.decl("left", "69%"),
+                    CSS.decl("top", "67%"),
+                    CSS.decl("transform", "translateX(-50%)")
                 ),
 
                 CSS.rule(
@@ -357,8 +367,9 @@ public struct DriveDiagram: ReusableComponent, Sendable {
                     ),
                     CSS.rule(
                         ".\(ClassName.label)",
-                        CSS.decl("display", "none")
-                    )
+                        CSS.decl("font-size", "0.7rem"),
+                        CSS.decl("padding", "0.22rem 0.45rem")
+                    ),
                 )
             ]
         )
