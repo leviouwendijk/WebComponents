@@ -82,8 +82,9 @@ public struct DocsCategoryNav: SelectableComponent {
                     ".docs-category-nav",
                     CSS.decl("position", "sticky"),
                     CSS.decl("top", "60px"),
-                    CSS.decl("z-index", "999"),
+                    CSS.decl("z-index", "998"),
                     CSS.decl("width", "100%"),
+                    CSS.decl("height", "var(--wc-docs-category-nav-height, 52px)"),
                     CSS.decl("box-sizing", "border-box"),
                     CSS.decl(
                         "background",

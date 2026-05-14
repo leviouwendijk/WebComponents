@@ -141,12 +141,14 @@ public struct DocsCategoryPage: ReusableComponent {
 
                 CSS.rule(
                     ".wc-docs-category-page .docs-project-context-nav",
-                    CSS.decl("top", "var(--wc-docs-header-height)")
+                    CSS.decl("top", "var(--wc-docs-header-height)"),
+                    CSS.decl("z-index", "999")
                 ),
 
                 CSS.rule(
                     ".wc-docs-category-page .docs-category-nav",
-                    CSS.decl("top", "var(--wc-docs-category-nav-top)")
+                    CSS.decl("top", "var(--wc-docs-category-nav-top)"),
+                    CSS.decl("z-index", "998")
                 ),
 
                 CSS.rule(
