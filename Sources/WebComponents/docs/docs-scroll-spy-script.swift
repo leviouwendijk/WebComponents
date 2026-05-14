@@ -16,34 +16,87 @@ public struct DocsScrollSpyScript: ReusableComponent {
     (() => {
         if (window.wcDocsScrollSpy?.initialized) return;
 
-        function hashFromHref(href) {
-            if (!href) return null;
-            const idx = href.indexOf('#');
+        function idFromHref(value) {
+            if (!value) return null;
+
+            const raw = String(value);
+            const idx = raw.indexOf('#');
+
             if (idx < 0) return null;
-            const hash = href.slice(idx + 1);
-            return hash ? decodeURIComponent(hash) : null;
+
+            const id = raw.slice(idx + 1);
+
+            if (!id) return null;
+
+            try {
+                return decodeURIComponent(id);
+            } catch {
+                return id;
+            }
+        }
+
+        function collectLinkMap() {
+            const map = new Map();
+
+            document
+                .querySelectorAll('#toc a[href*="#"], #toc a[data-docs-spy-link]')
+                .forEach((link) => {
+                    const candidates = [
+                        link.getAttribute('href'),
+                        link.getAttribute('data-docs-spy-link')
+                    ];
+
+                    for (const candidate of candidates) {
+                        const id = idFromHref(candidate);
+
+                        if (!id) continue;
+
+                        if (!map.has(id)) {
+                            map.set(id, []);
+                        }
+
+                        map.get(id).push(link);
+                    }
+                });
+
+            return map;
+        }
+
+        function collectTargets(linkMap) {
+            return Array
+                .from(linkMap.keys())
+                .map((id) => document.getElementById(id))
+                .filter(Boolean);
         }
 
         function setActive(id) {
             if (!id) return;
 
-            document
-                .querySelectorAll('#toc a[data-docs-spy-link], #toc a[href^="#"]')
-                .forEach((link) => {
-                    const linkID = hashFromHref(link.getAttribute('href'));
+            const linkMap = collectLinkMap();
 
-                    if (linkID === id) {
-                        link.classList.add('selected-item');
-                        link.setAttribute('aria-current', 'location');
-                    } else {
-                        link.classList.remove('selected-item');
-                        link.removeAttribute('aria-current');
-                    }
+            document
+                .querySelectorAll('#toc a[href*="#"], #toc a[data-docs-spy-link]')
+                .forEach((link) => {
+                    link.classList.remove('selected-item');
+                    link.removeAttribute('aria-current');
                 });
+
+            const links = linkMap.get(id) || [];
+
+            links.forEach((link) => {
+                link.classList.add('selected-item');
+                link.setAttribute('aria-current', 'location');
+
+                const parent = link.closest('li');
+                if (parent) {
+                    parent.classList.add('expanded');
+                }
+            });
         }
 
         function scrollToID(id, updateHash) {
             const target = document.getElementById(id);
+
             if (!target) return false;
 
             target.scrollIntoView({
@@ -62,13 +115,16 @@ public struct DocsScrollSpyScript: ReusableComponent {
 
         function bindClicks() {
             document.addEventListener('click', (event) => {
-                const link = event.target.closest('#toc a[href*="#"], a[data-docs-scroll-link]');
+                const link = event.target.closest?.('#toc a[href*="#"], a[data-docs-scroll-link]');
+
                 if (!link) return;
 
-                const id = hashFromHref(link.getAttribute('href'));
+                const id = idFromHref(link.getAttribute('href'));
+
                 if (!id) return;
 
                 const target = document.getElementById(id);
+
                 if (!target) return;
 
                 event.preventDefault();
@@ -77,46 +133,51 @@ public struct DocsScrollSpyScript: ReusableComponent {
         }
 
         function observe() {
-            const content = document.getElementById('content-area');
-            const sections = Array.from(
-                document.querySelectorAll('[data-docs-section][id]')
-            );
+            const linkMap = collectLinkMap();
+            const targets = collectTargets(linkMap);
 
-            if (!sections.length) return;
+            if (!targets.length) return;
+
+            const initialID = idFromHref(window.location.hash);
+
+            if (initialID && linkMap.has(initialID)) {
+                requestAnimationFrame(() => {
+                    scrollToID(initialID, false);
+                });
+            } else {
+                setActive(targets[0].id);
+            }
 
             if (!('IntersectionObserver' in window)) {
-                const current = hashFromHref(window.location.hash) || sections[0].id;
-                setActive(current);
                 return;
             }
+
+            let latestID = null;
 
             const observer = new IntersectionObserver((entries) => {
                 const visible = entries
                     .filter((entry) => entry.isIntersecting)
                     .sort((a, b) => {
-                        return a.boundingClientRect.top - b.boundingClientRect.top;
+                        return Math.abs(a.boundingClientRect.top) - Math.abs(b.boundingClientRect.top);
                     });
 
                 if (!visible.length) return;
 
                 const id = visible[0].target.id;
+
+                if (!id || id === latestID) return;
+
+                latestID = id;
                 setActive(id);
             }, {
-                root: content || null,
-                threshold: [0.01, 0.15, 0.35],
-                rootMargin: '-12% 0px -70% 0px'
+                root: null,
+                threshold: [0.01, 0.12, 0.28, 0.5],
+                rootMargin: '-18% 0px -68% 0px'
             });
 
-            sections.forEach((section) => observer.observe(section));
-
-            const initialID = hashFromHref(window.location.hash);
-            if (initialID) {
-                requestAnimationFrame(() => {
-                    scrollToID(initialID, false);
-                });
-            } else {
-                setActive(sections[0].id);
-            }
+            targets.forEach((target) => {
+                observer.observe(target);
+            });
         }
 
         function init() {
