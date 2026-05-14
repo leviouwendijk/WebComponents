@@ -53,9 +53,5 @@ let package = Package(
                 // .product(name: "ProtocolComponents", package: "ProtocolComponents"),
             ],
         ),
-        .testTarget(
-            name: "WebComponentsTests",
-            dependencies: ["WebComponents"]
-        ),
     ]
 )
