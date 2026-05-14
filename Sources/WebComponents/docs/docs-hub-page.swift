@@ -31,7 +31,13 @@ public struct DocsHubPage: SelectableComponent {
     public var nodes: ReusableComponentNodes {
         .body(
             [
-                HTML.main(["id": "content-area", "class": "docs-hub \(Self.block)"]) {
+                HTML.main(
+                    [
+                        "id": "content-area",
+                        "class": "docs-hub \(Self.block)",
+                        "data-docs-search": ""
+                    ]
+                ) {
                     HTML.section(["class": "docs-hub-hero \(Self.block)__hero"]) {
                         HTML.p(["class": "docs-hub-kicker \(Self.block)__kicker"]) {
                             HTML.text(knowledgeBase.title)
@@ -50,7 +56,8 @@ public struct DocsHubPage: SelectableComponent {
                                 HTML.input([
                                     "type": "search",
                                     "placeholder": searchPlaceholder,
-                                    "aria-label": "Zoeken in de kennisbank"
+                                    "aria-label": "Zoeken in de kennisbank",
+                                    "data-docs-search-input": ""
                                 ])
 
                                 HTML.button(["type": "button"]) {
@@ -70,7 +77,12 @@ public struct DocsHubPage: SelectableComponent {
                     }
                 }
             ],
-            stylesheets: includeStyles ? [Self.stylesheet(), DocsHubCard.stylesheet()] : []
+            stylesheets: includeStyles ? [
+                Self.stylesheet(),
+                DocsHubCard.stylesheet(),
+                DocsFuzzySearchScript.stylesheet()
+            ] : [],
+            scripts: DocsFuzzySearchScript().nodes.scripts
         )
     }
 
@@ -213,7 +225,14 @@ public struct DocsHubCard: SelectableComponent {
     public var nodes: ReusableComponentNodes {
         .body(
             [
-                HTML.a(category.href, ["class": "docs-hub-card \(Self.block)"]) {
+                HTML.a(
+                    category.href,
+                    [
+                        "class": "docs-hub-card \(Self.block)",
+                        "data-docs-search-item": "",
+                        "data-docs-search-text": searchText
+                    ]
+                ) {
                     HTML.span(["class": "docs-hub-card__eyebrow \(Self.block)__eyebrow"]) {
                         HTML.text(category.id)
                     }
@@ -233,6 +252,16 @@ public struct DocsHubCard: SelectableComponent {
             ],
             stylesheets: includeStyles ? [Self.stylesheet()] : []
         )
+    }
+
+    private var searchText: String {
+        let itemText = category.items
+            .map { item in
+                "\(item.id) \(item.title) \(item.summary)"
+            }
+            .joined(separator: " ")
+
+        return "\(category.id) \(category.label) \(category.description) \(itemText)"
     }
 
     public static func stylesheet() -> CSSStyleSheet {

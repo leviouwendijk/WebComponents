@@ -125,18 +125,28 @@ public struct DocsCategoryPage: ReusableComponent {
                 CSS.rule(
                     ".wc-docs-category-page",
                     CSS.decl("--wc-docs-header-height", "60px"),
+                    CSS.decl("--wc-docs-project-context-height", "0px"),
                     CSS.decl("--wc-docs-category-nav-height", "52px"),
                     CSS.decl(
+                        "--wc-docs-category-nav-top",
+                        "calc(var(--wc-docs-header-height) + var(--wc-docs-project-context-height))"
+                    ),
+                    CSS.decl(
                         "--wc-docs-sticky-offset",
-                        "calc(var(--wc-docs-header-height) + var(--wc-docs-category-nav-height))"
+                        "calc(var(--wc-docs-category-nav-top) + var(--wc-docs-category-nav-height))"
                     ),
                     CSS.decl("background", "var(--background-color)"),
                     CSS.decl("color", "var(--text-color)")
                 ),
 
                 CSS.rule(
-                    ".wc-docs-category-page .docs-category-nav",
+                    ".wc-docs-category-page .docs-project-context-nav",
                     CSS.decl("top", "var(--wc-docs-header-height)")
+                ),
+
+                CSS.rule(
+                    ".wc-docs-category-page .docs-category-nav",
+                    CSS.decl("top", "var(--wc-docs-category-nav-top)")
                 ),
 
                 CSS.rule(

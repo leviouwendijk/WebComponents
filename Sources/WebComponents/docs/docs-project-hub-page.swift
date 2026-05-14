@@ -34,7 +34,13 @@ public struct DocsProjectHubPage: SelectableComponent {
     public var nodes: ReusableComponentNodes {
         .body(
             [
-                HTML.main(["id": "content-area", "class": "docs-project-hub \(Self.block)"]) {
+                HTML.main(
+                    [
+                        "id": "content-area",
+                        "class": "docs-project-hub \(Self.block)",
+                        "data-docs-search": ""
+                    ]
+                ) {
                     HTML.section(["class": "docs-project-hub__hero \(Self.block)__hero"]) {
                         HTML.p(["class": "docs-project-hub__eyebrow \(Self.block)__eyebrow"]) {
                             HTML.text(eyebrow)
@@ -53,7 +59,8 @@ public struct DocsProjectHubPage: SelectableComponent {
                                 HTML.input([
                                     "type": "search",
                                     "placeholder": searchPlaceholder,
-                                    "aria-label": "Search docs projects"
+                                    "aria-label": "Search docs projects",
+                                    "data-docs-search-input": ""
                                 ])
                             }
                         }
@@ -69,7 +76,12 @@ public struct DocsProjectHubPage: SelectableComponent {
                     }
                 }
             ],
-            stylesheets: includeStyles ? [Self.stylesheet(), DocsProjectCard.stylesheet()] : []
+            stylesheets: includeStyles ? [
+                Self.stylesheet(),
+                DocsProjectCard.stylesheet(),
+                DocsFuzzySearchScript.stylesheet()
+            ] : [],
+            scripts: DocsFuzzySearchScript().nodes.scripts
         )
     }
 
@@ -186,7 +198,14 @@ public struct DocsProjectCard: SelectableComponent {
     public var nodes: ReusableComponentNodes {
         .body(
             [
-                HTML.a(project.href, ["class": "docs-project-card \(Self.block)"]) {
+                HTML.a(
+                    project.href,
+                    [
+                        "class": "docs-project-card \(Self.block)",
+                        "data-docs-search-item": "",
+                        "data-docs-search-text": "\(project.id) \(project.label) \(project.description)"
+                    ]
+                ) {
                     HTML.span(["class": "\(Self.block)__eyebrow"]) {
                         HTML.text(project.id)
                     }
