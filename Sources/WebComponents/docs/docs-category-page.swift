@@ -126,7 +126,7 @@ public struct DocsCategoryPage: ReusableComponent {
                     ".wc-docs-category-page",
                     CSS.decl("--wc-docs-header-height", "60px"),
                     CSS.decl("--wc-docs-project-context-height", "44px"),
-                    CSS.decl("--wc-docs-category-nav-height", "52px"),
+                    CSS.decl("--wc-docs-category-nav-height", "66px"),
                     CSS.decl(
                         "--wc-docs-category-nav-top",
                         "calc(var(--wc-docs-header-height) + var(--wc-docs-project-context-height))"
