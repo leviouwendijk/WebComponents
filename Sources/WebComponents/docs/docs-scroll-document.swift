@@ -10,23 +10,53 @@ public struct DocsScrollDocument: SelectableComponent {
 
     public let category: DocsCategory
     public let kicker: String
+    public let lexicon: DocsLexicon
+    public let includeReferences: Bool
     public let includeStyles: Bool
     public let includeScript: Bool
 
     public init(
         category: DocsCategory,
-        kicker: String = "Kennisbank",
+        kicker: String? = nil,
+        lexicon: DocsLexicon = .english,
+        includeReferences: Bool = true,
         includeStyles: Bool = true,
         includeScript: Bool = true
     ) {
         self.category = category
-        self.kicker = kicker
+        self.kicker = kicker ?? lexicon.contentKicker
+        self.lexicon = lexicon
+        self.includeReferences = includeReferences
         self.includeStyles = includeStyles
         self.includeScript = includeScript
     }
 
     public var nodes: ReusableComponentNodes {
-        let body: HTMLFragment = [
+        let unresolved = unresolvedBody()
+        let resolved = CitationResolver.resolve(from: unresolved)
+
+        var body = resolved.body
+
+        if includeReferences {
+            body += DocsReferenceSection(
+                references: resolved.references,
+                title: lexicon.referencesTitle,
+                includeStyles: false
+            ).nodes.body
+        }
+
+        return .body(
+            body,
+            stylesheets: includeStyles ? [
+                Self.stylesheet(),
+                DocsReferenceSection.stylesheet()
+            ] : [],
+            scripts: includeScript ? DocsScrollSpyScript().nodes.scripts : []
+        )
+    }
+
+    private func unresolvedBody() -> HTMLFragment {
+        [
             HTML.comment("Docs Scroll Document"),
             HTML.main(
                 [
@@ -58,12 +88,6 @@ public struct DocsScrollDocument: SelectableComponent {
                 }
             }
         ]
-
-        return .body(
-            body,
-            stylesheets: includeStyles ? [Self.stylesheet()] : [],
-            scripts: includeScript ? DocsScrollSpyScript().nodes.scripts : []
-        )
     }
 
     private func sectionNode(
@@ -101,28 +125,22 @@ public struct DocsScrollDocument: SelectableComponent {
         HTML.article(
             [
                 "id": item.id,
-                "class": "docs-scroll-section \(Self.block)__item",
+                "class": "\(Self.block)__item",
                 "data-docs-section": item.id,
                 "data-scroll-section": item.id
             ]
         ) {
-            HTML.div(["class": "docs-scroll-section__number \(Self.block)__item-id"]) {
-                HTML.text(item.id)
-            }
-
-            HTML.div(["class": "docs-scroll-section__body \(Self.block)__item-body"]) {
-                HTML.header(["class": "\(Self.block)__item-header"]) {
-                    HTML.h2 {
-                        HTML.a("#\(item.id)", ["class": "\(Self.block)__heading-link"]) {
-                            HTML.text(item.title)
-                        }
-                    }
-
-                    HTML.p {
-                        HTML.text(item.summary)
-                    }
+            HTML.header(["class": "\(Self.block)__item-header"]) {
+                HTML.h3 {
+                    HTML.text(item.title)
                 }
 
+                HTML.p(["class": "\(Self.block)__item-summary"]) {
+                    HTML.text(item.summary)
+                }
+            }
+
+            HTML.div(["class": "\(Self.block)__item-body"]) {
                 item.body()
             }
         }
@@ -133,128 +151,110 @@ public struct DocsScrollDocument: SelectableComponent {
             rules: [
                 CSS.rule(
                     ".\(block)",
-                    CSS.decl("background", "var(--background-color)"),
-                    CSS.decl("color", "var(--text-color)")
-                ),
-
-                CSS.rule(
-                    ".\(block) #content-text-container",
-                    CSS.decl("width", "min(880px, calc(100% - 48px))"),
+                    CSS.decl("width", "min(780px, 100%)"),
                     CSS.decl("margin", "0 auto"),
+                    CSS.decl("padding", "52px 0 96px"),
                     CSS.decl("box-sizing", "border-box")
                 ),
 
                 CSS.rule(
                     ".\(block)__hero",
-                    CSS.decl("padding", "56px 0 34px"),
-                    CSS.decl("border-bottom", "1px solid var(--border-color)")
+                    CSS.decl("margin", "0 0 48px")
                 ),
 
                 CSS.rule(
                     ".\(block)__kicker",
-                    CSS.decl("margin", "0 0 10px"),
-                    CSS.decl("font-size", ".76rem"),
+                    CSS.decl("margin", "0 0 8px"),
+                    CSS.decl("font-size", ".82rem"),
                     CSS.decl("font-weight", "750"),
                     CSS.decl("letter-spacing", ".12em"),
                     CSS.decl("text-transform", "uppercase"),
-                    CSS.decl("color", "color-mix(in srgb, var(--text-color) 48%, transparent)")
+                    CSS.decl("color", "var(--muted-text-color)")
                 ),
 
                 CSS.rule(
                     ".\(block)__hero h1",
                     CSS.decl("margin", "0"),
-                    CSS.decl("font-size", "clamp(2.2rem, 5vw, 4.2rem)"),
-                    CSS.decl("line-height", "1.02"),
-                    CSS.decl("letter-spacing", "-.04em"),
-                    CSS.decl("color", "var(--text-color)")
+                    CSS.decl("font-size", "clamp(2.2rem, 5vw, 4.4rem)"),
+                    CSS.decl("line-height", ".95"),
+                    CSS.decl("letter-spacing", "-.055em")
                 ),
 
                 CSS.rule(
                     ".\(block)__lead",
-                    CSS.decl("max-width", "760px"),
+                    CSS.decl("max-width", "680px"),
                     CSS.decl("margin", "18px 0 0"),
-                    CSS.decl("font-size", "1.05rem"),
-                    CSS.decl("line-height", "1.65"),
-                    CSS.decl("color", "color-mix(in srgb, var(--text-color) 66%, transparent)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__body",
-                    CSS.decl("padding", "0 0 88px")
+                    CSS.decl("font-size", "1.08rem"),
+                    CSS.decl("line-height", "1.56"),
+                    CSS.decl("color", "var(--muted-text-color)")
                 ),
 
                 CSS.rule(
                     ".\(block)__section",
-                    CSS.decl("scroll-margin-top", "calc(var(--wc-docs-sticky-offset, 112px) + 24px)"),
-                    CSS.decl("padding", "42px 0 8px"),
-                    CSS.decl("border-bottom", "1px solid var(--border-color)")
+                    CSS.decl("margin", "0 0 56px"),
+                    CSS.decl("scroll-margin-top", "calc(var(--wc-docs-sticky-offset, 112px) + 24px)")
                 ),
 
                 CSS.rule(
                     ".\(block)__section-header",
-                    CSS.decl("margin", "0 0 26px")
+                    CSS.decl("margin", "0 0 22px"),
+                    CSS.decl("padding-bottom", "16px"),
+                    CSS.decl("border-bottom", "1px solid var(--border-color)")
                 ),
 
                 CSS.rule(
                     ".\(block)__section-header h2",
                     CSS.decl("margin", "0"),
                     CSS.decl("font-size", "1.55rem"),
-                    CSS.decl("line-height", "1.16"),
-                    CSS.decl("color", "var(--text-color)")
+                    CSS.decl("line-height", "1.08"),
+                    CSS.decl("letter-spacing", "-.025em")
                 ),
 
                 CSS.rule(
                     ".\(block)__section-header p",
-                    CSS.decl("max-width", "720px"),
                     CSS.decl("margin", "10px 0 0"),
-                    CSS.decl("color", "color-mix(in srgb, var(--text-color) 62%, transparent)")
+                    CSS.decl("line-height", "1.52"),
+                    CSS.decl("color", "var(--muted-text-color)")
                 ),
 
                 CSS.rule(
                     ".\(block)__item",
-                    CSS.decl("scroll-margin-top", "calc(var(--wc-docs-sticky-offset, 112px) + 24px)")
+                    CSS.decl("margin", "0 0 34px")
                 ),
 
                 CSS.rule(
-                    ".\(block)__item-header h2",
-                    CSS.decl("margin", "0 0 7px"),
-                    CSS.decl("font-size", "1.25rem"),
-                    CSS.decl("line-height", "1.2")
+                    ".\(block)__item-header",
+                    CSS.decl("margin", "0 0 14px")
                 ),
 
                 CSS.rule(
-                    ".\(block)__item-header p",
-                    CSS.decl("margin", "0 0 14px"),
-                    CSS.decl("color", "color-mix(in srgb, var(--text-color) 62%, transparent)")
+                    ".\(block)__item h3",
+                    CSS.decl("margin", "0"),
+                    CSS.decl("font-size", "1.22rem"),
+                    CSS.decl("line-height", "1.18"),
+                    CSS.decl("letter-spacing", "-.015em")
                 ),
 
                 CSS.rule(
-                    ".\(block)__heading-link",
-                    CSS.decl("color", "var(--text-color)"),
-                    CSS.decl("text-decoration", "none")
+                    ".\(block)__item-summary",
+                    CSS.decl("margin", "8px 0 0"),
+                    CSS.decl("line-height", "1.5"),
+                    CSS.decl("color", "var(--muted-text-color)")
                 ),
 
                 CSS.rule(
-                    ".\(block)__heading-link:hover",
-                    CSS.decl("color", "var(--link-color)"),
-                    CSS.decl("text-decoration", "underline")
-                )
-            ],
-            media: [
-                CSS.media(
-                    "(max-width: 720px)",
-                    CSS.rule(
-                        ".\(block) #content-text-container",
-                        CSS.decl("width", "calc(100% - 32px)")
-                    ),
-                    CSS.rule(
-                        ".\(block)__hero",
-                        CSS.decl("padding", "38px 0 26px")
-                    ),
-                    CSS.rule(
-                        ".\(block)__section",
-                        CSS.decl("padding", "34px 0 6px")
-                    )
+                    ".\(block)__item-body",
+                    CSS.decl("margin-top", "14px")
+                ),
+
+                CSS.rule(
+                    ".\(block)__item-body p",
+                    CSS.decl("line-height", "1.68")
+                ),
+
+                CSS.rule(
+                    ".\(block)__item-body pre",
+                    CSS.decl("overflow-x", "auto")
                 )
             ]
         )

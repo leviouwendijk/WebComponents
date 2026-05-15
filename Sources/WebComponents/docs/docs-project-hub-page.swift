@@ -13,21 +13,24 @@ public struct DocsProjectHubPage: SelectableComponent {
     public let projects: [DocsProject]
     public let eyebrow: String
     public let searchPlaceholder: String?
+    public let lexicon: DocsLexicon
     public let includeStyles: Bool
 
     public init(
         title: String,
         lead: String,
         projects: [DocsProject],
-        eyebrow: String = "Docs",
-        searchPlaceholder: String? = "Search projects...",
+        eyebrow: String? = nil,
+        searchPlaceholder: String? = nil,
+        lexicon: DocsLexicon = .english,
         includeStyles: Bool = true
     ) {
         self.title = title
         self.lead = lead
         self.projects = projects
-        self.eyebrow = eyebrow
-        self.searchPlaceholder = searchPlaceholder
+        self.lexicon = lexicon
+        self.eyebrow = eyebrow ?? lexicon.docs
+        self.searchPlaceholder = searchPlaceholder ?? lexicon.searchProjectsPlaceholder
         self.includeStyles = includeStyles
     }
 
@@ -59,7 +62,7 @@ public struct DocsProjectHubPage: SelectableComponent {
                                 HTML.input([
                                     "type": "search",
                                     "placeholder": searchPlaceholder,
-                                    "aria-label": "Search docs projects",
+                                    "aria-label": lexicon.searchProjectsAriaLabel,
                                     "data-docs-search-input": ""
                                 ])
                             }

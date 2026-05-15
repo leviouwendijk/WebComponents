@@ -14,18 +14,21 @@ public struct DocsCategoryPage: ReusableComponent {
     public let mode: DocsCategoryContentMode
     public let header: @Sendable () -> HTMLFragment
     public let currentHref: String?
+    public let lexicon: DocsLexicon
 
     public init(
         knowledgeBase: DocsKnowledgeBase,
         category: DocsCategory,
         mode: DocsCategoryContentMode = .scrollDocument,
         currentHref: String? = nil,
+        lexicon: DocsLexicon = .english,
         header: @escaping @Sendable () -> HTMLFragment
     ) {
         self.knowledgeBase = knowledgeBase
         self.category = category
         self.mode = mode
         self.currentHref = currentHref
+        self.lexicon = lexicon
         self.header = header
     }
 
@@ -33,11 +36,13 @@ public struct DocsCategoryPage: ReusableComponent {
         let nav = DocsCategoryNav(
             categories: knowledgeBase.categories,
             activeID: category.id,
+            ariaLabel: lexicon.categoryNavAriaLabel,
             includeStyles: false
         )
 
         let toc = DocsScopedTOC(
             navigation: category.navigation,
+            title: lexicon.tocTitle,
             currentHref: currentHref,
             includeStyles: false
         )
@@ -73,6 +78,7 @@ public struct DocsCategoryPage: ReusableComponent {
         case .scrollDocument:
             return DocsScrollDocument(
                 category: category,
+                lexicon: lexicon,
                 includeStyles: false,
                 includeScript: false
             ).nodes
@@ -98,6 +104,7 @@ public struct DocsCategoryPage: ReusableComponent {
         switch mode {
         case .scrollDocument:
             sheets.append(DocsScrollDocument.stylesheet())
+            sheets.append(DocsReferenceSection.stylesheet())
 
         case .definitionsIndex:
             sheets.append(DocsDefinitionIndex.stylesheet())

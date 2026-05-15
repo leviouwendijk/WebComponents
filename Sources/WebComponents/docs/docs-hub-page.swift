@@ -12,19 +12,22 @@ public struct DocsHubPage: SelectableComponent {
     public let title: String
     public let lead: String
     public let searchPlaceholder: String?
+    public let lexicon: DocsLexicon
     public let includeStyles: Bool
 
     public init(
         knowledgeBase: DocsKnowledgeBase,
         title: String,
         lead: String,
-        searchPlaceholder: String? = "Zoek in de kennisbank...",
+        searchPlaceholder: String? = nil,
+        lexicon: DocsLexicon = .english,
         includeStyles: Bool = true
     ) {
         self.knowledgeBase = knowledgeBase
         self.title = title
         self.lead = lead
-        self.searchPlaceholder = searchPlaceholder
+        self.searchPlaceholder = searchPlaceholder ?? lexicon.searchKnowledgeBasePlaceholder
+        self.lexicon = lexicon
         self.includeStyles = includeStyles
     }
 
@@ -56,12 +59,12 @@ public struct DocsHubPage: SelectableComponent {
                                 HTML.input([
                                     "type": "search",
                                     "placeholder": searchPlaceholder,
-                                    "aria-label": "Zoeken in de kennisbank",
+                                    "aria-label": lexicon.searchKnowledgeBaseAriaLabel,
                                     "data-docs-search-input": ""
                                 ])
 
                                 HTML.button(["type": "button"]) {
-                                    HTML.text("Zoeken")
+                                    HTML.text(lexicon.searchButton)
                                 }
                             }
                         }

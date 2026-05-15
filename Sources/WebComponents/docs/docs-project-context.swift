@@ -10,15 +10,18 @@ public struct DocsProjectContextNav: SelectableComponent {
 
     public let site: DocsSite
     public let context: DocsNavigationContext
+    public let lexicon: DocsLexicon
     public let includeStyles: Bool
 
     public init(
         site: DocsSite,
         context: DocsNavigationContext,
+        lexicon: DocsLexicon = .english,
         includeStyles: Bool = true
     ) {
         self.site = site
         self.context = context
+        self.lexicon = lexicon
         self.includeStyles = includeStyles
     }
 
@@ -28,7 +31,7 @@ public struct DocsProjectContextNav: SelectableComponent {
                 HTML.nav(
                     [
                         "class": "docs-project-context-nav \(Self.block)",
-                        "aria-label": "Docs context"
+                        "aria-label": lexicon.docsContextAriaLabel
                     ]
                 ) {
                     HTML.div(["class": "\(Self.block)__inner"]) {
@@ -41,7 +44,7 @@ public struct DocsProjectContextNav: SelectableComponent {
                                 project.href,
                                 ["class": "\(Self.block)__project-home"]
                             ) {
-                                HTML.text("Project home")
+                                HTML.text(lexicon.projectHome)
                             }
                         }
                     }
@@ -60,7 +63,7 @@ public struct DocsProjectContextNav: SelectableComponent {
                 site.homeHref,
                 ["class": "\(Self.block)__crumb"]
             ) {
-                HTML.text("All docs")
+                HTML.text(lexicon.allDocs)
             }
 
             if let project {
@@ -103,7 +106,7 @@ public struct DocsProjectContextNav: SelectableComponent {
             HTML.details(["class": "\(Self.block)__details"]) {
                 HTML.summary(["class": "\(Self.block)__summary"]) {
                     HTML.span(["class": "\(Self.block)__summary-label"]) {
-                        HTML.text(activeProject?.label ?? "Projects")
+                        HTML.text(activeProject?.label ?? lexicon.projects)
                     }
                 }
 

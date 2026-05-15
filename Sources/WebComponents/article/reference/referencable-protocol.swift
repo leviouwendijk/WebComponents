@@ -1,9 +1,23 @@
-public struct ReferenceData {
-    let title: String
-    let url: String
-    let authorLine: String?
-    let dateISO8601: String?
-    let doi: String?
+public struct ReferenceData: Sendable, Codable {
+    public let title: String
+    public let url: String
+    public let authorLine: String?
+    public let dateISO8601: String?
+    public let doi: String?
+
+    public init(
+        title: String,
+        url: String,
+        authorLine: String? = nil,
+        dateISO8601: String? = nil,
+        doi: String? = nil
+    ) {
+        self.title = title
+        self.url = url
+        self.authorLine = authorLine
+        self.dateISO8601 = dateISO8601
+        self.doi = doi
+    }
 }
 
 public protocol Referencable: 
