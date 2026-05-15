@@ -57,7 +57,7 @@ public struct DocsMobileMenuButton: SelectableComponent {
                 CSS.rule(
                     ".\(block)",
                     CSS.decl("position", "relative"),
-                    CSS.decl("display", "inline-grid"),
+                    CSS.decl("display", "none"),
                     CSS.decl("place-items", "center"),
                     CSS.decl("width", "38px"),
                     CSS.decl("height", "34px"),
@@ -67,6 +67,11 @@ public struct DocsMobileMenuButton: SelectableComponent {
                     CSS.decl("color", "var(--text-color)"),
                     CSS.decl("padding", "0"),
                     CSS.decl("cursor", "pointer")
+                ),
+
+                CSS.rule(
+                    ".\(block)[hidden]",
+                    CSS.decl("display", "none")
                 ),
 
                 CSS.rule(
@@ -109,6 +114,15 @@ public struct DocsMobileMenuButton: SelectableComponent {
                 CSS.rule(
                     ".\(block).open .\(block)__line:nth-child(3), .\(block)[aria-expanded=\"true\"] .\(block)__line:nth-child(3)",
                     CSS.decl("transform", "translateY(0) rotate(-45deg)")
+                )
+            ],
+            media: [
+                CSS.media(
+                    "(max-width: 1200px)",
+                    CSS.rule(
+                        ".\(block):not([hidden])",
+                        CSS.decl("display", "inline-grid")
+                    )
                 )
             ]
         )

@@ -109,11 +109,12 @@ public struct DocsMobileTOCMenuScript: ReusableComponent {
             for (const button of buttons()) {
                 const target = targetFor(button);
                 const hasTarget = Boolean(target);
+                const shouldShow = hasTarget && isMobile();
 
-                button.toggleAttribute('hidden', !hasTarget);
-                button.setAttribute('aria-hidden', hasTarget ? 'false' : 'true');
+                button.toggleAttribute('hidden', !shouldShow);
+                button.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
 
-                if (!hasTarget) {
+                if (!shouldShow) {
                     button.classList.remove('open');
                     button.setAttribute('aria-expanded', 'false');
                 }
