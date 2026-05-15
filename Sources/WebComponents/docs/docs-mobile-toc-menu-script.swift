@@ -17,6 +17,7 @@ public struct DocsMobileTOCMenuScript: ReusableComponent {
         if (window.docsMobileTOC?.initialized) return;
 
         const mobileQuery = '(max-width: 1200px)';
+        const storagePrefix = 'docs-mobile-menu:v1:';
 
         function isMobile() {
             return window.matchMedia(mobileQuery).matches;
@@ -64,6 +65,35 @@ public struct DocsMobileTOCMenuScript: ReusableComponent {
             return explicit;
         }
 
+        function stateKey(target) {
+            const id = target?.id || 'drawer';
+            const path = window.location.pathname || '/';
+
+            return `${storagePrefix}${path}#${id}`;
+        }
+
+        function readStoredState(target) {
+            try {
+                const value = localStorage.getItem(stateKey(target));
+
+                if (value === 'open') return true;
+                if (value === 'closed') return false;
+            } catch (_) {}
+
+            return null;
+        }
+
+        function writeStoredState(target, isOpen) {
+            if (!target || !isMobile()) return;
+
+            try {
+                localStorage.setItem(
+                    stateKey(target),
+                    isOpen ? 'open' : 'closed'
+                );
+            } catch (_) {}
+        }
+
         function shouldOpenOnDesktop(target) {
             if (!target) return false;
 
@@ -74,7 +104,23 @@ public struct DocsMobileTOCMenuScript: ReusableComponent {
             return target.id === 'toc';
         }
 
-        function setOpen(target, isOpen) {
+        function defaultMobileOpen(target) {
+            if (!target) return false;
+
+            return target.dataset.docsMobileMenuMobileDefaultOpen === 'true';
+        }
+
+        function preferredMobileOpen(target) {
+            const stored = readStoredState(target);
+
+            if (stored !== null) {
+                return stored;
+            }
+
+            return defaultMobileOpen(target);
+        }
+
+        function setOpen(target, isOpen, options = {}) {
             if (!target) return;
 
             const open = Boolean(isOpen);
@@ -89,6 +135,10 @@ public struct DocsMobileTOCMenuScript: ReusableComponent {
                 button.classList.toggle('open', open && isMobile());
                 button.setAttribute('aria-expanded', open && isMobile() ? 'true' : 'false');
             }
+
+            if (options.persist !== false) {
+                writeStoredState(target, open);
+            }
         }
 
         function closeTarget(target) {
@@ -98,7 +148,7 @@ public struct DocsMobileTOCMenuScript: ReusableComponent {
         function closeAll() {
             for (const target of targets()) {
                 if (!isMobile() && shouldOpenOnDesktop(target)) {
-                    setOpen(target, true);
+                    setOpen(target, true, { persist: false });
                 } else {
                     setOpen(target, false);
                 }
@@ -125,12 +175,16 @@ public struct DocsMobileTOCMenuScript: ReusableComponent {
             syncButtons();
 
             for (const target of targets()) {
-                if (!isMobile() && shouldOpenOnDesktop(target)) {
-                    setOpen(target, true);
-                } else if (!isMobile()) {
-                    setOpen(target, false);
-                } else if (!target.classList.contains('open')) {
-                    setOpen(target, false);
+                if (isMobile()) {
+                    setOpen(
+                        target,
+                        preferredMobileOpen(target),
+                        { persist: false }
+                    );
+                } else if (shouldOpenOnDesktop(target)) {
+                    setOpen(target, true, { persist: false });
+                } else {
+                    setOpen(target, false, { persist: false });
                 }
             }
         }

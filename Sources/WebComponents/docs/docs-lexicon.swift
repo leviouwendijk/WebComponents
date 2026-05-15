@@ -17,6 +17,9 @@ public struct DocsLexicon: Sendable {
     public let searchKnowledgeBaseAriaLabel: String
     public let searchButton: String
 
+    public let lightModeLabel: String
+    public let darkModeLabel: String
+
     public init(
         docs: String,
         allDocs: String,
@@ -31,7 +34,9 @@ public struct DocsLexicon: Sendable {
         searchProjectsAriaLabel: String,
         searchKnowledgeBasePlaceholder: String,
         searchKnowledgeBaseAriaLabel: String,
-        searchButton: String
+        searchButton: String,
+        lightModeLabel: String,
+        darkModeLabel: String
     ) {
         self.docs = docs
         self.allDocs = allDocs
@@ -47,6 +52,8 @@ public struct DocsLexicon: Sendable {
         self.searchKnowledgeBasePlaceholder = searchKnowledgeBasePlaceholder
         self.searchKnowledgeBaseAriaLabel = searchKnowledgeBaseAriaLabel
         self.searchButton = searchButton
+        self.lightModeLabel = lightModeLabel
+        self.darkModeLabel = darkModeLabel
     }
 
     public static let english = DocsLexicon(
@@ -63,7 +70,9 @@ public struct DocsLexicon: Sendable {
         searchProjectsAriaLabel: "Search docs projects",
         searchKnowledgeBasePlaceholder: "Search knowledge base...",
         searchKnowledgeBaseAriaLabel: "Search knowledge base",
-        searchButton: "Search"
+        searchButton: "Search",
+        lightModeLabel: "Light",
+        darkModeLabel: "Dark"
     )
 
     public static let dutch = DocsLexicon(
@@ -80,6 +89,8 @@ public struct DocsLexicon: Sendable {
         searchProjectsAriaLabel: "Zoek in documentatieonderdelen",
         searchKnowledgeBasePlaceholder: "Zoek in de kennisbank...",
         searchKnowledgeBaseAriaLabel: "Zoek in de kennisbank",
-        searchButton: "Zoeken"
+        searchButton: "Zoeken",
+        lightModeLabel: "Licht",
+        darkModeLabel: "Donker"
     )
 }

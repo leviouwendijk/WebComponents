@@ -10,15 +10,18 @@ public struct DocsThemeToggle: SelectableComponent {
     public static let block = "wc-docs-theme-toggle"
 
     public let id: String
+    public let lexicon: DocsLexicon
     public let includeStyles: Bool
     public let includeScript: Bool
 
     public init(
         id: String = "dark-mode-toggle",
+        lexicon: DocsLexicon = .english,
         includeStyles: Bool = true,
         includeScript: Bool = true
     ) {
         self.id = id
+        self.lexicon = lexicon
         self.includeStyles = includeStyles
         self.includeScript = includeScript
     }
@@ -31,10 +34,12 @@ public struct DocsThemeToggle: SelectableComponent {
                         "id": id,
                         "class": Self.block,
                         "type": "button",
-                        "data-docs-theme-toggle": ""
+                        "data-docs-theme-toggle": "",
+                        "data-docs-theme-light-label": lexicon.lightModeLabel,
+                        "data-docs-theme-dark-label": lexicon.darkModeLabel
                     ]
                 ) {
-                    HTML.text("Dark Mode")
+                    HTML.text(lexicon.darkModeLabel)
                 }
             ],
             stylesheets: includeStyles ? [Self.stylesheet()] : [],
@@ -86,18 +91,30 @@ public struct DocsThemeScript: ReusableComponent {
         const storageKey = 'theme';
 
         function buttons() {
-            return Array.from(document.querySelectorAll('#dark-mode-toggle, [data-docs-theme-toggle]'));
+            return Array.from(
+                document.querySelectorAll('#dark-mode-toggle, [data-docs-theme-toggle]')
+            );
+        }
+
+        function labelsFor(button) {
+            return {
+                light: button.dataset.docsThemeLightLabel || 'Light',
+                dark: button.dataset.docsThemeDarkLabel || 'Dark'
+            };
         }
 
         function setButtonLabels(isDark) {
             buttons().forEach((button) => {
-                button.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+                const labels = labelsFor(button);
+
+                button.textContent = isDark ? labels.light : labels.dark;
                 button.setAttribute('aria-pressed', isDark ? 'true' : 'false');
             });
         }
 
         function apply(theme) {
             const isDark = theme === 'dark';
+
             document.documentElement.classList.toggle('dark-mode', isDark);
             localStorage.setItem(storageKey, isDark ? 'dark' : 'light');
             setButtonLabels(isDark);
@@ -113,10 +130,11 @@ public struct DocsThemeScript: ReusableComponent {
 
         function init() {
             const saved = localStorage.getItem(storageKey);
+
             if (saved === 'dark') {
                 apply('dark');
             } else {
-                setButtonLabels(false);
+                apply('light');
             }
 
             document.addEventListener('click', (event) => {
