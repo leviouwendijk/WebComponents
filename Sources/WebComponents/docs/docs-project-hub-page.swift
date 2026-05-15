@@ -203,18 +203,27 @@ public struct DocsProjectCard: SelectableComponent {
     }
 
     public var nodes: ReusableComponentNodes {
-        .body(
+        let eyebrow = project.knowledgeBase.subtitle ?? project.id
+        let searchText = [
+            project.id,
+            project.label,
+            project.description,
+            project.knowledgeBase.title,
+            project.knowledgeBase.subtitle ?? ""
+        ].joined(separator: " ")
+
+        return .body(
             [
                 HTML.a(
                     project.href,
                     [
                         "class": "docs-project-card \(Self.block)",
                         "data-docs-search-item": "",
-                        "data-docs-search-text": "\(project.id) \(project.label) \(project.description)"
+                        "data-docs-search-text": searchText
                     ]
                 ) {
                     HTML.span(["class": "\(Self.block)__eyebrow"]) {
-                        HTML.text(project.id)
+                        HTML.text(eyebrow)
                     }
 
                     HTML.h2 {
