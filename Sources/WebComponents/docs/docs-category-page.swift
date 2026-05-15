@@ -103,6 +103,7 @@ public struct DocsCategoryPage: ReusableComponent {
         case .definitionsIndex:
             return DocsDefinitionIndex(
                 category: category,
+                lexicon: lexicon,
                 includeStyles: false
             ).nodes
         }

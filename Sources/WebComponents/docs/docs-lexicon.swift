@@ -20,6 +20,13 @@ public struct DocsLexicon: Sendable {
     public let lightModeLabel: String
     public let darkModeLabel: String
 
+    public let categorySingularLabel: String
+    public let categoryPluralLabel: String
+    public let entrySingularLabel: String
+    public let entryPluralLabel: String
+    public let definitionSingularLabel: String
+    public let definitionPluralLabel: String
+
     public init(
         docs: String,
         allDocs: String,
@@ -36,7 +43,13 @@ public struct DocsLexicon: Sendable {
         searchKnowledgeBaseAriaLabel: String,
         searchButton: String,
         lightModeLabel: String,
-        darkModeLabel: String
+        darkModeLabel: String,
+        categorySingularLabel: String,
+        categoryPluralLabel: String,
+        entrySingularLabel: String,
+        entryPluralLabel: String,
+        definitionSingularLabel: String,
+        definitionPluralLabel: String
     ) {
         self.docs = docs
         self.allDocs = allDocs
@@ -54,6 +67,40 @@ public struct DocsLexicon: Sendable {
         self.searchButton = searchButton
         self.lightModeLabel = lightModeLabel
         self.darkModeLabel = darkModeLabel
+        self.categorySingularLabel = categorySingularLabel
+        self.categoryPluralLabel = categoryPluralLabel
+        self.entrySingularLabel = entrySingularLabel
+        self.entryPluralLabel = entryPluralLabel
+        self.definitionSingularLabel = definitionSingularLabel
+        self.definitionPluralLabel = definitionPluralLabel
+    }
+
+    public func categoryCountLabel(
+        _ count: Int
+    ) -> String {
+        countLabel(
+            count,
+            singular: categorySingularLabel,
+            plural: categoryPluralLabel
+        )
+    }
+
+    public func entryCountLabel(
+        _ count: Int
+    ) -> String {
+        countLabel(
+            count,
+            singular: entrySingularLabel,
+            plural: entryPluralLabel
+        )
+    }
+
+    private func countLabel(
+        _ count: Int,
+        singular: String,
+        plural: String
+    ) -> String {
+        "\(count) \(count == 1 ? singular : plural)"
     }
 
     public static let english = DocsLexicon(
@@ -72,7 +119,13 @@ public struct DocsLexicon: Sendable {
         searchKnowledgeBaseAriaLabel: "Search knowledge base",
         searchButton: "Search",
         lightModeLabel: "Light",
-        darkModeLabel: "Dark"
+        darkModeLabel: "Dark",
+        categorySingularLabel: "category",
+        categoryPluralLabel: "categories",
+        entrySingularLabel: "entry",
+        entryPluralLabel: "entries",
+        definitionSingularLabel: "Definition",
+        definitionPluralLabel: "Definitions"
     )
 
     public static let dutch = DocsLexicon(
@@ -91,6 +144,12 @@ public struct DocsLexicon: Sendable {
         searchKnowledgeBaseAriaLabel: "Zoek in de kennisbank",
         searchButton: "Zoeken",
         lightModeLabel: "Licht",
-        darkModeLabel: "Donker"
+        darkModeLabel: "Donker",
+        categorySingularLabel: "categorie",
+        categoryPluralLabel: "categorieën",
+        entrySingularLabel: "onderdeel",
+        entryPluralLabel: "onderdelen",
+        definitionSingularLabel: "Definitie",
+        definitionPluralLabel: "Definities"
     )
 }

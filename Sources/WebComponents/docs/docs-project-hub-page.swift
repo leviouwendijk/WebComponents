@@ -73,6 +73,7 @@ public struct DocsProjectHubPage: SelectableComponent {
                         for project in projects {
                             DocsProjectCard(
                                 project: project,
+                                lexicon: lexicon,
                                 includeStyles: false
                             ).nodes.body
                         }
@@ -188,13 +189,16 @@ public struct DocsProjectCard: SelectableComponent {
     public static let block = "wc-docs-project-card"
 
     public let project: DocsProject
+    public let lexicon: DocsLexicon
     public let includeStyles: Bool
 
     public init(
         project: DocsProject,
+        lexicon: DocsLexicon = .english,
         includeStyles: Bool = true
     ) {
         self.project = project
+        self.lexicon = lexicon
         self.includeStyles = includeStyles
     }
 
@@ -222,7 +226,9 @@ public struct DocsProjectCard: SelectableComponent {
                     }
 
                     HTML.span(["class": "\(Self.block)__meta"]) {
-                        HTML.text("\(project.categoryCount) categories · \(project.itemCount) entries")
+                        HTML.text(
+                            "\(lexicon.categoryCountLabel(project.categoryCount)) · \(lexicon.entryCountLabel(project.itemCount))"
+                        )
                     }
                 }
             ],

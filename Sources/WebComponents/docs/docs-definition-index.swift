@@ -10,15 +10,18 @@ public struct DocsDefinitionIndex: SelectableComponent {
 
     public let category: DocsCategory
     public let eyebrow: String
+    public let lexicon: DocsLexicon
     public let includeStyles: Bool
 
     public init(
         category: DocsCategory,
-        eyebrow: String = "Definities",
+        eyebrow: String? = nil,
+        lexicon: DocsLexicon = .english,
         includeStyles: Bool = true
     ) {
         self.category = category
-        self.eyebrow = eyebrow
+        self.eyebrow = eyebrow ?? lexicon.definitionPluralLabel
+        self.lexicon = lexicon
         self.includeStyles = includeStyles
     }
 
@@ -75,6 +78,7 @@ public struct DocsDefinitionIndex: SelectableComponent {
                 for item in section.items {
                     DocsDefinitionCard(
                         item: item,
+                        lexicon: lexicon,
                         includeStyles: false
                     ).nodes.body
                 }
@@ -193,13 +197,16 @@ public struct DocsDefinitionCard: SelectableComponent {
     public static let block = "wc-docs-definition-card"
 
     public let item: DocsItem
+    public let lexicon: DocsLexicon
     public let includeStyles: Bool
 
     public init(
         item: DocsItem,
+        lexicon: DocsLexicon = .english,
         includeStyles: Bool = true
     ) {
         self.item = item
+        self.lexicon = lexicon
         self.includeStyles = includeStyles
     }
 
@@ -215,7 +222,7 @@ public struct DocsDefinitionCard: SelectableComponent {
                     ]
                 ) {
                     HTML.span(["class": "docs-definition-card__kicker \(Self.block)__kicker"]) {
-                        HTML.text("Definitie")
+                        HTML.text(lexicon.definitionSingularLabel)
                     }
 
                     HTML.h3 {

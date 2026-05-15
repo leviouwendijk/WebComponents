@@ -74,6 +74,7 @@ public struct DocsHubPage: SelectableComponent {
                         for category in knowledgeBase.categories {
                             DocsHubCard(
                                 category: category,
+                                lexicon: lexicon,
                                 includeStyles: false
                             ).nodes.body
                         }
@@ -215,13 +216,16 @@ public struct DocsHubCard: SelectableComponent {
     public static let block = "wc-docs-hub-card"
 
     public let category: DocsCategory
+    public let lexicon: DocsLexicon
     public let includeStyles: Bool
 
     public init(
         category: DocsCategory,
+        lexicon: DocsLexicon = .english,
         includeStyles: Bool = true
     ) {
         self.category = category
+        self.lexicon = lexicon
         self.includeStyles = includeStyles
     }
 
@@ -249,7 +253,7 @@ public struct DocsHubCard: SelectableComponent {
                     }
 
                     HTML.span(["class": "docs-hub-card__meta \(Self.block)__meta"]) {
-                        HTML.text("\(category.items.count) onderdelen")
+                        HTML.text(lexicon.entryCountLabel(category.items.count))
                     }
                 }
             ],
