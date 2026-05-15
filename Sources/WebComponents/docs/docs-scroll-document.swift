@@ -32,18 +32,39 @@ public struct DocsScrollDocument: SelectableComponent {
     }
 
     public var nodes: ReusableComponentNodes {
-        let unresolved = unresolvedBody()
+        let unresolved = unresolvedContentContainerChildren()
         let resolved = CitationResolver.resolve(from: unresolved)
 
-        var body = resolved.body
+        var contentChildren = resolved.body
 
         if includeReferences {
-            body += DocsReferenceSection(
+            contentChildren += DocsReferenceSection(
                 references: resolved.references,
                 title: lexicon.referencesTitle,
                 includeStyles: false
             ).nodes.body
         }
+
+        let body: HTMLFragment = [
+            HTML.comment("Docs Scroll Document"),
+            HTMLElement(
+                "main",
+                attrs: [
+                    "id": "content-area",
+                    "class": "docs-scroll-content \(Self.block)",
+                    "data-wc-docs-scroll-document": category.id
+                ],
+                children: [
+                    HTMLElement(
+                        "div",
+                        attrs: [
+                            "id": "content-text-container"
+                        ],
+                        children: contentChildren
+                    )
+                ]
+            )
+        ]
 
         return .body(
             body,
@@ -55,95 +76,155 @@ public struct DocsScrollDocument: SelectableComponent {
         )
     }
 
-    private func unresolvedBody() -> HTMLFragment {
+    private func unresolvedContentContainerChildren() -> HTMLFragment {
         [
-            HTML.comment("Docs Scroll Document"),
-            HTML.main(
-                [
-                    "id": "content-area",
-                    "class": "docs-scroll-content \(Self.block)",
-                    "data-wc-docs-scroll-document": category.id
-                ]
-            ) {
-                HTML.div(["id": "content-text-container"]) {
-                    HTML.header(["class": "docs-scroll-hero \(Self.block)__hero"]) {
-                        HTML.p(["class": "docs-scroll-kicker \(Self.block)__kicker"]) {
-                            HTML.text(kicker)
-                        }
-
-                        HTML.h1 {
-                            HTML.text(category.label)
-                        }
-
-                        HTML.p(["class": "docs-scroll-lead \(Self.block)__lead"]) {
-                            HTML.text(category.description)
-                        }
-                    }
-
-                    HTML.div(["class": "docs-scroll-sections \(Self.block)__body"]) {
-                        for section in category.sections {
-                            sectionNode(section)
-                        }
-                    }
+            heroNode(),
+            HTMLElement(
+                "div",
+                attrs: [
+                    "class": "docs-scroll-sections \(Self.block)__body"
+                ],
+                children: category.sections.map { section in
+                    sectionNode(section)
                 }
-            }
+            )
         ]
+    }
+
+    private func heroNode() -> any HTMLNode {
+        HTMLElement(
+            "header",
+            attrs: [
+                "class": "docs-scroll-hero \(Self.block)__hero"
+            ],
+            children: [
+                HTMLElement(
+                    "p",
+                    attrs: [
+                        "class": "docs-scroll-kicker \(Self.block)__kicker"
+                    ],
+                    children: [
+                        HTMLText(kicker)
+                    ]
+                ),
+                HTMLElement(
+                    "h1",
+                    children: [
+                        HTMLText(category.label)
+                    ]
+                ),
+                HTMLElement(
+                    "p",
+                    attrs: [
+                        "class": "docs-scroll-lead \(Self.block)__lead"
+                    ],
+                    children: [
+                        HTMLText(category.description)
+                    ]
+                )
+            ]
+        )
     }
 
     private func sectionNode(
         _ section: DocsSection
     ) -> any HTMLNode {
-        HTML.section(
-            [
+        var children: [any HTMLNode] = [
+            sectionHeaderNode(section)
+        ]
+
+        children += section.items.map { item in
+            itemNode(item)
+        }
+
+        return HTMLElement(
+            "section",
+            attrs: [
                 "id": section.id,
                 "class": "\(Self.block)__section",
                 "data-docs-section": section.id,
                 "data-scroll-section": section.id
-            ]
-        ) {
-            HTML.header(["class": "\(Self.block)__section-header"]) {
-                HTML.h2 {
-                    HTML.text(section.title)
-                }
+            ],
+            children: children
+        )
+    }
 
-                if let summary = section.summary, !summary.isEmpty {
-                    HTML.p {
-                        HTML.text(summary)
-                    }
-                }
-            }
+    private func sectionHeaderNode(
+        _ section: DocsSection
+    ) -> any HTMLNode {
+        var children: [any HTMLNode] = [
+            HTMLElement(
+                "h2",
+                children: [
+                    HTMLText(section.title)
+                ]
+            )
+        ]
 
-            for item in section.items {
-                itemNode(item)
-            }
+        if let summary = section.summary, !summary.isEmpty {
+            children.append(
+                HTMLElement(
+                    "p",
+                    children: [
+                        HTMLText(summary)
+                    ]
+                )
+            )
         }
+
+        return HTMLElement(
+            "header",
+            attrs: [
+                "class": "\(Self.block)__section-header"
+            ],
+            children: children
+        )
     }
 
     private func itemNode(
         _ item: DocsItem
     ) -> any HTMLNode {
-        HTML.article(
-            [
-                "id": item.id,
-                "class": "\(Self.block)__item",
-                "data-docs-section": item.id,
-                "data-scroll-section": item.id
+        [
+            itemHeaderNode(item),
+            HTMLElement(
+                "div",
+                attrs: [
+                    "class": "\(Self.block)__item-body"
+                ],
+                children: item.body()
+            )
+        ].asArticle(
+            id: item.id,
+            className: "\(Self.block)__item"
+        )
+    }
+
+    private func itemHeaderNode(
+        _ item: DocsItem
+    ) -> any HTMLNode {
+        HTMLElement(
+            "header",
+            attrs: [
+                "class": "\(Self.block)__item-header"
+            ],
+            children: [
+                HTMLElement(
+                    "h3",
+                    children: [
+                        HTMLText(item.title)
+                    ]
+                ),
+                HTMLElement(
+                    "p",
+                    attrs: [
+                        "class": "\(Self.block)__item-summary"
+                    ],
+                    children: [
+                        HTMLText(item.summary)
+                    ]
+                )
             ]
-        ) {
-            HTML.header(["class": "\(Self.block)__item-header"]) {
-                HTML.h3 {
-                    HTML.text(item.title)
-                }
-
-                HTML.p(["class": "\(Self.block)__item-summary"]) {
-                    HTML.text(item.summary)
-                }
-            }
-
-            HTML.div(["class": "\(Self.block)__item-body"]) {
-                item.body()
-            }
-        }
+        )
     }
 
     public static func stylesheet() -> CSSStyleSheet {
@@ -257,6 +338,24 @@ public struct DocsScrollDocument: SelectableComponent {
                     CSS.decl("overflow-x", "auto")
                 )
             ]
+        )
+    }
+}
+
+private extension Array where Element == any HTMLNode {
+    func asArticle(
+        id: String,
+        className: String
+    ) -> any HTMLNode {
+        HTMLElement(
+            "article",
+            attrs: [
+                "id": id,
+                "class": className,
+                "data-docs-section": id,
+                "data-scroll-section": id
+            ],
+            children: self
         )
     }
 }
