@@ -257,7 +257,7 @@ public struct DocsScrollDocument: SelectableComponent {
             rules: [
                 CSS.rule(
                     ".\(block)",
-                    CSS.decl("width", "min(780px, 100%)"),
+                    CSS.decl("width", "min(780px, calc(100% - 48px))"),
                     CSS.decl("margin", "0 auto"),
                     CSS.decl("padding", "52px 0 96px"),
                     CSS.decl("box-sizing", "border-box")
@@ -361,6 +361,26 @@ public struct DocsScrollDocument: SelectableComponent {
                 CSS.rule(
                     ".\(block)__item-body pre",
                     CSS.decl("overflow-x", "auto")
+                )
+            ],
+            media: [
+                CSS.media(
+                    "(max-width: 640px)",
+                    CSS.rule(
+                        ".\(block)",
+                        CSS.decl("width", "100%"),
+                        CSS.decl("padding", "34px 18px 76px")
+                    ),
+
+                    CSS.rule(
+                        ".\(block)__hero",
+                        CSS.decl("margin-bottom", "36px")
+                    ),
+
+                    CSS.rule(
+                        ".\(block)__section",
+                        CSS.decl("margin-bottom", "44px")
+                    )
                 )
             ]
         )

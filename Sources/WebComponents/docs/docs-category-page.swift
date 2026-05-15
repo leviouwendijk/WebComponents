@@ -176,9 +176,23 @@ public struct DocsCategoryPage: ReusableComponent {
                 ),
 
                 CSS.rule(
+                    ".wc-docs-category-page .container",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "280px minmax(0, 1fr)"),
+                    CSS.decl("gap", "0"),
+                    CSS.decl("width", "min(1280px, 100%)"),
+                    CSS.decl("margin", "0 auto")
+                ),
+
+                CSS.rule(
                     ".wc-docs-category-page nav#toc",
                     CSS.decl("top", "var(--wc-docs-sticky-offset)"),
                     CSS.decl("height", "calc(100dvh - var(--wc-docs-sticky-offset))")
+                ),
+
+                CSS.rule(
+                    ".wc-docs-category-page #content-area",
+                    CSS.decl("min-width", "0")
                 ),
 
                 CSS.rule(
@@ -187,6 +201,15 @@ public struct DocsCategoryPage: ReusableComponent {
                 )
             ],
             media: [
+                CSS.media(
+                    "(max-width: 980px)",
+                    CSS.rule(
+                        ".wc-docs-category-page .container",
+                        CSS.decl("display", "block"),
+                        CSS.decl("width", "100%")
+                    )
+                ),
+
                 CSS.media(
                     "(max-width: 720px)",
                     CSS.rule(

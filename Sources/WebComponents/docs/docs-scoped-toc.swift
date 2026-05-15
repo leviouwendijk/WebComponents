@@ -35,7 +35,9 @@ public struct DocsScopedTOC: SelectableComponent {
                 [
                     "id": "toc",
                     "class": "toc open \(Self.block)",
-                    "data-wc-docs-toc": ""
+                    "data-wc-docs-toc": "",
+                    "data-docs-mobile-menu-target": "",
+                    "data-docs-mobile-menu-desktop-open": "true"
                 ]
             ) {
                 HTML.h2 {
@@ -184,18 +186,71 @@ public struct DocsScopedTOC: SelectableComponent {
         CSSStyleSheet(
             rules: [
                 CSS.rule(
+                    ".\(block)",
+                    CSS.decl("position", "sticky"),
+                    CSS.decl("align-self", "start"),
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("padding", "24px 18px"),
+                    CSS.decl("border-right", "1px solid var(--border-color)"),
+                    CSS.decl("background", "var(--background-color)"),
+                    CSS.decl("color", "var(--text-color)"),
+                    CSS.decl("overflow-y", "auto")
+                ),
+
+                CSS.rule(
+                    ".\(block) ul",
+                    CSS.decl("list-style", "none"),
+                    CSS.decl("padding-left", "0")
+                ),
+
+                CSS.rule(
+                    ".\(block) li",
+                    CSS.decl("margin", "6px 0")
+                ),
+
+                CSS.rule(
+                    ".\(block) h2",
+                    CSS.decl("margin-top", "0"),
+                    CSS.decl("font-size", ".8rem"),
+                    CSS.decl("letter-spacing", ".1em"),
+                    CSS.decl("text-transform", "uppercase"),
+                    CSS.decl("color", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block) h3",
+                    CSS.decl("font-size", ".84rem"),
+                    CSS.decl("margin", "18px 0 8px"),
+                    CSS.decl("color", "var(--text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block) a",
+                    CSS.decl("display", "block"),
+                    CSS.decl("border-radius", "8px"),
+                    CSS.decl("padding", "6px 8px"),
+                    CSS.decl("color", "var(--muted-text-color)"),
+                    CSS.decl("text-decoration", "none"),
+                    CSS.decl("font-size", ".88rem"),
+                    CSS.decl("scroll-margin-top", "var(--wc-docs-sticky-offset, 112px)")
+                ),
+
+                CSS.rule(
+                    ".\(block) a:hover",
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 7%, transparent)"),
+                    CSS.decl("color", "var(--text-color)")
+                ),
+
+                CSS.rule(
                     ".\(block) a[aria-current=\"location\"]",
                     CSS.decl("font-weight", "700")
                 ),
 
                 CSS.rule(
                     ".\(block) a.selected-item",
-                    CSS.decl("font-weight", "700")
-                ),
-
-                CSS.rule(
-                    ".\(block) a",
-                    CSS.decl("scroll-margin-top", "var(--wc-docs-sticky-offset, 112px)")
+                    CSS.decl("font-weight", "700"),
+                    CSS.decl("background", "color-mix(in srgb, var(--link-color) 18%, transparent)"),
+                    CSS.decl("color", "var(--text-color)")
                 ),
 
                 CSS.rule(
@@ -214,6 +269,32 @@ public struct DocsScopedTOC: SelectableComponent {
                     ".dark-mode .\(block)",
                     CSS.decl("background-color", "var(--background-color)"),
                     CSS.decl("color", "var(--text-color)")
+                )
+            ],
+            media: [
+                CSS.media(
+                    "(max-width: 1200px)",
+                    CSS.rule(
+                        ".\(block)",
+                        CSS.decl("position", "fixed"),
+                        CSS.decl("left", "0"),
+                        CSS.decl("right", "0"),
+                        CSS.decl("bottom", "0"),
+                        CSS.decl("top", "var(--wc-docs-sticky-offset, 112px)"),
+                        CSS.decl("z-index", "997"),
+                        CSS.decl("height", "auto"),
+                        CSS.decl("width", "100%"),
+                        CSS.decl("border-right", "0"),
+                        CSS.decl("border-top", "1px solid var(--border-color)"),
+                        CSS.decl("transform", "translateX(-100%)"),
+                        CSS.decl("transition", "transform 180ms ease"),
+                        CSS.decl("will-change", "transform")
+                    ),
+
+                    CSS.rule(
+                        ".\(block).open",
+                        CSS.decl("transform", "translateX(0)")
+                    )
                 )
             ]
         )
