@@ -8,16 +8,19 @@ public struct DocsBrandBadge: SelectableComponent, Sendable {
 
     public static let block = "wc-docs-brand-badge"
 
-    public let markURL: String
+    public let markURL: String?
+    public let fallbackText: String
     public let accessibilityLabel: String?
     public let includeStyles: Bool
 
     public init(
-        markURL: String,
+        markURL: String? = nil,
+        fallbackText: String,
         accessibilityLabel: String? = nil,
         includeStyles: Bool = true
     ) {
         self.markURL = markURL
+        self.fallbackText = fallbackText
         self.accessibilityLabel = accessibilityLabel
         self.includeStyles = includeStyles
     }
@@ -30,23 +33,40 @@ public struct DocsBrandBadge: SelectableComponent, Sendable {
                     "role": "img",
                     "aria-label": accessibilityLabel
                 ]
-            } else {
-                return [
-                    "class": Self.block,
-                    "aria-hidden": "true"
-                ]
             }
+
+            return [
+                "class": Self.block,
+                "aria-hidden": "true"
+            ]
         }()
 
         return .body(
             [
                 HTML.span(attrs) {
-                    HTML.span(
-                        [
-                            "class": "\(Self.block)__glyph",
-                            "style": "--wc-docs-brand-mark-url: url('\(markURL)');"
-                        ]
-                    ) {}
+                    HTML.span(["class": "\(Self.block)__fallback"]) {
+                        HTML.text(fallbackText)
+                    }
+
+                    if let markURL {
+                        HTML.span(
+                            [
+                                "class": "\(Self.block)__glyph",
+                                "style": "--wc-docs-brand-mark-url: url('\(markURL)');"
+                            ]
+                        ) {}
+
+                        HTML.img(
+                            src: markURL,
+                            alt: "",
+                            [
+                                "class": "\(Self.block)__probe",
+                                "aria-hidden": "true",
+                                "onload": "this.parentElement.classList.add('wc-docs-brand-badge--image-loaded')",
+                                "onerror": "this.parentElement.classList.remove('wc-docs-brand-badge--image-loaded')"
+                            ]
+                        )
+                    }
                 }
             ],
             stylesheets: includeStyles ? [Self.stylesheet()] : []
@@ -67,19 +87,31 @@ public struct DocsBrandBadge: SelectableComponent, Sendable {
                     CSS.decl("border-radius", "10px"),
                     CSS.decl(
                         "background",
-                        "var(--wc-docs-brand-badge-bg, color-mix(in srgb, var(--text-color) 10%, transparent))"
+                        "var(--wc-docs-brand-badge-bg, color-mix(in srgb, var(--text-color) 9%, transparent))"
                     ),
                     CSS.decl(
                         "box-shadow",
                         "inset 0 0 0 1px color-mix(in srgb, var(--text-color) 8%, transparent)"
                     ),
                     CSS.decl("color", "var(--wc-docs-brand-glyph-color, var(--text-color))"),
-                    CSS.decl("overflow", "hidden")
+                    CSS.decl("overflow", "hidden"),
+                    CSS.decl("position", "relative")
+                ),
+
+                CSS.rule(
+                    ".\(block)__fallback",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("place-items", "center"),
+                    CSS.decl("font-size", ".72rem"),
+                    CSS.decl("font-weight", "850"),
+                    CSS.decl("letter-spacing", "-.06em"),
+                    CSS.decl("line-height", "1"),
+                    CSS.decl("color", "currentColor")
                 ),
 
                 CSS.rule(
                     ".\(block)__glyph",
-                    CSS.decl("display", "block"),
+                    CSS.decl("display", "none"),
                     CSS.decl("width", "22px"),
                     CSS.decl("height", "22px"),
                     CSS.decl("background", "currentColor"),
@@ -96,10 +128,30 @@ public struct DocsBrandBadge: SelectableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(block)--image-loaded .\(block)__fallback",
+                    CSS.decl("display", "none")
+                ),
+
+                CSS.rule(
+                    ".\(block)--image-loaded .\(block)__glyph",
+                    CSS.decl("display", "block")
+                ),
+
+                CSS.rule(
+                    ".\(block)__probe",
+                    CSS.decl("position", "absolute"),
+                    CSS.decl("width", "1px"),
+                    CSS.decl("height", "1px"),
+                    CSS.decl("opacity", "0"),
+                    CSS.decl("pointer-events", "none"),
+                    CSS.decl("user-select", "none")
+                ),
+
+                CSS.rule(
                     ".dark-mode .\(block)",
                     CSS.decl(
                         "--wc-docs-brand-badge-bg",
-                        "color-mix(in srgb, var(--text-color) 14%, transparent)"
+                        "color-mix(in srgb, var(--text-color) 13%, transparent)"
                     )
                 )
             ]
