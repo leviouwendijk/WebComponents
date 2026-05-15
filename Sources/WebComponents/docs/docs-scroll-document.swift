@@ -31,10 +31,35 @@ public struct DocsScrollDocument: SelectableComponent {
         self.includeScript = includeScript
     }
 
-    public var nodes: ReusableComponentNodes {
-        let unresolved = unresolvedContentContainerChildren()
-        let resolved = CitationResolver.resolve(from: unresolved)
+    public var resolvedContent: ArticleItem.ReferenceResolved {
+        CitationResolver.resolve(
+            from: unresolvedContentContainerChildren()
+        )
+    }
 
+    public func navigation(
+        includeReferencesTitle referencesTitle: String? = nil
+    ) -> NavigationStructure {
+        var roots = category.navigation.roots
+
+        if includeReferences,
+           let referencesTitle,
+           !resolvedContent.references.isEmpty {
+            roots.append(
+                NavigationNode(
+                    label: referencesTitle,
+                    path: "#references"
+                )
+            )
+        }
+
+        return NavigationStructure(
+            roots: roots
+        )
+    }
+
+    public var nodes: ReusableComponentNodes {
+        let resolved = resolvedContent
         var contentChildren = resolved.body
 
         if includeReferences {

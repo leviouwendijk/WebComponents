@@ -32,7 +32,9 @@ public struct DocsReferenceSection: SelectableComponent {
                 HTML.section(
                     [
                         "id": "references",
-                        "class": "docs-reference-section \(Self.block)"
+                        "class": "docs-reference-section \(Self.block)",
+                        "data-docs-section": "references",
+                        "data-scroll-section": "references"
                     ]
                 ) {
                     HTML.h2 {
@@ -57,7 +59,8 @@ public struct DocsReferenceSection: SelectableComponent {
                     ".\(block)",
                     CSS.decl("margin-top", "56px"),
                     CSS.decl("padding-top", "28px"),
-                    CSS.decl("border-top", "1px solid var(--border-color)")
+                    CSS.decl("border-top", "1px solid var(--border-color)"),
+                    CSS.decl("scroll-margin-top", "calc(var(--wc-docs-sticky-offset, 112px) + 24px)")
                 ),
 
                 CSS.rule(

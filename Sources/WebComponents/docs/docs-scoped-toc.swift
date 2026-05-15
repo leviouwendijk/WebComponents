@@ -65,19 +65,38 @@ public struct DocsScopedTOC: SelectableComponent {
     private func renderCategory(
         _ node: NavigationNode
     ) -> any HTMLNode {
-        HTML.el(
+        let hasChildren = node.hasChildren
+
+        var attrs: HTMLAttribute = [
+            "class": node.path == nil ? "toc-category" : "toc-category toc-category--linked",
+            "data-toc-category": node.label.lowercased()
+        ]
+
+        if hasChildren && nodeContainsSelected(node) {
+            attrs.merge([
+                "data-expanded": "true"
+            ])
+        }
+
+        return HTML.el(
             "li",
-            [
-                "class": "toc-category",
-                "data-toc-category": node.label.lowercased()
-            ]
+            attrs
         ) {
             HTML.h3 {
-                HTML.text(node.label)
+                if let path = node.path {
+                    link(
+                        label: node.label,
+                        href: path
+                    )
+                } else {
+                    HTML.text(node.label)
+                }
             }
 
-            HTML.el("ul") {
-                renderNodes(node.children)
+            if hasChildren {
+                HTML.el("ul") {
+                    renderNodes(node.children)
+                }
             }
         }
     }
@@ -177,6 +196,18 @@ public struct DocsScopedTOC: SelectableComponent {
                 CSS.rule(
                     ".\(block) a",
                     CSS.decl("scroll-margin-top", "var(--wc-docs-sticky-offset, 112px)")
+                ),
+
+                CSS.rule(
+                    ".\(block) .toc-category > h3 a",
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("color", "inherit"),
+                    CSS.decl("text-decoration", "none")
+                ),
+
+                CSS.rule(
+                    ".\(block) .toc-category > h3 a:hover",
+                    CSS.decl("text-decoration", "none")
                 ),
 
                 CSS.rule(

@@ -32,6 +32,23 @@ public struct DocsCategoryPage: ReusableComponent {
         self.header = header
     }
 
+    private func navigation() -> NavigationStructure {
+        switch mode {
+        case .scrollDocument:
+            return DocsScrollDocument(
+                category: category,
+                lexicon: lexicon,
+                includeStyles: false,
+                includeScript: false
+            ).navigation(
+                includeReferencesTitle: lexicon.referencesTitle
+            )
+
+        case .definitionsIndex:
+            return category.navigation
+        }
+    }
+
     public var nodes: ReusableComponentNodes {
         let nav = DocsCategoryNav(
             categories: knowledgeBase.categories,
@@ -41,7 +58,7 @@ public struct DocsCategoryPage: ReusableComponent {
         )
 
         let toc = DocsScopedTOC(
-            navigation: category.navigation,
+            navigation: navigation(),
             title: lexicon.tocTitle,
             currentHref: currentHref,
             includeStyles: false
