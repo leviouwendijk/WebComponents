@@ -1,21 +1,55 @@
 import HTML
+import Primitives
 
 public struct DocsSite: Sendable {
     public let id: String
     public let title: String
     public let homeHref: String
     public let projects: [DocsProject]
+    public let visibility: Set<BuildEnvironment>
 
     public init(
         id: String,
         title: String,
         homeHref: String = "/",
-        projects: [DocsProject]
+        projects: [DocsProject],
+        visibility: Set<BuildEnvironment> = DocsVisibility.live
     ) {
         self.id = id
         self.title = title
         self.homeHref = homeHref
         self.projects = projects
+        self.visibility = visibility
+    }
+
+    public func isVisible(
+        in environment: BuildEnvironment
+    ) -> Bool {
+        visibility.contains(environment)
+    }
+
+    public func visible(
+        in environment: BuildEnvironment
+    ) -> DocsSite {
+        guard isVisible(in: environment) else {
+            return DocsSite(
+                id: id,
+                title: title,
+                homeHref: homeHref,
+                projects: [],
+                visibility: visibility
+            )
+        }
+
+        return DocsSite(
+            id: id,
+            title: title,
+            homeHref: homeHref,
+            projects: projects.compactMap { project in
+                project.visible(in: environment)
+            },
+            visibility: visibility
+        )
     }
 
     public func project(
@@ -37,19 +71,49 @@ public struct DocsProject: Sendable {
     public let description: String
     public let href: String
     public let knowledgeBase: DocsKnowledgeBase
+    public let visibility: Set<BuildEnvironment>
 
     public init(
         id: String,
         label: String,
         description: String,
         href: String,
+        visibility: Set<BuildEnvironment> = DocsVisibility.live,
         knowledgeBase: DocsKnowledgeBase
     ) {
         self.id = id
         self.label = label
         self.description = description
         self.href = href
+        self.visibility = visibility
         self.knowledgeBase = knowledgeBase
+    }
+
+    public func isVisible(
+        in environment: BuildEnvironment
+    ) -> Bool {
+        visibility.contains(environment)
+    }
+
+    public func visible(
+        in environment: BuildEnvironment
+    ) -> DocsProject? {
+        guard isVisible(in: environment) else {
+            return nil
+        }
+
+        guard let visibleKnowledgeBase = knowledgeBase.visible(in: environment) else {
+            return nil
+        }
+
+        return DocsProject(
+            id: id,
+            label: label,
+            description: description,
+            href: href,
+            visibility: visibility,
+            knowledgeBase: visibleKnowledgeBase
+        )
     }
 
     public var categoryCount: Int {

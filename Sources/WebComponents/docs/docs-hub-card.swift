@@ -23,7 +23,9 @@ public struct DocsHubCard: SelectableComponent {
     }
 
     public var nodes: ReusableComponentNodes {
-        .body(
+        let eyebrow = category.subtitle ?? category.id
+
+        return .body(
             [
                 HTML.a(
                     category.href,
@@ -34,7 +36,7 @@ public struct DocsHubCard: SelectableComponent {
                     ]
                 ) {
                     HTML.span(["class": "docs-hub-card__eyebrow \(Self.block)__eyebrow"]) {
-                        HTML.text(category.id)
+                        HTML.text(eyebrow)
                     }
 
                     HTML.h2 {
@@ -61,7 +63,7 @@ public struct DocsHubCard: SelectableComponent {
             }
             .joined(separator: " ")
 
-        return "\(category.id) \(category.label) \(category.description) \(itemText)"
+        return "\(category.id) \(category.label) \(category.subtitle ?? "") \(category.description) \(itemText)"
     }
 
     public static func stylesheet() -> CSSStyleSheet {
