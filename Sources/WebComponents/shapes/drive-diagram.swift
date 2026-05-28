@@ -168,7 +168,7 @@ public struct DriveDiagram: ReusableComponent, Sendable {
                 }
             ],
             stylesheets: [
-                Self.css()
+                Self.stylesheet()
             ]
         )
     }
@@ -177,7 +177,7 @@ public struct DriveDiagram: ReusableComponent, Sendable {
         nodes.body[0]
     }
 
-    public static func css() -> CSSStyleSheet {
+    public static func stylesheet() -> CSSStyleSheet {
         CSSStyleSheet(
             rules: [
                 CSS.rule(
