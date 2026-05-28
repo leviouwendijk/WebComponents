@@ -2,6 +2,11 @@ import Constructors
 import HTML
 import Primitives
 
+public enum DocsSectionPresentation: Sendable {
+    case chapter
+    case structural
+}
+
 public struct DocsKnowledgeBase: Sendable {
     public let title: String
     public let subtitle: String?
@@ -117,16 +122,29 @@ public struct DocsCategory: Sendable {
 
     public var navigation: NavigationStructure {
         NavigationStructure(
-            roots: sections.map { section in
-                NavigationNode(
-                    label: section.title,
-                    children: section.items.map { item in
+            roots: sections.flatMap { section in
+                switch section.presentation {
+                case .chapter:
+                    return [
+                        NavigationNode(
+                            label: section.title,
+                            children: section.items.map { item in
+                                NavigationNode(
+                                    label: item.title,
+                                    path: item.href
+                                )
+                            }
+                        )
+                    ]
+
+                case .structural:
+                    return section.items.map { item in
                         NavigationNode(
                             label: item.title,
                             path: item.href
                         )
                     }
-                )
+                }
             }
         )
     }
@@ -137,6 +155,7 @@ public struct DocsSection: Sendable {
     public let title: String
     public let summary: String?
     public let items: [DocsItem]
+    public let presentation: DocsSectionPresentation
     public let visibility: Set<BuildEnvironment>
 
     public init(
@@ -144,12 +163,14 @@ public struct DocsSection: Sendable {
         title: String,
         summary: String? = nil,
         items: [DocsItem],
+        presentation: DocsSectionPresentation = .chapter,
         visibility: Set<BuildEnvironment> = DocsVisibility.live
     ) {
         self.id = id
         self.title = title
         self.summary = summary
         self.items = items
+        self.presentation = presentation
         self.visibility = visibility
     }
 
@@ -173,6 +194,7 @@ public struct DocsSection: Sendable {
             items: items.compactMap { item in
                 item.visible(in: environment)
             },
+            presentation: presentation,
             visibility: visibility
         )
     }

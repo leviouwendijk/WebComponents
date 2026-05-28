@@ -154,24 +154,72 @@ public struct DocsScrollDocument: SelectableComponent {
     private func sectionNode(
         _ section: DocsSection
     ) -> any HTMLNode {
-        var children: [any HTMLNode] = [
-            sectionHeaderNode(section)
-        ]
+        let headingLevel = itemHeadingLevel(
+            for: section
+        )
+
+        var children: [any HTMLNode] = []
+
+        if section.presentation == .chapter {
+            children.append(
+                sectionHeaderNode(section)
+            )
+        }
 
         children += section.items.map { item in
-            itemNode(item)
+            itemNode(
+                item,
+                headingLevel: headingLevel
+            )
         }
 
         return HTMLElement(
             "section",
-            attrs: [
-                "id": section.id,
-                "class": "\(Self.block)__section",
-                "data-docs-section": section.id,
-                "data-scroll-section": section.id
-            ],
+            attrs: sectionAttrs(section),
             children: children
         )
+    }
+
+    private func sectionAttrs(
+        _ section: DocsSection
+    ) -> HTMLAttribute {
+        var attrs: HTMLAttribute = [
+            "id": section.id,
+            "class": sectionClass(section),
+            "data-docs-section": section.id
+        ]
+
+        if section.presentation == .chapter {
+            attrs.merge([
+                "data-scroll-section": section.id
+            ])
+        }
+
+        return attrs
+    }
+
+    private func sectionClass(
+        _ section: DocsSection
+    ) -> String {
+        switch section.presentation {
+        case .chapter:
+            return "\(Self.block)__section \(Self.block)__section--chapter"
+
+        case .structural:
+            return "\(Self.block)__section \(Self.block)__section--structural"
+        }
+    }
+
+    private func itemHeadingLevel(
+        for section: DocsSection
+    ) -> Int {
+        switch section.presentation {
+        case .chapter:
+            return 3
+
+        case .structural:
+            return 2
+        }
     }
 
     private func sectionHeaderNode(
@@ -207,10 +255,14 @@ public struct DocsScrollDocument: SelectableComponent {
     }
 
     private func itemNode(
-        _ item: DocsItem
+        _ item: DocsItem,
+        headingLevel: Int
     ) -> any HTMLNode {
         [
-            itemHeaderNode(item),
+            itemHeaderNode(
+                item,
+                headingLevel: headingLevel
+            ),
             HTMLElement(
                 "div",
                 attrs: [
@@ -225,7 +277,8 @@ public struct DocsScrollDocument: SelectableComponent {
     }
 
     private func itemHeaderNode(
-        _ item: DocsItem
+        _ item: DocsItem,
+        headingLevel: Int
     ) -> any HTMLNode {
         HTMLElement(
             "header",
@@ -234,7 +287,7 @@ public struct DocsScrollDocument: SelectableComponent {
             ],
             children: [
                 HTMLElement(
-                    "h3",
+                    "h\(headingLevel)",
                     children: [
                         HTMLText(item.title)
                     ]
@@ -302,8 +355,13 @@ public struct DocsScrollDocument: SelectableComponent {
                 ),
 
                 CSS.rule(
+                    ".\(block)__section--structural",
+                    CSS.decl("margin-bottom", "0")
+                ),
+
+                CSS.rule(
                     ".\(block)__section-header",
-                    CSS.decl("margin", "0 0 22px"),
+                    CSS.decl("margin", "0 0 28px"),
                     CSS.decl("padding-bottom", "16px"),
                     CSS.decl("border-bottom", "1px solid var(--border-color)")
                 ),
@@ -325,7 +383,13 @@ public struct DocsScrollDocument: SelectableComponent {
 
                 CSS.rule(
                     ".\(block)__item",
-                    CSS.decl("margin", "0 0 34px")
+                    CSS.decl("margin", "0 0 42px"),
+                    CSS.decl("scroll-margin-top", "calc(var(--wc-docs-sticky-offset, 112px) + 24px)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__item:last-child",
+                    CSS.decl("margin-bottom", "0")
                 ),
 
                 CSS.rule(
@@ -334,10 +398,16 @@ public struct DocsScrollDocument: SelectableComponent {
                 ),
 
                 CSS.rule(
-                    ".\(block)__item h3",
+                    ".\(block)__item h2, .\(block)__item h3",
                     CSS.decl("margin", "0"),
+                    CSS.decl("font-size", "clamp(1.42rem, 2.2vw, 1.78rem)"),
+                    CSS.decl("line-height", "1.12"),
+                    CSS.decl("letter-spacing", "-.025em")
+                ),
+
+                CSS.rule(
+                    ".\(block)__section--chapter .\(block)__item h3",
                     CSS.decl("font-size", "1.22rem"),
-                    CSS.decl("line-height", "1.18"),
                     CSS.decl("letter-spacing", "-.015em")
                 ),
 
@@ -350,7 +420,7 @@ public struct DocsScrollDocument: SelectableComponent {
 
                 CSS.rule(
                     ".\(block)__item-body",
-                    CSS.decl("margin-top", "14px")
+                    CSS.decl("margin-top", "16px")
                 ),
 
                 CSS.rule(
