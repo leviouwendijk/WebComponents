@@ -1733,17 +1733,20 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     CSS.rule(
                         ".\(ClassName.compactStage)",
                         CSS.decl("padding", "8px"),
-                        CSS.decl("border-radius", "14px")
+                        CSS.decl("border-radius", "14px"),
+                        CSS.decl("overflow-x", "auto"),
+                        CSS.decl("overflow-y", "hidden"),
+                        CSS.decl("scrollbar-width", "thin"),
+                        CSS.decl("-webkit-overflow-scrolling", "touch"),
+                        CSS.decl("overscroll-behavior-x", "contain")
                     ),
 
                     CSS.rule(
-                        ".\(ClassName.compactTitle)",
-                        CSS.decl("font-size", "12px")
-                    ),
-
-                    CSS.rule(
-                        ".\(ClassName.compactSubtitle)",
-                        CSS.decl("font-size", "10px")
+                        ".\(ClassName.compactSVG)",
+                        CSS.decl("width", "760px"),
+                        CSS.decl("min-width", "760px"),
+                        CSS.decl("max-width", "none"),
+                        CSS.decl("height", "auto")
                     ),
 
                     CSS.rule(
@@ -1765,14 +1768,6 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                         CSS.decl("font-size", ".78rem")
                     )
                 ),
-
-                CSS.media(
-                    "(prefers-reduced-motion: reduce)",
-                    CSS.rule(
-                        ".\(ClassName.switchRoot)[data-state=\"\(OperantOutcomeTarget.voordeel.rawValue)\"] .\(ClassName.compactPath)[data-operant-switch-track=\"\(OperantOutcomeTarget.voordeel.rawValue)\"], .\(ClassName.switchRoot)[data-state=\"\(OperantOutcomeTarget.nadeel.rawValue)\"] .\(ClassName.compactPath)[data-operant-switch-track=\"\(OperantOutcomeTarget.nadeel.rawValue)\"]",
-                        CSS.decl("animation", "none")
-                    )
-                )
             ],
             keyframes: [
                 CSS.keyframes("wc-operant-conditioning-path-flow") {
