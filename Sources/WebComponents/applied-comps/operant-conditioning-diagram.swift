@@ -140,6 +140,9 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         static let matrix = "wc-operant-conditioning-diagram__matrix"
         static let caption = "wc-operant-conditioning-diagram__caption"
 
+        static let codeFigure = "wc-operant-conditioning-diagram__code-figure"
+        static let codeBlock = "wc-operant-conditioning-diagram__code-block"
+
         static let flowFigure = "wc-operant-conditioning-diagram__flow-figure"
         static let matrixFigure = "wc-operant-conditioning-diagram__matrix-figure"
         static let quadrantFigure = "wc-operant-conditioning-diagram__quadrant-figure"
@@ -338,6 +341,46 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             }
         }
     }
+
+    public static func split_outcome_code_node(
+        id: String = "operant-conditioning-split-outcome-code",
+        caption: String? = "De terugkoppeling als codeblok: een aantrekker versterkt de volgende keuze; een afstoter verzwakt die keuze."
+    ) -> any HTMLNode {
+        HTML.figure(
+            [
+                "id": id,
+                "class": "\(ClassName.root) \(ClassName.codeFigure)"
+            ]
+        ) {
+            HTML.pre(
+                [
+                    "class": ClassName.codeBlock,
+                    "aria-label": "Operante terugkoppeling als codeblok."
+                ]
+            ) {
+                HTML.code {
+                    HTML.text(Self.splitOutcomeCodeText)
+                }
+            }
+
+            if let caption, !caption.isEmpty {
+                HTML.figcaption(["class": ClassName.caption]) {
+                    HTML.text(caption)
+                }
+            }
+        }
+    }
+
+    public static let splitOutcomeCodeText = """
+    Prikkel ───────▶ [keuze] Gedrag ◀──────────────────────────────┐
+                         ↓                                         │
+                     uitkomst?                                     │
+                     ├─ Aantrekker                                 │
+                     │   → Versterkt ──────────────────────────────┤
+                     │                                             │
+                     └─ Afstoter                                   │
+                         → Verzwakt ───────────────────────────────┘
+    """
 
     public static func split_outcome_flow_body(
         markerID: String = "operant-split-flow-arrowhead",
@@ -781,12 +824,22 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     CSS.decl("border", "1px solid var(--border-color)"),
                     CSS.decl("border-radius", "18px"),
                     CSS.decl("background", "color-mix(in srgb, var(--surface-color, var(--background-color)) 94%, var(--text-color) 6%)"),
-                    CSS.decl("box-shadow", "0 18px 40px rgba(15, 23, 42, .06)")
+                    CSS.decl("box-shadow", "0 18px 40px rgba(15, 23, 42, .06)"),
+                    CSS.decl("overflow", "hidden")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.root), .\(ClassName.stage), .\(ClassName.splitFlowStage)",
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("max-width", "100%")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.flow).wc-flow, .\(ClassName.flow) .wc-flow",
+                    CSS.decl("box-sizing", "border-box"),
                     CSS.decl("margin", "0"),
+                    CSS.decl("min-width", "0"),
+                    CSS.decl("max-width", "100%"),
                     CSS.decl("width", "100%")
                 ),
 
@@ -798,9 +851,16 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(ClassName.flow).wc-flow .wc-flow__box, .\(ClassName.flow) .wc-flow__box",
+                    CSS.decl("box-sizing", "border-box"),
                     CSS.decl("min-width", "0"),
-                    CSS.decl("max-width", "none"),
+                    CSS.decl("max-width", "100%"),
                     CSS.decl("flex", "1 1 0")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.flow).wc-flow .wc-flow__box-inner, .\(ClassName.flow) .wc-flow__box-inner",
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("max-width", "100%")
                 ),
 
                 CSS.rule(
@@ -957,6 +1017,36 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.codeFigure)",
+                    CSS.decl("width", "min(860px, 100%)"),
+                    CSS.decl("margin", "24px 0 30px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.codeBlock)",
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("max-width", "100%"),
+                    CSS.decl("margin", "0"),
+                    CSS.decl("padding", "18px"),
+                    CSS.decl("overflow-x", "auto"),
+                    CSS.decl("border", "1px solid var(--border-color)"),
+                    CSS.decl("border-radius", "16px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, var(--background-color)) 94%, var(--text-color) 6%)"),
+                    CSS.decl("box-shadow", "0 18px 40px rgba(15, 23, 42, .06)"),
+                    CSS.decl("font-family", "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"),
+                    CSS.decl("font-size", "clamp(.78rem, 2.8vw, .92rem)"),
+                    CSS.decl("line-height", "1.65"),
+                    CSS.decl("white-space", "pre"),
+                    CSS.decl("color", "var(--text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.codeBlock) code",
+                    CSS.decl("font", "inherit"),
+                    CSS.decl("color", "inherit")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.caption)",
                     CSS.decl("margin", "10px 0 0"),
                     CSS.decl("font-size", ".9rem"),
@@ -1024,6 +1114,12 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     CSS.rule(
                         ".\(ClassName.splitFlowBox)",
                         CSS.decl("min-height", "64px")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.codeBlock)",
+                        CSS.decl("padding", "14px"),
+                        CSS.decl("font-size", ".78rem")
                     )
                 )
             ]
