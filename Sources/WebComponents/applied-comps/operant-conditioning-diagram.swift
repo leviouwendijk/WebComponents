@@ -372,15 +372,26 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
     }
 
     public static let splitOutcomeCodeText = """
-    Prikkel ───────▶ [keuze] Gedrag ◀──────────────────────────────┐
-                         ↓                                         │
-                     uitkomst?                                     │
-                     ├─ Aantrekker                                 │
-                     │   → Versterkt ──────────────────────────────┤
-                     │                                             │
-                     └─ Afstoter                                   │
-                         → Verzwakt ───────────────────────────────┘
+    Prikkel ------> [keuze] Gedrag <------------------------------┐
+                         |                                        │
+                     uitkomst?                                    │
+                     ├─ Aantrekker                                │
+                     │   -> Versterkt ----------------------------┤
+                     │                                            │
+                     └─ Afstoter                                  │
+                         -> Verzwakt -----------------------------┘
     """
+
+    // public static let splitOutcomeCodeText = """
+    // Prikkel ───────▶ [keuze] Gedrag ◀──────────────────────────────┐
+    //                      ↓                                         │
+    //                  uitkomst?                                     │
+    //                  ├─ Aantrekker                                 │
+    //                  │   → Versterkt ──────────────────────────────┤
+    //                  │                                             │
+    //                  └─ Afstoter                                   │
+    //                      → Verzwakt ───────────────────────────────┘
+    // """
 
     public static func split_outcome_flow_body(
         markerID: String = "operant-split-flow-arrowhead",
