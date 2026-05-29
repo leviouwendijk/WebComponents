@@ -103,9 +103,35 @@ public enum OperantOutcomeTarget: String, Sendable, CaseIterable {
     }
 }
 
+public enum OperantOutcomeEffect: String, Sendable, CaseIterable {
+    case versterkt
+    case verzwakt
+
+    public var title: String {
+        switch self {
+        case .versterkt:
+            return "Versterkt"
+
+        case .verzwakt:
+            return "Verzwakt"
+        }
+    }
+
+    public var subtitle: String {
+        switch self {
+        case .versterkt:
+            return "keuze neemt toe"
+
+        case .verzwakt:
+            return "keuze neemt af"
+        }
+    }
+}
+
 public struct OperantConditioningDiagram: ReusableComponent, Sendable {
     public typealias Quadrant = OperantQuadrant
     public typealias OutcomeTarget = OperantOutcomeTarget
+    public typealias OutcomeEffect = OperantOutcomeEffect
 
     private enum ClassName {
         static let root = "wc-operant-conditioning-diagram"
@@ -141,9 +167,12 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         static let splitFlowBoxChoice = "wc-operant-conditioning-diagram__split-flow-box--choice"
         static let splitFlowBoxAantrekker = "wc-operant-conditioning-diagram__split-flow-box--aantrekker"
         static let splitFlowBoxAfstoter = "wc-operant-conditioning-diagram__split-flow-box--afstoter"
+        static let splitFlowBoxVersterkt = "wc-operant-conditioning-diagram__split-flow-box--versterkt"
+        static let splitFlowBoxVerzwakt = "wc-operant-conditioning-diagram__split-flow-box--verzwakt"
         static let splitFlowTitle = "wc-operant-conditioning-diagram__split-flow-title"
         static let splitFlowSubtitle = "wc-operant-conditioning-diagram__split-flow-subtitle"
         static let splitFlowOutcomes = "wc-operant-conditioning-diagram__split-flow-outcomes"
+        static let splitFlowEffects = "wc-operant-conditioning-diagram__split-flow-effects"
         static let splitFlowArrowLayer = "wc-operant-conditioning-diagram__split-flow-arrow-layer"
         static let splitFlowPath = "wc-operant-conditioning-diagram__split-flow-path"
         static let splitFlowForward = "wc-operant-conditioning-diagram__split-flow-path--forward"
@@ -284,7 +313,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
 
     public static func split_outcome_flow_node(
         id: String = "operant-conditioning-split-outcome-flow",
-        caption: String? = "De uitkomst splitst hier in wat gedrag aantrekt of afstoot. Beide uitkomsten keren terug naar de keuze: ze veranderen hoe waarschijnlijk die keuze later wordt.",
+        caption: String? = "De keuze leidt naar een uitkomst. Die uitkomst werkt via versterking of verzwakking terug op de waarschijnlijkheid van die keuze.",
         highlighted: OperantFlowBox? = .choice
     ) -> any HTMLNode {
         HTML.figure(
@@ -314,7 +343,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             [
                 "class": ClassName.splitFlowStage,
                 "role": "img",
-                "aria-label": "Operante conditionering: prikkel leidt tot keuze, keuze leidt tot aantrekker of afstoter, en beide uitkomsten beïnvloeden de volgende keuze."
+                "aria-label": "Operante conditionering: prikkel leidt tot keuze, keuze leidt tot aantrekker of afstoter, en de uitkomst versterkt of verzwakt de volgende keuze."
             ]
         ) {
             split_outcome_flow_arrow_layer(
@@ -339,6 +368,26 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     subtitle: "Gedrag",
                     highlighted: highlighted == .choice
                 )
+
+                HTML.div(["class": ClassName.splitFlowEffects]) {
+                    split_flow_box(
+                        classes: [
+                            ClassName.splitFlowBoxVersterkt
+                        ],
+                        title: OperantOutcomeEffect.versterkt.title,
+                        subtitle: OperantOutcomeEffect.versterkt.subtitle,
+                        highlighted: false
+                    )
+
+                    split_flow_box(
+                        classes: [
+                            ClassName.splitFlowBoxVerzwakt
+                        ],
+                        title: OperantOutcomeEffect.verzwakt.title,
+                        subtitle: OperantOutcomeEffect.verzwakt.subtitle,
+                        highlighted: false
+                    )
+                }
 
                 HTML.div(["class": ClassName.splitFlowOutcomes]) {
                     split_flow_box(
@@ -526,7 +575,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 "path",
                 [
                     "class": "\(ClassName.splitFlowPath) \(ClassName.splitFlowForward)",
-                    "d": "M 235 180 H 378",
+                    "d": "M 188 180 H 296",
                     "marker-end": "url(#\(markerID))"
                 ]
             ) {}
@@ -535,7 +584,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 "path",
                 [
                     "class": "\(ClassName.splitFlowPath) \(ClassName.splitFlowForward)",
-                    "d": "M 620 180 H 690 V 102 H 760",
+                    "d": "M 470 180 H 555 V 102 H 805",
                     "marker-end": "url(#\(markerID))"
                 ]
             ) {}
@@ -544,7 +593,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 "path",
                 [
                     "class": "\(ClassName.splitFlowPath) \(ClassName.splitFlowForward)",
-                    "d": "M 620 180 H 690 V 258 H 760",
+                    "d": "M 470 180 H 555 V 258 H 805",
                     "marker-end": "url(#\(markerID))"
                 ]
             ) {}
@@ -553,7 +602,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 "path",
                 [
                     "class": "\(ClassName.splitFlowPath) \(ClassName.splitFlowReturn)",
-                    "d": "M 760 128 H 700 V 218 H 622",
+                    "d": "M 805 128 H 675",
                     "marker-end": "url(#\(markerID))"
                 ]
             ) {}
@@ -562,7 +611,25 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 "path",
                 [
                     "class": "\(ClassName.splitFlowPath) \(ClassName.splitFlowReturn)",
-                    "d": "M 760 232 H 700 V 142 H 622",
+                    "d": "M 805 232 H 675",
+                    "marker-end": "url(#\(markerID))"
+                ]
+            ) {}
+
+            HTML.el(
+                "path",
+                [
+                    "class": "\(ClassName.splitFlowPath) \(ClassName.splitFlowReturn)",
+                    "d": "M 590 128 H 530 V 160 H 472",
+                    "marker-end": "url(#\(markerID))"
+                ]
+            ) {}
+
+            HTML.el(
+                "path",
+                [
+                    "class": "\(ClassName.splitFlowPath) \(ClassName.splitFlowReturn)",
+                    "d": "M 590 232 H 530 V 200 H 472",
                     "marker-end": "url(#\(markerID))"
                 ]
             ) {}
@@ -789,14 +856,14 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     CSS.decl("position", "relative"),
                     CSS.decl("z-index", "1"),
                     CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-columns", "minmax(150px, 1fr) minmax(150px, 1fr) minmax(170px, 1fr)"),
+                    CSS.decl("grid-template-columns", "minmax(132px, .9fr) minmax(150px, 1fr) minmax(132px, .8fr) minmax(170px, 1fr)"),
                     CSS.decl("align-items", "center"),
-                    CSS.decl("gap", "96px"),
+                    CSS.decl("gap", "58px"),
                     CSS.decl("min-height", "260px")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.splitFlowOutcomes)",
+                    ".\(ClassName.splitFlowOutcomes), .\(ClassName.splitFlowEffects)",
                     CSS.decl("display", "grid"),
                     CSS.decl("gap", "40px")
                 ),
@@ -912,7 +979,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     ),
 
                     CSS.rule(
-                        ".\(ClassName.splitFlowOutcomes)",
+                        ".\(ClassName.splitFlowOutcomes), .\(ClassName.splitFlowEffects)",
                         CSS.decl("gap", "14px")
                     ),
 
