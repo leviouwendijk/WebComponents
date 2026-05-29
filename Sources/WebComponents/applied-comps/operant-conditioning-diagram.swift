@@ -454,20 +454,20 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             )
 
             compact_svg_box(
-                x: 582,
-                y: 66,
-                width: 134,
-                height: 54,
+                x: 572,
+                y: 60,
+                width: 154,
+                height: 66,
                 title: OperantOutcomeTarget.voordeel.title,
                 subtitles: OperantOutcomeTarget.voordeel.subtitles,
                 highlighted: highlighted == .outcome
             )
 
             compact_svg_box(
-                x: 582,
-                y: 174,
-                width: 134,
-                height: 54,
+                x: 572,
+                y: 168,
+                width: 154,
+                height: 66,
                 title: OperantOutcomeTarget.nadeel.title,
                 subtitles: OperantOutcomeTarget.nadeel.subtitles,
                 highlighted: highlighted == .outcome
@@ -492,7 +492,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             )
 
             compact_svg_path(
-                d: "M 649 66 V 24 H 294 V 30",
+                d: "M 649 60 V 24 H 294 V 30",
                 markerID: markerID,
                 kind: .returning
             )
@@ -504,7 +504,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             )
 
             compact_svg_path(
-                d: "M 649 228 V 268 H 294 V 262",
+                d: "M 649 234 V 268 H 294 V 262",
                 markerID: markerID,
                 kind: .returning
             )
@@ -664,10 +664,10 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             )
 
             compact_svg_switch_box(
-                x: 582,
-                y: 66,
-                width: 134,
-                height: 54,
+                x: 572,
+                y: 60,
+                width: 154,
+                height: 66,
                 title: OperantOutcomeTarget.voordeel.title,
                 subtitles: OperantOutcomeTarget.voordeel.subtitles,
                 highlighted: highlighted == .outcome,
@@ -676,10 +676,10 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             )
 
             compact_svg_switch_box(
-                x: 582,
-                y: 174,
-                width: 134,
-                height: 54,
+                x: 572,
+                y: 168,
+                width: 154,
+                height: 66,
                 title: OperantOutcomeTarget.nadeel.title,
                 subtitles: OperantOutcomeTarget.nadeel.subtitles,
                 highlighted: highlighted == .outcome,
@@ -708,7 +708,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             )
 
             compact_svg_switch_path(
-                d: "M 649 66 V 24 H 294 V 30",
+                d: "M 649 60 V 24 H 294 V 30",
                 markerID: markerID,
                 kind: .returning,
                 track: .voordeel
@@ -722,7 +722,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             )
 
             compact_svg_switch_path(
-                d: "M 649 228 V 268 H 294 V 262",
+                d: "M 649 234 V 268 H 294 V 262",
                 markerID: markerID,
                 kind: .returning,
                 track: .nadeel
