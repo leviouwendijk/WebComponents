@@ -192,8 +192,7 @@ public struct DocsProjectContextNav: SelectableComponent {
 
                 CSS.rule(
                     ".\(block)__crumb",
-                    CSS.decl("display", "inline-flex"),
-                    CSS.decl("align-items", "center"),
+                    CSS.decl("display", "block"),
                     CSS.decl("min-width", "0"),
                     CSS.decl("max-width", "220px"),
                     CSS.decl("overflow", "hidden"),
@@ -202,6 +201,19 @@ public struct DocsProjectContextNav: SelectableComponent {
                     CSS.decl("color", "var(--muted-text-color)"),
                     CSS.decl("text-decoration", "none")
                 ),
+
+                // CSS.rule(
+                //     ".\(block)__crumb",
+                //     CSS.decl("display", "inline-flex"),
+                //     CSS.decl("align-items", "center"),
+                //     CSS.decl("min-width", "0"),
+                //     CSS.decl("max-width", "220px"),
+                //     CSS.decl("overflow", "hidden"),
+                //     CSS.decl("text-overflow", "ellipsis"),
+                //     CSS.decl("white-space", "nowrap"),
+                //     CSS.decl("color", "var(--muted-text-color)"),
+                //     CSS.decl("text-decoration", "none")
+                // ),
 
                 CSS.rule(
                     ".\(block)__crumb:hover",
