@@ -455,7 +455,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 y: 66,
                 width: 134,
                 height: 54,
-                title: "Aantrekker",
+                title: OperantOutcomeTarget.voordeel.title,
                 subtitle: OperantOutcomeTarget.voordeel.subtitle,
                 highlighted: highlighted == .outcome
             )
@@ -465,7 +465,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 y: 174,
                 width: 134,
                 height: 54,
-                title: "Afstoter",
+                title: OperantOutcomeTarget.nadeel.title,
                 subtitle: OperantOutcomeTarget.nadeel.subtitle,
                 highlighted: highlighted == .outcome
             )
@@ -1218,17 +1218,20 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
     (() => {
         if (window.wcOperantOutcomeSwitch?.initialized) return;
 
+        const voordeelTrack = '\#(OperantOutcomeTarget.voordeel.rawValue)';
+        const nadeelTrack = '\#(OperantOutcomeTarget.nadeel.rawValue)';
+
         function statusText(track) {
-            if (track === 'afstoter') {
-                return 'Afstoter geselecteerd: de uitkomst verzwakt dezelfde keuze.';
+            if (track === nadeelTrack) {
+                return '\#(switch_status_text(.nadeel))';
             }
 
-            return 'Aantrekker geselecteerd: de uitkomst versterkt dezelfde keuze.';
+            return '\#(switch_status_text(.voordeel))';
         }
 
         function setState(root, track) {
             if (!root) return;
-            if (track !== 'aantrekker' && track !== 'afstoter') return;
+            if (track !== voordeelTrack && track !== nadeelTrack) return;
 
             root.setAttribute('data-state', track);
 
@@ -1275,7 +1278,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             root.querySelectorAll('[data-operant-switch]').forEach((switchRoot) => {
                 setState(
                     switchRoot,
-                    switchRoot.getAttribute('data-state') || 'aantrekker'
+                    switchRoot.getAttribute('data-state') || voordeelTrack
                 );
             });
         }
@@ -1544,7 +1547,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.switchRoot)[data-state=\"aantrekker\"] [data-operant-switch-track=\"aantrekker\"], .\(ClassName.switchRoot)[data-state=\"afstoter\"] [data-operant-switch-track=\"afstoter\"]",
+                    ".\(ClassName.switchRoot)[data-state=\"\(OperantOutcomeTarget.voordeel.rawValue)\"] [data-operant-switch-track=\"\(OperantOutcomeTarget.voordeel.rawValue)\"], .\(ClassName.switchRoot)[data-state=\"\(OperantOutcomeTarget.nadeel.rawValue)\"] [data-operant-switch-track=\"\(OperantOutcomeTarget.nadeel.rawValue)\"]",
                     CSS.decl("opacity", "1")
                 ),
 
@@ -1554,7 +1557,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.switchRoot)[data-state=\"aantrekker\"] .\(ClassName.compactPath)[data-operant-switch-track=\"aantrekker\"], .\(ClassName.switchRoot)[data-state=\"afstoter\"] .\(ClassName.compactPath)[data-operant-switch-track=\"afstoter\"]",
+                    ".\(ClassName.switchRoot)[data-state=\"\(OperantOutcomeTarget.voordeel.rawValue)\"] .\(ClassName.compactPath)[data-operant-switch-track=\"\(OperantOutcomeTarget.voordeel.rawValue)\"], .\(ClassName.switchRoot)[data-state=\"\(OperantOutcomeTarget.nadeel.rawValue)\"] .\(ClassName.compactPath)[data-operant-switch-track=\"\(OperantOutcomeTarget.nadeel.rawValue)\"]",
                     CSS.decl("stroke-dasharray", "10 8"),
                     CSS.decl("stroke-dashoffset", "0"),
                     CSS.decl("animation", "wc-operant-conditioning-path-flow 900ms linear infinite")
@@ -1691,7 +1694,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 CSS.media(
                     "(prefers-reduced-motion: reduce)",
                     CSS.rule(
-                        ".\(ClassName.switchRoot)[data-state=\"aantrekker\"] .\(ClassName.compactPath)[data-operant-switch-track=\"aantrekker\"], .\(ClassName.switchRoot)[data-state=\"afstoter\"] .\(ClassName.compactPath)[data-operant-switch-track=\"afstoter\"]",
+                        ".\(ClassName.switchRoot)[data-state=\"\(OperantOutcomeTarget.voordeel.rawValue)\"] .\(ClassName.compactPath)[data-operant-switch-track=\"\(OperantOutcomeTarget.voordeel.rawValue)\"], .\(ClassName.switchRoot)[data-state=\"\(OperantOutcomeTarget.nadeel.rawValue)\"] .\(ClassName.compactPath)[data-operant-switch-track=\"\(OperantOutcomeTarget.nadeel.rawValue)\"]",
                         CSS.decl("animation", "none")
                     )
                 )
