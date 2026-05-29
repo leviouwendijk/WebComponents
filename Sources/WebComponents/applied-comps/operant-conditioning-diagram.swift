@@ -79,26 +79,35 @@ public enum OperantFlowBox: String, Sendable, CaseIterable {
 }
 
 public enum OperantOutcomeTarget: String, Sendable, CaseIterable {
-    case aantrekker
-    case afstoter
+    // case aantrekker
+    // case afstoter
+    case voordeel
+    case nadeel
 
     public var title: String {
         switch self {
-        case .aantrekker:
-            return "Aantrekker"
+        // case .aantrekker:
+        //     return "Aantrekker"
 
-        case .afstoter:
-            return "Afstoter"
+        // case .afstoter:
+        //     return "Afstoter"
+        case .voordeel: return "Voordeel (winst)"
+        case .nadeel: return "Nadeel (verlies)"
         }
     }
 
     public var subtitle: String {
         switch self {
-        case .aantrekker:
-            return "voordeel / winst"
+        // case .aantrekker:
+        //     return "voordeel / winst"
 
-        case .afstoter:
-            return "nadeel / kost"
+        // case .afstoter:
+        //     return "nadeel / kost"
+        case .voordeel:
+            return "(+)aantrekker, (-)afstoter"
+
+        case .nadeel:
+            return "(-)aantrekker, (+)afstoter"
         }
     }
 }
@@ -447,7 +456,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 134,
                 height: 54,
                 title: "Aantrekker",
-                subtitle: OperantOutcomeTarget.aantrekker.subtitle,
+                subtitle: OperantOutcomeTarget.voordeel.subtitle,
                 highlighted: highlighted == .outcome
             )
 
@@ -457,7 +466,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 134,
                 height: 54,
                 title: "Afstoter",
-                subtitle: OperantOutcomeTarget.afstoter.subtitle,
+                subtitle: OperantOutcomeTarget.nadeel.subtitle,
                 highlighted: highlighted == .outcome
             )
 
@@ -508,7 +517,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
     public static func compact_outcome_switch_node(
         id: String = "operant-conditioning-compact-outcome-switch",
         caption: String? = "Schakel tussen de twee mogelijke uitkomsten: een aantrekker versterkt deze keuze; een afstoter verzwakt deze keuze.",
-        initial: OperantOutcomeTarget = .aantrekker,
+        initial: OperantOutcomeTarget = .voordeel,
         highlighted: OperantFlowBox? = .choice
     ) -> any HTMLNode {
         HTML.figure(
@@ -532,13 +541,13 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     ]
                 ) {
                     switch_button(
-                        .aantrekker,
-                        active: initial == .aantrekker
+                        .voordeel,
+                        active: initial == .voordeel
                     )
 
                     switch_button(
-                        .afstoter,
-                        active: initial == .afstoter
+                        .nadeel,
+                        active: initial == .nadeel
                     )
                 }
 
@@ -637,7 +646,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 title: "Versterkt",
                 subtitle: "keuze neemt toe",
                 highlighted: false,
-                track: .aantrekker
+                track: .voordeel
             )
 
             compact_svg_switch_box(
@@ -648,7 +657,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 title: "Verzwakt",
                 subtitle: "keuze neemt af",
                 highlighted: false,
-                track: .afstoter
+                track: .nadeel
             )
 
             compact_svg_switch_box(
@@ -657,9 +666,9 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 134,
                 height: 54,
                 title: "Aantrekker",
-                subtitle: OperantOutcomeTarget.aantrekker.subtitle,
+                subtitle: OperantOutcomeTarget.voordeel.subtitle,
                 highlighted: highlighted == .outcome,
-                track: .aantrekker,
+                track: .voordeel,
                 interactive: true
             )
 
@@ -669,9 +678,9 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 134,
                 height: 54,
                 title: "Afstoter",
-                subtitle: OperantOutcomeTarget.afstoter.subtitle,
+                subtitle: OperantOutcomeTarget.nadeel.subtitle,
                 highlighted: highlighted == .outcome,
-                track: .afstoter,
+                track: .nadeel,
                 interactive: true
             )
 
@@ -685,42 +694,42 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 d: "M 358 147 H 458 V 93 H 570",
                 markerID: markerID,
                 kind: .forward,
-                track: .aantrekker
+                track: .voordeel
             )
 
             compact_svg_switch_path(
                 d: "M 358 147 H 458 V 201 H 570",
                 markerID: markerID,
                 kind: .forward,
-                track: .afstoter
+                track: .nadeel
             )
 
             compact_svg_switch_path(
                 d: "M 649 66 V 24 H 294 V 30",
                 markerID: markerID,
                 kind: .returning,
-                track: .aantrekker
+                track: .voordeel
             )
 
             compact_svg_switch_path(
                 d: "M 294 80 V 118",
                 markerID: markerID,
                 kind: .returning,
-                track: .aantrekker
+                track: .voordeel
             )
 
             compact_svg_switch_path(
                 d: "M 649 228 V 268 H 294 V 262",
                 markerID: markerID,
                 kind: .returning,
-                track: .afstoter
+                track: .nadeel
             )
 
             compact_svg_switch_path(
                 d: "M 294 212 V 176",
                 markerID: markerID,
                 kind: .returning,
-                track: .afstoter
+                track: .nadeel
             )
         }
     }
@@ -1197,11 +1206,11 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         _ target: OperantOutcomeTarget
     ) -> String {
         switch target {
-        case .aantrekker:
-            return "Aantrekker geselecteerd: de uitkomst versterkt dezelfde keuze."
+        case .voordeel:
+            return "Voordeel geselecteerd: de uitkomst versterkt dezelfde keuze."
 
-        case .afstoter:
-            return "Afstoter geselecteerd: de uitkomst verzwakt dezelfde keuze."
+        case .nadeel:
+            return "Nadeel geselecteerd: de uitkomst verzwakt dezelfde keuze."
         }
     }
 
