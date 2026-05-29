@@ -447,7 +447,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 134,
                 height: 54,
                 title: "Aantrekker",
-                subtitle: "toegang / behoud",
+                subtitle: OperantOutcomeTarget.aantrekker.subtitle,
                 highlighted: highlighted == .outcome
             )
 
@@ -457,7 +457,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 134,
                 height: 54,
                 title: "Afstoter",
-                subtitle: "vermijding / opheffing",
+                subtitle: OperantOutcomeTarget.afstoter.subtitle,
                 highlighted: highlighted == .outcome
             )
 
@@ -657,7 +657,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 134,
                 height: 54,
                 title: "Aantrekker",
-                subtitle: "toegang / behoud",
+                subtitle: OperantOutcomeTarget.aantrekker.subtitle,
                 highlighted: highlighted == .outcome,
                 track: .aantrekker,
                 interactive: true
@@ -669,7 +669,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 134,
                 height: 54,
                 title: "Afstoter",
-                subtitle: "vermijding / opheffing",
+                subtitle: OperantOutcomeTarget.afstoter.subtitle,
                 highlighted: highlighted == .outcome,
                 track: .afstoter,
                 interactive: true
