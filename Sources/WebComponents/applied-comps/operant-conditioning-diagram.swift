@@ -140,9 +140,6 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         static let matrix = "wc-operant-conditioning-diagram__matrix"
         static let caption = "wc-operant-conditioning-diagram__caption"
 
-        static let codeFigure = "wc-operant-conditioning-diagram__code-figure"
-        static let codeBlock = "wc-operant-conditioning-diagram__code-block"
-
         static let flowFigure = "wc-operant-conditioning-diagram__flow-figure"
         static let matrixFigure = "wc-operant-conditioning-diagram__matrix-figure"
         static let quadrantFigure = "wc-operant-conditioning-diagram__quadrant-figure"
@@ -162,29 +159,20 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         static let quadrantObject = "wc-operant-conditioning-diagram__quadrant-object"
         static let quadrantDirection = "wc-operant-conditioning-diagram__quadrant-direction"
 
-        static let splitFlowFigure = "wc-operant-conditioning-diagram__split-flow-figure"
-        static let splitFlowStage = "wc-operant-conditioning-diagram__split-flow-stage"
-        static let splitFlowGrid = "wc-operant-conditioning-diagram__split-flow-grid"
-        static let splitFlowMiddle = "wc-operant-conditioning-diagram__split-flow-middle"
-        static let splitFlowChoiceSlot = "wc-operant-conditioning-diagram__split-flow-choice-slot"
+        static let codeFigure = "wc-operant-conditioning-diagram__code-figure"
+        static let codeBlock = "wc-operant-conditioning-diagram__code-block"
 
-        static let splitFlowBox = "wc-operant-conditioning-diagram__split-flow-box"
-        static let splitFlowBoxStimulus = "wc-operant-conditioning-diagram__split-flow-box--stimulus"
-        static let splitFlowBoxChoice = "wc-operant-conditioning-diagram__split-flow-box--choice"
-        static let splitFlowBoxAantrekker = "wc-operant-conditioning-diagram__split-flow-box--aantrekker"
-        static let splitFlowBoxAfstoter = "wc-operant-conditioning-diagram__split-flow-box--afstoter"
-        static let splitFlowBoxVersterkt = "wc-operant-conditioning-diagram__split-flow-box--versterkt"
-        static let splitFlowBoxVerzwakt = "wc-operant-conditioning-diagram__split-flow-box--verzwakt"
-
-        static let splitFlowTitle = "wc-operant-conditioning-diagram__split-flow-title"
-        static let splitFlowSubtitle = "wc-operant-conditioning-diagram__split-flow-subtitle"
-        static let splitFlowOutcomes = "wc-operant-conditioning-diagram__split-flow-outcomes"
-        static let splitFlowEffects = "wc-operant-conditioning-diagram__split-flow-effects"
-        static let splitFlowArrowLayer = "wc-operant-conditioning-diagram__split-flow-arrow-layer"
-        static let splitFlowPath = "wc-operant-conditioning-diagram__split-flow-path"
-        static let splitFlowForward = "wc-operant-conditioning-diagram__split-flow-path--forward"
-        static let splitFlowReturn = "wc-operant-conditioning-diagram__split-flow-path--return"
-        static let splitFlowMarkerHead = "wc-operant-conditioning-diagram__split-flow-marker-head"
+        static let compactFigure = "wc-operant-conditioning-diagram__compact-figure"
+        static let compactStage = "wc-operant-conditioning-diagram__compact-stage"
+        static let compactSVG = "wc-operant-conditioning-diagram__compact-svg"
+        static let compactBox = "wc-operant-conditioning-diagram__compact-box"
+        static let compactBoxHighlighted = "wc-operant-conditioning-diagram__compact-box--highlighted"
+        static let compactTitle = "wc-operant-conditioning-diagram__compact-title"
+        static let compactSubtitle = "wc-operant-conditioning-diagram__compact-subtitle"
+        static let compactPath = "wc-operant-conditioning-diagram__compact-path"
+        static let compactForward = "wc-operant-conditioning-diagram__compact-path--forward"
+        static let compactReturn = "wc-operant-conditioning-diagram__compact-path--return"
+        static let compactMarkerHead = "wc-operant-conditioning-diagram__compact-marker-head"
     }
 
     public let id: String
@@ -323,22 +311,189 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         caption: String? = "De keuze leidt naar een uitkomst. Die uitkomst werkt via versterking of verzwakking terug op de waarschijnlijkheid van die keuze.",
         highlighted: OperantFlowBox? = .choice
     ) -> any HTMLNode {
+        compact_outcome_flow_node(
+            id: id,
+            caption: caption,
+            highlighted: highlighted
+        )
+    }
+
+    public static func split_outcome_flow_body(
+        markerID: String = "operant-split-flow-arrowhead",
+        highlighted: OperantFlowBox? = .choice
+    ) -> any HTMLNode {
+        HTML.div(["class": ClassName.compactStage]) {
+            compact_outcome_flow_svg(
+                markerID: markerID,
+                highlighted: highlighted
+            )
+        }
+    }
+
+    public static func compact_outcome_flow_node(
+        id: String = "operant-conditioning-compact-outcome-flow",
+        caption: String? = "De terugkoppeling: een aantrekker versterkt de volgende keuze; een afstoter verzwakt die keuze.",
+        highlighted: OperantFlowBox? = .choice
+    ) -> any HTMLNode {
         HTML.figure(
             [
                 "id": id,
-                "class": "\(ClassName.root) \(ClassName.splitFlowFigure)"
+                "class": "\(ClassName.root) \(ClassName.compactFigure)"
             ]
         ) {
-            split_outcome_flow_body(
-                markerID: "\(id)-arrowhead",
-                highlighted: highlighted
-            )
+            HTML.div(["class": ClassName.compactStage]) {
+                compact_outcome_flow_svg(
+                    markerID: "\(id)-arrowhead",
+                    highlighted: highlighted
+                )
+            }
 
             if let caption, !caption.isEmpty {
                 HTML.figcaption(["class": ClassName.caption]) {
                     HTML.text(caption)
                 }
             }
+        }
+    }
+
+    public static func compact_outcome_flow_svg(
+        markerID: String = "operant-compact-flow-arrowhead",
+        highlighted: OperantFlowBox? = .choice
+    ) -> any HTMLNode {
+        HTML.el(
+            "svg",
+            [
+                "class": ClassName.compactSVG,
+                "viewBox": "0 0 760 292",
+                "preserveAspectRatio": "xMidYMid meet",
+                "role": "img",
+                "aria-label": "Prikkel leidt tot keuze. Keuze leidt tot aantrekker of afstoter. Aantrekker versterkt de volgende keuze; afstoter verzwakt de volgende keuze."
+            ]
+        ) {
+            HTML.el("defs") {
+                HTML.el(
+                    "marker",
+                    [
+                        "id": markerID,
+                        "viewBox": "0 0 10 10",
+                        "refX": "9",
+                        "refY": "5",
+                        "markerWidth": "7",
+                        "markerHeight": "7",
+                        "orient": "auto"
+                    ]
+                ) {
+                    HTML.el(
+                        "path",
+                        [
+                            "class": ClassName.compactMarkerHead,
+                            "d": "M 0 0 L 10 5 L 0 10 z"
+                        ]
+                    ) {}
+                }
+            }
+
+            compact_svg_box(
+                x: 28,
+                y: 122,
+                width: 124,
+                height: 50,
+                title: "Prikkel",
+                subtitle: "Omgeving",
+                highlighted: highlighted == .stimulus
+            )
+
+            compact_svg_box(
+                x: 232,
+                y: 122,
+                width: 124,
+                height: 50,
+                title: "Keuze",
+                subtitle: "Gedrag",
+                highlighted: highlighted == .choice
+            )
+
+            compact_svg_box(
+                x: 232,
+                y: 32,
+                width: 124,
+                height: 46,
+                title: "Versterkt",
+                subtitle: "keuze neemt toe",
+                highlighted: false
+            )
+
+            compact_svg_box(
+                x: 232,
+                y: 214,
+                width: 124,
+                height: 46,
+                title: "Verzwakt",
+                subtitle: "keuze neemt af",
+                highlighted: false
+            )
+
+            compact_svg_box(
+                x: 582,
+                y: 66,
+                width: 134,
+                height: 54,
+                title: "Aantrekker",
+                subtitle: "toegang / behoud",
+                highlighted: highlighted == .outcome
+            )
+
+            compact_svg_box(
+                x: 582,
+                y: 174,
+                width: 134,
+                height: 54,
+                title: "Afstoter",
+                subtitle: "vermijding / opheffing",
+                highlighted: highlighted == .outcome
+            )
+
+            compact_svg_path(
+                d: "M 154 147 H 220",
+                markerID: markerID,
+                kind: .forward
+            )
+
+            compact_svg_path(
+                d: "M 358 147 H 458 V 93 H 570",
+                markerID: markerID,
+                kind: .forward
+            )
+
+            compact_svg_path(
+                d: "M 358 147 H 458 V 201 H 570",
+                markerID: markerID,
+                kind: .forward
+            )
+
+            compact_svg_path(
+                d: "M 582 93 H 368",
+                markerID: markerID,
+                kind: .returning
+            )
+
+            compact_svg_path(
+                d: "M 294 80 V 110",
+                markerID: markerID,
+                kind: .returning
+            )
+
+            compact_svg_path(
+                d: "M 582 201 H 368",
+                markerID: markerID,
+                kind: .returning
+            )
+
+            compact_svg_path(
+                d: "M 294 214 V 184",
+                markerID: markerID,
+                kind: .returning
+            )
         }
     }
 
@@ -381,100 +536,6 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                      `-- Afstoter                               |
                          -> Verzwakt ---------------------------'
     """
-
-    // public static let splitOutcomeCodeText = """
-    // Prikkel ───────▶ [keuze] Gedrag ◀──────────────────────────────┐
-    //                      ↓                                         │
-    //                  uitkomst?                                     │
-    //                  ├─ Aantrekker                                 │
-    //                  │   → Versterkt ──────────────────────────────┤
-    //                  │                                             │
-    //                  └─ Afstoter                                   │
-    //                      → Verzwakt ───────────────────────────────┘
-    // """
-
-    public static func split_outcome_flow_body(
-        markerID: String = "operant-split-flow-arrowhead",
-        highlighted: OperantFlowBox? = .choice
-    ) -> any HTMLNode {
-        HTML.div(
-            [
-                "class": ClassName.splitFlowStage,
-                "role": "img",
-                "aria-label": "Operante conditionering: prikkel leidt tot keuze, keuze leidt tot aantrekker of afstoter, en die uitkomst versterkt of verzwakt de volgende keuze."
-            ]
-        ) {
-            split_outcome_flow_arrow_layer(
-                markerID: markerID
-            )
-
-            HTML.div(["class": ClassName.splitFlowGrid]) {
-                split_flow_box(
-                    classes: [
-                        ClassName.splitFlowBoxStimulus
-                    ],
-                    title: "Prikkel",
-                    subtitle: "Omgeving",
-                    highlighted: highlighted == .stimulus
-                )
-
-                HTML.div(["class": ClassName.splitFlowMiddle]) {
-                    HTML.div(["class": ClassName.splitFlowEffects]) {
-                        split_flow_box(
-                            classes: [
-                                ClassName.splitFlowBoxVersterkt
-                            ],
-                            title: OperantOutcomeEffect.versterkt.title,
-                            subtitle: OperantOutcomeEffect.versterkt.subtitle,
-                            highlighted: false
-                        )
-                    }
-
-                    HTML.div(["class": ClassName.splitFlowChoiceSlot]) {
-                        split_flow_box(
-                            classes: [
-                                ClassName.splitFlowBoxChoice
-                            ],
-                            title: "Keuze",
-                            subtitle: "Gedrag",
-                            highlighted: highlighted == .choice
-                        )
-                    }
-
-                    HTML.div(["class": ClassName.splitFlowEffects]) {
-                        split_flow_box(
-                            classes: [
-                                ClassName.splitFlowBoxVerzwakt
-                            ],
-                            title: OperantOutcomeEffect.verzwakt.title,
-                            subtitle: OperantOutcomeEffect.verzwakt.subtitle,
-                            highlighted: false
-                        )
-                    }
-                }
-
-                HTML.div(["class": ClassName.splitFlowOutcomes]) {
-                    split_flow_box(
-                        classes: [
-                            ClassName.splitFlowBoxAantrekker
-                        ],
-                        title: OperantOutcomeTarget.aantrekker.title,
-                        subtitle: OperantOutcomeTarget.aantrekker.subtitle,
-                        highlighted: highlighted == .outcome
-                    )
-
-                    split_flow_box(
-                        classes: [
-                            ClassName.splitFlowBoxAfstoter
-                        ],
-                        title: OperantOutcomeTarget.afstoter.title,
-                        subtitle: OperantOutcomeTarget.afstoter.subtitle,
-                        highlighted: highlighted == .outcome
-                    )
-                }
-            }
-        }
-    }
 
     public static func matrix() -> MatrixDiagram {
         MatrixDiagram(
@@ -600,131 +661,89 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         }
     }
 
-    private static func split_outcome_flow_arrow_layer(
-        markerID: String
-    ) -> any HTMLNode {
-        HTML.el(
-            "svg",
-            [
-                "class": ClassName.splitFlowArrowLayer,
-                "viewBox": "0 0 1000 420",
-                "preserveAspectRatio": "none",
-                "aria-hidden": "true"
-            ]
-        ) {
-            HTML.el("defs") {
-                HTML.el(
-                    "marker",
-                    [
-                        "id": markerID,
-                        "viewBox": "0 0 10 10",
-                        "refX": "9",
-                        "refY": "5",
-                        "markerWidth": "7",
-                        "markerHeight": "7",
-                        "orient": "auto"
-                    ]
-                ) {
-                    HTML.el(
-                        "path",
-                        [
-                            "class": ClassName.splitFlowMarkerHead,
-                            "d": "M 0 0 L 10 5 L 0 10 z"
-                        ]
-                    ) {}
-                }
-            }
-
-            HTML.el(
-                "path",
-                [
-                    "class": "\(ClassName.splitFlowPath) \(ClassName.splitFlowForward)",
-                    "d": "M 230 210 H 360",
-                    "marker-end": "url(#\(markerID))"
-                ]
-            ) {}
-
-            HTML.el(
-                "path",
-                [
-                    "class": "\(ClassName.splitFlowPath) \(ClassName.splitFlowForward)",
-                    "d": "M 545 210 H 620 V 112 H 765",
-                    "marker-end": "url(#\(markerID))"
-                ]
-            ) {}
-
-            HTML.el(
-                "path",
-                [
-                    "class": "\(ClassName.splitFlowPath) \(ClassName.splitFlowForward)",
-                    "d": "M 545 210 H 620 V 308 H 765",
-                    "marker-end": "url(#\(markerID))"
-                ]
-            ) {}
-
-            HTML.el(
-                "path",
-                [
-                    "class": "\(ClassName.splitFlowPath) \(ClassName.splitFlowReturn)",
-                    "d": "M 765 112 H 545",
-                    "marker-end": "url(#\(markerID))"
-                ]
-            ) {}
-
-            HTML.el(
-                "path",
-                [
-                    "class": "\(ClassName.splitFlowPath) \(ClassName.splitFlowReturn)",
-                    "d": "M 765 308 H 545",
-                    "marker-end": "url(#\(markerID))"
-                ]
-            ) {}
-
-            HTML.el(
-                "path",
-                [
-                    "class": "\(ClassName.splitFlowPath) \(ClassName.splitFlowReturn)",
-                    "d": "M 450 145 V 168",
-                    "marker-end": "url(#\(markerID))"
-                ]
-            ) {}
-
-            HTML.el(
-                "path",
-                [
-                    "class": "\(ClassName.splitFlowPath) \(ClassName.splitFlowReturn)",
-                    "d": "M 450 275 V 252",
-                    "marker-end": "url(#\(markerID))"
-                ]
-            ) {}
-        }
+    private enum CompactPathKind {
+        case forward
+        case returning
     }
 
-    private static func split_flow_box(
-        classes: [String],
+    private static func compact_svg_box(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
         title: String,
         subtitle: String,
         highlighted: Bool
-    ) -> any HTMLNode {
-        var allClasses = [
-            ClassName.splitFlowBox
-        ] + classes
+    ) -> HTMLFragment {
+        let className = highlighted
+            ? "\(ClassName.compactBox) \(ClassName.compactBoxHighlighted)"
+            : ClassName.compactBox
 
-        if highlighted {
-            allClasses.append(
-                ClassName.highlighted
-            )
-        }
+        let centerX = x + (width / 2)
 
-        return HTML.div(["class": allClasses.joined(separator: " ")]) {
-            HTML.b(["class": ClassName.splitFlowTitle]) {
+        return [
+            HTML.el(
+                "rect",
+                [
+                    "class": className,
+                    "x": "\(x)",
+                    "y": "\(y)",
+                    "width": "\(width)",
+                    "height": "\(height)",
+                    "rx": "12",
+                    "ry": "12"
+                ]
+            ) {},
+
+            HTML.el(
+                "text",
+                [
+                    "class": ClassName.compactTitle,
+                    "x": "\(centerX)",
+                    "y": "\(y + 20)",
+                    "text-anchor": "middle"
+                ]
+            ) {
                 HTML.text(title)
-            }
+            },
 
-            HTML.span(["class": ClassName.splitFlowSubtitle]) {
+            HTML.el(
+                "text",
+                [
+                    "class": ClassName.compactSubtitle,
+                    "x": "\(centerX)",
+                    "y": "\(y + 37)",
+                    "text-anchor": "middle"
+                ]
+            ) {
                 HTML.text(subtitle)
             }
-        }
+        ]
+    }
+
+    private static func compact_svg_path(
+        d: String,
+        markerID: String,
+        kind: CompactPathKind
+    ) -> any HTMLNode {
+        let kindClass: String = {
+            switch kind {
+            case .forward:
+                return ClassName.compactForward
+
+            case .returning:
+                return ClassName.compactReturn
+            }
+        }()
+
+        return HTML.el(
+            "path",
+            [
+                "class": "\(ClassName.compactPath) \(kindClass)",
+                "d": d,
+                "marker-end": "url(#\(markerID))"
+            ]
+        ) {}
     }
 
     private static func flow_box(
@@ -840,7 +859,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.root), .\(ClassName.stage), .\(ClassName.splitFlowStage)",
+                    ".\(ClassName.root), .\(ClassName.stage), .\(ClassName.compactStage)",
                     CSS.decl("box-sizing", "border-box"),
                     CSS.decl("max-width", "100%")
                 ),
@@ -922,108 +941,78 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.splitFlowStage)",
-                    CSS.decl("position", "relative"),
-                    CSS.decl("padding", "18px"),
+                    ".\(ClassName.compactFigure)",
+                    CSS.decl("width", "min(760px, 100%)"),
+                    CSS.decl("margin", "24px 0 30px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.compactStage)",
+                    CSS.decl("max-width", "100%"),
+                    CSS.decl("padding", "12px"),
                     CSS.decl("border", "1px solid var(--border-color)"),
-                    CSS.decl("border-radius", "18px"),
+                    CSS.decl("border-radius", "16px"),
                     CSS.decl("background", "color-mix(in srgb, var(--surface-color, var(--background-color)) 94%, var(--text-color) 6%)"),
                     CSS.decl("box-shadow", "0 18px 40px rgba(15, 23, 42, .06)"),
                     CSS.decl("overflow", "hidden")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.splitFlowGrid)",
-                    CSS.decl("position", "relative"),
-                    CSS.decl("z-index", "1"),
-                    CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-columns", "minmax(150px, .9fr) minmax(190px, 1fr) minmax(190px, 1fr)"),
-                    CSS.decl("align-items", "center"),
-                    CSS.decl("gap", "88px"),
-                    CSS.decl("min-height", "320px")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.splitFlowMiddle)",
-                    CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-rows", "auto auto auto"),
-                    CSS.decl("gap", "22px"),
-                    CSS.decl("align-items", "center")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.splitFlowChoiceSlot)",
-                    CSS.decl("display", "grid")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.splitFlowOutcomes)",
-                    CSS.decl("display", "grid"),
-                    CSS.decl("gap", "58px")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.splitFlowEffects)",
-                    CSS.decl("display", "grid")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.splitFlowBox)",
-                    CSS.decl("display", "flex"),
-                    CSS.decl("flex-direction", "column"),
-                    CSS.decl("align-items", "center"),
-                    CSS.decl("justify-content", "center"),
-                    CSS.decl("gap", "6px"),
-                    CSS.decl("min-height", "76px"),
-                    CSS.decl("padding", "14px 16px"),
-                    CSS.decl("border", "1px solid var(--border-color, rgba(0,0,0,0.12))"),
-                    CSS.decl("border-radius", "14px"),
-                    CSS.decl("background", "var(--background-color, #fff)"),
-                    CSS.decl("box-shadow", "var(--shadow-soft, 0 12px 28px rgba(0,0,0,0.08))"),
-                    CSS.decl("text-align", "center")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.splitFlowTitle)",
-                    CSS.decl("font-weight", "760"),
-                    CSS.decl("line-height", "1.1"),
-                    CSS.decl("color", "var(--text-color, #0f172a)")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.splitFlowSubtitle)",
-                    CSS.decl("font-size", ".92rem"),
-                    CSS.decl("line-height", "1.25"),
-                    CSS.decl("color", "var(--ref-meta-text-color, var(--text-color, #0f172a))")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.splitFlowArrowLayer)",
-                    CSS.decl("position", "absolute"),
-                    CSS.decl("inset", "0"),
-                    CSS.decl("z-index", "0"),
+                    ".\(ClassName.compactSVG)",
+                    CSS.decl("display", "block"),
                     CSS.decl("width", "100%"),
-                    CSS.decl("height", "100%"),
-                    CSS.decl("pointer-events", "none")
+                    CSS.decl("height", "auto"),
+                    CSS.decl("max-width", "100%"),
+                    CSS.decl("overflow", "visible")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.splitFlowPath)",
+                    ".\(ClassName.compactBox)",
+                    CSS.decl("fill", "var(--background-color, #fff)"),
+                    CSS.decl("stroke", "var(--border-color, rgba(0,0,0,0.12))"),
+                    CSS.decl("stroke-width", "1.15"),
+                    CSS.decl("filter", "drop-shadow(0 10px 18px rgba(15, 23, 42, .08))")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.compactBoxHighlighted)",
+                    CSS.decl("fill", "color-mix(in srgb, var(--link-color) 10%, var(--background-color, #fff))"),
+                    CSS.decl("stroke", "color-mix(in srgb, var(--link-color) 44%, var(--border-color))")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.compactTitle)",
+                    CSS.decl("font-size", "13px"),
+                    CSS.decl("font-weight", "760"),
+                    CSS.decl("line-height", "1"),
+                    CSS.decl("fill", "var(--text-color, #0f172a)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.compactSubtitle)",
+                    CSS.decl("font-size", "11px"),
+                    CSS.decl("font-weight", "430"),
+                    CSS.decl("line-height", "1"),
+                    CSS.decl("fill", "color-mix(in srgb, var(--text-color, #0f172a) 74%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.compactPath)",
                     CSS.decl("fill", "none"),
                     CSS.decl("stroke", "var(--flow-arrow-color, var(--text-color, #0f172a))"),
-                    CSS.decl("stroke-width", "2.2"),
-                    CSS.decl("stroke-linecap", "square"),
-                    CSS.decl("stroke-linejoin", "miter")
+                    CSS.decl("stroke-width", "2"),
+                    CSS.decl("stroke-linecap", "round"),
+                    CSS.decl("stroke-linejoin", "round")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.splitFlowReturn)",
-                    CSS.decl("stroke-dasharray", "7 7"),
+                    ".\(ClassName.compactReturn)",
+                    CSS.decl("stroke-dasharray", "5 5"),
                     CSS.decl("opacity", ".72")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.splitFlowMarkerHead)",
+                    ".\(ClassName.compactMarkerHead)",
                     CSS.decl("fill", "var(--flow-arrow-color, var(--text-color, #0f172a))")
                 ),
 
@@ -1096,35 +1085,19 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     ),
 
                     CSS.rule(
-                        ".\(ClassName.splitFlowStage)",
-                        CSS.decl("padding", "14px")
+                        ".\(ClassName.compactStage)",
+                        CSS.decl("padding", "8px"),
+                        CSS.decl("border-radius", "14px")
                     ),
 
                     CSS.rule(
-                        ".\(ClassName.splitFlowGrid)",
-                        CSS.decl("grid-template-columns", "1fr"),
-                        CSS.decl("gap", "14px"),
-                        CSS.decl("min-height", "0")
+                        ".\(ClassName.compactTitle)",
+                        CSS.decl("font-size", "12px")
                     ),
 
                     CSS.rule(
-                        ".\(ClassName.splitFlowMiddle)",
-                        CSS.decl("gap", "14px")
-                    ),
-
-                    CSS.rule(
-                        ".\(ClassName.splitFlowOutcomes)",
-                        CSS.decl("gap", "14px")
-                    ),
-
-                    CSS.rule(
-                        ".\(ClassName.splitFlowArrowLayer)",
-                        CSS.decl("display", "none")
-                    ),
-
-                    CSS.rule(
-                        ".\(ClassName.splitFlowBox)",
-                        CSS.decl("min-height", "64px")
+                        ".\(ClassName.compactSubtitle)",
+                        CSS.decl("font-size", "10px")
                     ),
 
                     CSS.rule(
