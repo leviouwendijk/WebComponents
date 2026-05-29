@@ -472,25 +472,13 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             )
 
             compact_svg_path(
-                d: "M 582 93 H 368",
+                d: "M 649 66 V 24 H 294 V 30",
                 markerID: markerID,
                 kind: .returning
             )
 
             compact_svg_path(
-                d: "M 294 80 V 110",
-                markerID: markerID,
-                kind: .returning
-            )
-
-            compact_svg_path(
-                d: "M 582 201 H 368",
-                markerID: markerID,
-                kind: .returning
-            )
-
-            compact_svg_path(
-                d: "M 294 214 V 184",
+                d: "M 649 228 V 268 H 294 V 260",
                 markerID: markerID,
                 kind: .returning
             )
