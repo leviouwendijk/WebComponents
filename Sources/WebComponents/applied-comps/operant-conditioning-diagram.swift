@@ -1570,6 +1570,8 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     ".\(ClassName.switchControls)",
                     CSS.decl("display", "inline-flex"),
                     CSS.decl("width", "fit-content"),
+                    CSS.decl("justify-self", "end"),
+                    CSS.decl("margin-left", "auto"),
                     CSS.decl("align-items", "center"),
                     CSS.decl("gap", "4px"),
                     CSS.decl("padding", "3px"),
