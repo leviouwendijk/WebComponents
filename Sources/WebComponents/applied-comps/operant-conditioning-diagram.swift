@@ -1481,32 +1481,59 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(ClassName.switchControls)",
-                    CSS.decl("display", "flex"),
-                    CSS.decl("flex-wrap", "wrap"),
-                    CSS.decl("gap", "8px"),
-                    CSS.decl("align-items", "center")
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("width", "fit-content"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("gap", "4px"),
+                    CSS.decl("padding", "3px"),
+                    CSS.decl("border", "1px solid var(--border-color, rgba(0,0,0,0.12))"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--background-color, #fff) 94%, var(--text-color, #0f172a) 6%)"),
+                    CSS.decl("box-shadow", "inset 0 1px 0 rgba(255,255,255,.55)"),
+                    CSS.decl("flex", "0 0 auto")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.switchButton)",
                     CSS.decl("appearance", "none"),
-                    CSS.decl("border", "1px solid var(--border-color, rgba(0,0,0,0.12))"),
+                    CSS.decl("border", "0"),
                     CSS.decl("border-radius", "999px"),
-                    CSS.decl("padding", "7px 12px"),
-                    CSS.decl("background", "var(--background-color, #fff)"),
-                    CSS.decl("color", "var(--text-color, #0f172a)"),
+                    CSS.decl("height", "30px"),
+                    CSS.decl("padding", "0 12px"),
+                    CSS.decl("background", "transparent"),
+                    CSS.decl("color", "color-mix(in srgb, var(--text-color, #0f172a) 62%, transparent)"),
                     CSS.decl("font", "inherit"),
-                    CSS.decl("font-size", ".86rem"),
-                    CSS.decl("font-weight", "720"),
-                    CSS.decl("cursor", "pointer")
+                    CSS.decl("font-size", ".82rem"),
+                    CSS.decl("font-weight", "740"),
+                    CSS.decl("line-height", "30px"),
+                    CSS.decl("cursor", "pointer"),
+                    CSS.decl("transition", "background 140ms ease, color 140ms ease, box-shadow 140ms ease")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchButton):hover",
+                    CSS.decl("color", "var(--text-color, #0f172a)")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.switchButton)[aria-pressed=\"true\"]",
-                    CSS.decl("background", "color-mix(in srgb, var(--link-color) 13%, var(--background-color, #fff))"),
-                    CSS.decl("border-color", "color-mix(in srgb, var(--link-color) 45%, var(--border-color))"),
-                    CSS.decl("box-shadow", "0 10px 26px color-mix(in srgb, var(--link-color) 13%, transparent)")
+                    CSS.decl("background", "var(--text-color, #0f172a)"),
+                    CSS.decl("color", "var(--background-color, #fff)"),
+                    CSS.decl("box-shadow", "0 1px 2px rgba(15, 23, 42, .16)")
                 ),
+
+                CSS.rule(
+                    ".\(ClassName.switchButton):focus-visible",
+                    CSS.decl("outline", "2px solid color-mix(in srgb, var(--link-color) 70%, transparent)"),
+                    CSS.decl("outline-offset", "2px")
+                ),
+
+                // CSS.rule(
+                //     ".\(ClassName.switchButton)[aria-pressed=\"true\"]",
+                //     CSS.decl("background", "color-mix(in srgb, var(--link-color) 13%, var(--background-color, #fff))"),
+                //     CSS.decl("border-color", "color-mix(in srgb, var(--link-color) 45%, var(--border-color))"),
+                //     CSS.decl("box-shadow", "0 10px 26px color-mix(in srgb, var(--link-color) 13%, transparent)")
+                // ),
 
                 CSS.rule(
                     ".\(ClassName.switchRoot) [data-operant-switch-track]",
@@ -1634,8 +1661,10 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
 
                     CSS.rule(
                         ".\(ClassName.switchButton)",
-                        CSS.decl("padding", "6px 10px"),
-                        CSS.decl("font-size", ".8rem")
+                        CSS.decl("height", "28px"),
+                        CSS.decl("padding", "0 10px"),
+                        CSS.decl("font-size", ".8rem"),
+                        CSS.decl("line-height", "28px")
                     ),
 
                     CSS.rule(
