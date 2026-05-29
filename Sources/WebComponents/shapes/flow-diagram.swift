@@ -114,7 +114,7 @@ public struct FlowDiagram: SelectableComponent {
                     }
                 }
             ],
-            stylesheets: [Self.css()]
+            stylesheets: [Self.stylesheet()]
         )
     }
 
@@ -220,6 +220,10 @@ extension FlowDiagram {
     }
 
     public static func css() -> CSSStyleSheet {
+        stylesheet()
+    }
+
+    public static func stylesheet() -> CSSStyleSheet {
         let s = selectors
 
         let root = s.root.rawValue
