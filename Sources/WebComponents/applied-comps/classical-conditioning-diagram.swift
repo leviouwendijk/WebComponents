@@ -79,16 +79,12 @@ public struct ClassicalConditioningDiagram: ReusableComponent, Sendable {
                     ) {
                         [
                             HTML.b { HTML.text("Prikkel") },
-                            HTML.span { HTML.text("situatie / signaal") }
+                            HTML.span { HTML.text("voorspellend signaal") }
                         ]
                     }
                 ),
 
-                .arrow(
-                    .init(
-                        label: "voorspelt"
-                    )
-                ),
+                .arrow(.init()),
 
                 .box(
                     flow_box(
@@ -97,7 +93,7 @@ public struct ClassicalConditioningDiagram: ReusableComponent, Sendable {
                     ) {
                         [
                             HTML.b { HTML.text("Gevolg") },
-                            HTML.span { HTML.text("wat erop volgt") }
+                            HTML.span { HTML.text("herhaaldelijk vervolg") }
                         ]
                     }
                 )
