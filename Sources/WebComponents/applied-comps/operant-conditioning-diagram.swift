@@ -95,10 +95,10 @@ public enum OperantOutcomeTarget: String, Sendable, CaseIterable {
     public var subtitle: String {
         switch self {
         case .aantrekker:
-            return "toegang / behoud"
+            return "voordeel / winst"
 
         case .afstoter:
-            return "vermijding / opheffing"
+            return "nadeel / kost"
         }
     }
 }
