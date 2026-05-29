@@ -203,13 +203,21 @@ public struct DocsCategoryPage: ReusableComponent {
             ],
             media: [
                 CSS.media(
-                    "(max-width: 980px)",
+                    "(max-width: 1200px)",
                     CSS.rule(
                         ".wc-docs-category-page .container",
                         CSS.decl("display", "block"),
                         CSS.decl("width", "100%")
                     )
                 ),
+                // CSS.media(
+                //     "(max-width: 980px)",
+                //     CSS.rule(
+                //         ".wc-docs-category-page .container",
+                //         CSS.decl("display", "block"),
+                //         CSS.decl("width", "100%")
+                //     )
+                // ),
 
                 CSS.media(
                     "(max-width: 720px)",
