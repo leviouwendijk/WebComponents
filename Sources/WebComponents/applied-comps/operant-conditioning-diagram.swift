@@ -1528,13 +1528,6 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     CSS.decl("outline-offset", "2px")
                 ),
 
-                // CSS.rule(
-                //     ".\(ClassName.switchButton)[aria-pressed=\"true\"]",
-                //     CSS.decl("background", "color-mix(in srgb, var(--link-color) 13%, var(--background-color, #fff))"),
-                //     CSS.decl("border-color", "color-mix(in srgb, var(--link-color) 45%, var(--border-color))"),
-                //     CSS.decl("box-shadow", "0 10px 26px color-mix(in srgb, var(--link-color) 13%, transparent)")
-                // ),
-
                 CSS.rule(
                     ".\(ClassName.switchRoot) [data-operant-switch-track]",
                     CSS.decl("opacity", ".18"),
@@ -1544,6 +1537,18 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.switchRoot)[data-state=\"aantrekker\"] [data-operant-switch-track=\"aantrekker\"], .\(ClassName.switchRoot)[data-state=\"afstoter\"] [data-operant-switch-track=\"afstoter\"]",
                     CSS.decl("opacity", "1")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchRoot) .\(ClassName.compactPath)[data-operant-switch-track]",
+                    CSS.decl("animation", "none")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchRoot)[data-state=\"aantrekker\"] .\(ClassName.compactPath)[data-operant-switch-track=\"aantrekker\"], .\(ClassName.switchRoot)[data-state=\"afstoter\"] .\(ClassName.compactPath)[data-operant-switch-track=\"afstoter\"]",
+                    CSS.decl("stroke-dasharray", "10 8"),
+                    CSS.decl("stroke-dashoffset", "0"),
+                    CSS.decl("animation", "wc-operant-conditioning-path-flow 900ms linear infinite")
                 ),
 
                 CSS.rule(
@@ -1672,7 +1677,22 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                         CSS.decl("padding", "14px"),
                         CSS.decl("font-size", ".78rem")
                     )
+                ),
+
+                CSS.media(
+                    "(prefers-reduced-motion: reduce)",
+                    CSS.rule(
+                        ".\(ClassName.switchRoot)[data-state=\"aantrekker\"] .\(ClassName.compactPath)[data-operant-switch-track=\"aantrekker\"], .\(ClassName.switchRoot)[data-state=\"afstoter\"] .\(ClassName.compactPath)[data-operant-switch-track=\"afstoter\"]",
+                        CSS.decl("animation", "none")
+                    )
                 )
+            ],
+            keyframes: [
+                CSS.keyframes("wc-operant-conditioning-path-flow") {
+                    CSS.to {
+                        CSS.decl("stroke-dashoffset", "-18")
+                    }
+                }
             ]
         )
     }
