@@ -79,36 +79,39 @@ public enum OperantFlowBox: String, Sendable, CaseIterable {
 }
 
 public enum OperantOutcomeTarget: String, Sendable, CaseIterable {
-    // case aantrekker
-    // case afstoter
     case voordeel
     case nadeel
 
     public var title: String {
         switch self {
-        // case .aantrekker:
-        //     return "Aantrekker"
+        case .voordeel:
+            return "Voordeel"
 
-        // case .afstoter:
-        //     return "Afstoter"
-        case .voordeel: return "Voordeel (winst)"
-        case .nadeel: return "Nadeel (verlies)"
+        case .nadeel:
+            return "Nadeel"
+        }
+    }
+
+    public var subtitles: [String] {
+        switch self {
+        case .voordeel:
+            return [
+                "winst",
+                "toegang tot aantrekker",
+                "verlichting van afstoter"
+            ]
+
+        case .nadeel:
+            return [
+                "verlies",
+                "verlies van aantrekker",
+                "activatie van afstoter"
+            ]
         }
     }
 
     public var subtitle: String {
-        switch self {
-        // case .aantrekker:
-        //     return "voordeel / winst"
-
-        // case .afstoter:
-        //     return "nadeel / kost"
-        case .voordeel:
-            return "(+)aantrekker, (-)afstoter"
-
-        case .nadeel:
-            return "(-)aantrekker, (+)afstoter"
-        }
+        subtitles.joined(separator: " · ")
     }
 }
 
@@ -384,7 +387,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 "viewBox": "0 0 760 292",
                 "preserveAspectRatio": "xMidYMid meet",
                 "role": "img",
-                "aria-label": "Prikkel leidt tot keuze. Keuze leidt tot aantrekker of afstoter. Aantrekker versterkt dezelfde keuze; afstoter verzwakt dezelfde keuze."
+                "aria-label": "Prikkel leidt tot keuze. Keuze leidt tot voordeel of nadeel. Voordeel versterkt dezelfde keuze; nadeel verzwakt dezelfde keuze."
             ]
         ) {
             HTML.el("defs") {
@@ -456,7 +459,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 134,
                 height: 54,
                 title: OperantOutcomeTarget.voordeel.title,
-                subtitle: OperantOutcomeTarget.voordeel.subtitle,
+                subtitles: OperantOutcomeTarget.voordeel.subtitles,
                 highlighted: highlighted == .outcome
             )
 
@@ -466,7 +469,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 134,
                 height: 54,
                 title: OperantOutcomeTarget.nadeel.title,
-                subtitle: OperantOutcomeTarget.nadeel.subtitle,
+                subtitles: OperantOutcomeTarget.nadeel.subtitles,
                 highlighted: highlighted == .outcome
             )
 
@@ -516,7 +519,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
 
     public static func compact_outcome_switch_node(
         id: String = "operant-conditioning-compact-outcome-switch",
-        caption: String? = "Schakel tussen de twee mogelijke uitkomsten: een aantrekker versterkt deze keuze; een afstoter verzwakt deze keuze.",
+        caption: String? = "Schakel tussen de twee mogelijke uitkomsten: voordeel versterkt deze keuze; nadeel verzwakt deze keuze.",
         initial: OperantOutcomeTarget = .voordeel,
         highlighted: OperantFlowBox? = .choice
     ) -> any HTMLNode {
@@ -592,7 +595,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 "viewBox": "0 0 760 292",
                 "preserveAspectRatio": "xMidYMid meet",
                 "role": "img",
-                "aria-label": "Prikkel leidt tot keuze. De keuze schakelt naar aantrekker of afstoter. De actieve uitkomst versterkt of verzwakt dezelfde keuze."
+                "aria-label": "Prikkel leidt tot keuze. De keuze schakelt naar voordeel of nadeel. De actieve uitkomst versterkt of verzwakt dezelfde keuze."
             ]
         ) {
             HTML.el("defs") {
@@ -665,8 +668,8 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 y: 66,
                 width: 134,
                 height: 54,
-                title: "Aantrekker",
-                subtitle: OperantOutcomeTarget.voordeel.subtitle,
+                title: OperantOutcomeTarget.voordeel.title,
+                subtitles: OperantOutcomeTarget.voordeel.subtitles,
                 highlighted: highlighted == .outcome,
                 track: .voordeel,
                 interactive: true
@@ -677,8 +680,8 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 y: 174,
                 width: 134,
                 height: 54,
-                title: "Afstoter",
-                subtitle: OperantOutcomeTarget.nadeel.subtitle,
+                title: OperantOutcomeTarget.nadeel.title,
+                subtitles: OperantOutcomeTarget.nadeel.subtitles,
                 highlighted: highlighted == .outcome,
                 track: .nadeel,
                 interactive: true
@@ -736,7 +739,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
 
     public static func split_outcome_code_node(
         id: String = "operant-conditioning-split-outcome-code",
-        caption: String? = "De terugkoppeling als codeblok: een aantrekker versterkt de volgende keuze; een afstoter verzwakt die keuze."
+        caption: String? = "De terugkoppeling als codeblok: voordeel versterkt de volgende keuze; nadeel verzwakt die keuze."
     ) -> any HTMLNode {
         HTML.figure(
             [
@@ -767,10 +770,10 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
     Prikkel ------> [keuze] Gedrag <-----------------------------.
                          |                                      |
                      uitkomst?                                  |
-                     |-- Aantrekker                             |
+                     |-- Voordeel                               |
                      |   -> Versterkt --------------------------|
                      |                                          |
-                     `-- Afstoter                               |
+                     `-- Nadeel                                 |
                          -> Verzwakt ---------------------------'
     """
 
@@ -912,11 +915,42 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         subtitle: String,
         highlighted: Bool
     ) -> HTMLFragment {
+        compact_svg_box(
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            title: title,
+            subtitles: [subtitle],
+            highlighted: highlighted
+        )
+    }
+
+    private static func compact_svg_box(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        title: String,
+        subtitles: [String],
+        highlighted: Bool
+    ) -> HTMLFragment {
         let className = highlighted
             ? "\(ClassName.compactBox) \(ClassName.compactBoxHighlighted)"
             : ClassName.compactBox
 
         let centerX = x + (width / 2)
+        let cleanedSubtitles = subtitles
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+
+        let titleY = cleanedSubtitles.count > 1
+            ? y + 17
+            : y + 20
+
+        let subtitleStartY = cleanedSubtitles.count > 1
+            ? y + 34
+            : y + 37
 
         return [
             HTML.el(
@@ -937,25 +971,17 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 [
                     "class": ClassName.compactTitle,
                     "x": "\(centerX)",
-                    "y": "\(y + 20)",
+                    "y": "\(titleY)",
                     "text-anchor": "middle"
                 ]
             ) {
                 HTML.text(title)
-            },
-
-            HTML.el(
-                "text",
-                [
-                    "class": ClassName.compactSubtitle,
-                    "x": "\(centerX)",
-                    "y": "\(y + 37)",
-                    "text-anchor": "middle"
-                ]
-            ) {
-                HTML.text(subtitle)
             }
-        ]
+        ] + compact_svg_subtitle_nodes(
+            centerX: centerX,
+            startY: subtitleStartY,
+            subtitles: cleanedSubtitles
+        )
     }
 
     private static func compact_svg_switch_box(
@@ -969,11 +995,46 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         track: OperantOutcomeTarget? = nil,
         interactive: Bool = false
     ) -> HTMLFragment {
+        compact_svg_switch_box(
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            title: title,
+            subtitles: [subtitle],
+            highlighted: highlighted,
+            track: track,
+            interactive: interactive
+        )
+    }
+
+    private static func compact_svg_switch_box(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        title: String,
+        subtitles: [String],
+        highlighted: Bool,
+        track: OperantOutcomeTarget? = nil,
+        interactive: Bool = false
+    ) -> HTMLFragment {
         let rectClassName = highlighted
             ? "\(ClassName.compactBox) \(ClassName.compactBoxHighlighted)"
             : ClassName.compactBox
 
         let centerX = x + (width / 2)
+        let cleanedSubtitles = subtitles
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+
+        let titleY = cleanedSubtitles.count > 1
+            ? y + 17
+            : y + 20
+
+        let subtitleStartY = cleanedSubtitles.count > 1
+            ? y + 34
+            : y + 37
 
         var attrs: HTMLAttribute = [
             "class": ClassName.compactGroup
@@ -1001,44 +1062,58 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 "g",
                 attrs
             ) {
-                HTML.el(
-                    "rect",
-                    [
-                        "class": rectClassName,
-                        "x": "\(x)",
-                        "y": "\(y)",
-                        "width": "\(width)",
-                        "height": "\(height)",
-                        "rx": "12",
-                        "ry": "12"
-                    ]
-                ) {}
+                [
+                    HTML.el(
+                        "rect",
+                        [
+                            "class": rectClassName,
+                            "x": "\(x)",
+                            "y": "\(y)",
+                            "width": "\(width)",
+                            "height": "\(height)",
+                            "rx": "12",
+                            "ry": "12"
+                        ]
+                    ) {},
 
-                HTML.el(
-                    "text",
-                    [
-                        "class": ClassName.compactTitle,
-                        "x": "\(centerX)",
-                        "y": "\(y + 20)",
-                        "text-anchor": "middle"
-                    ]
-                ) {
-                    HTML.text(title)
-                }
-
-                HTML.el(
-                    "text",
-                    [
-                        "class": ClassName.compactSubtitle,
-                        "x": "\(centerX)",
-                        "y": "\(y + 37)",
-                        "text-anchor": "middle"
-                    ]
-                ) {
-                    HTML.text(subtitle)
-                }
+                    HTML.el(
+                        "text",
+                        [
+                            "class": ClassName.compactTitle,
+                            "x": "\(centerX)",
+                            "y": "\(titleY)",
+                            "text-anchor": "middle"
+                        ]
+                    ) {
+                        HTML.text(title)
+                    }
+                ] + compact_svg_subtitle_nodes(
+                    centerX: centerX,
+                    startY: subtitleStartY,
+                    subtitles: cleanedSubtitles
+                )
             }
         ]
+    }
+
+    private static func compact_svg_subtitle_nodes(
+        centerX: Int,
+        startY: Int,
+        subtitles: [String]
+    ) -> HTMLFragment {
+        subtitles.enumerated().map { index, subtitle -> any HTMLNode in
+            HTML.el(
+                "text",
+                [
+                    "class": ClassName.compactSubtitle,
+                    "x": "\(centerX)",
+                    "y": "\(startY + (index * 12))",
+                    "text-anchor": "middle"
+                ]
+            ) {
+                HTML.text(subtitle)
+            }
+        }
     }
 
     private static func compact_svg_path(
