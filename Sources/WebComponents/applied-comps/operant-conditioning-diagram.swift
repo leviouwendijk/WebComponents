@@ -184,7 +184,8 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     ) {
                         [
                             HTML.b { HTML.text("Prikkel") },
-                            HTML.span { HTML.text("Situatie / context") }
+                            // HTML.span { HTML.text("Situatie / context") }
+                            HTML.span { HTML.text("Omgeving") }
                         ]
                     }
                 ),
@@ -212,7 +213,8 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     ) {
                         [
                             HTML.b { HTML.text("Uitkomst") },
-                            HTML.span { HTML.text("Gevolg (versterkt | verzwakt)") }
+                            HTML.span { HTML.text("Gevolg") }
+                            // HTML.span { HTML.text("Gevolg (versterkt | verzwakt)") }
                         ]
                     }
                 )
