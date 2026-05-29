@@ -165,6 +165,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         static let compactFigure = "wc-operant-conditioning-diagram__compact-figure"
         static let compactStage = "wc-operant-conditioning-diagram__compact-stage"
         static let compactSVG = "wc-operant-conditioning-diagram__compact-svg"
+        static let compactGroup = "wc-operant-conditioning-diagram__compact-group"
         static let compactBox = "wc-operant-conditioning-diagram__compact-box"
         static let compactBoxHighlighted = "wc-operant-conditioning-diagram__compact-box--highlighted"
         static let compactTitle = "wc-operant-conditioning-diagram__compact-title"
@@ -173,6 +174,13 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         static let compactForward = "wc-operant-conditioning-diagram__compact-path--forward"
         static let compactReturn = "wc-operant-conditioning-diagram__compact-path--return"
         static let compactMarkerHead = "wc-operant-conditioning-diagram__compact-marker-head"
+
+        static let switchFigure = "wc-operant-conditioning-diagram__switch-figure"
+        static let switchRoot = "wc-operant-conditioning-diagram__switch-root"
+        static let switchControls = "wc-operant-conditioning-diagram__switch-controls"
+        static let switchButton = "wc-operant-conditioning-diagram__switch-button"
+        static let switchStage = "wc-operant-conditioning-diagram__switch-stage"
+        static let switchLive = "wc-operant-conditioning-diagram__switch-live"
     }
 
     public let id: String
@@ -367,7 +375,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 "viewBox": "0 0 760 292",
                 "preserveAspectRatio": "xMidYMid meet",
                 "role": "img",
-                "aria-label": "Prikkel leidt tot keuze. Keuze leidt tot aantrekker of afstoter. Aantrekker versterkt de volgende keuze; afstoter verzwakt de volgende keuze."
+                "aria-label": "Prikkel leidt tot keuze. Keuze leidt tot aantrekker of afstoter. Aantrekker versterkt dezelfde keuze; afstoter verzwakt dezelfde keuze."
             ]
         ) {
             HTML.el("defs") {
@@ -478,9 +486,241 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             )
 
             compact_svg_path(
-                d: "M 649 228 V 268 H 294 V 260",
+                d: "M 294 80 V 118",
                 markerID: markerID,
                 kind: .returning
+            )
+
+            compact_svg_path(
+                d: "M 649 228 V 268 H 294 V 262",
+                markerID: markerID,
+                kind: .returning
+            )
+
+            compact_svg_path(
+                d: "M 294 212 V 176",
+                markerID: markerID,
+                kind: .returning
+            )
+        }
+    }
+
+    public static func compact_outcome_switch_node(
+        id: String = "operant-conditioning-compact-outcome-switch",
+        caption: String? = "Schakel tussen de twee mogelijke uitkomsten: een aantrekker versterkt deze keuze; een afstoter verzwakt deze keuze.",
+        initial: OperantOutcomeTarget = .aantrekker,
+        highlighted: OperantFlowBox? = .choice
+    ) -> any HTMLNode {
+        HTML.figure(
+            [
+                "id": id,
+                "class": "\(ClassName.root) \(ClassName.switchFigure)"
+            ]
+        ) {
+            HTML.div(
+                [
+                    "class": ClassName.switchRoot,
+                    "data-operant-switch": "true",
+                    "data-state": initial.rawValue
+                ]
+            ) {
+                HTML.div(
+                    [
+                        "class": ClassName.switchControls,
+                        "role": "group",
+                        "aria-label": "Kies welke uitkomst actief wordt getoond."
+                    ]
+                ) {
+                    switch_button(
+                        .aantrekker,
+                        active: initial == .aantrekker
+                    )
+
+                    switch_button(
+                        .afstoter,
+                        active: initial == .afstoter
+                    )
+                }
+
+                HTML.div(["class": "\(ClassName.compactStage) \(ClassName.switchStage)"]) {
+                    compact_outcome_switch_svg(
+                        markerID: "\(id)-arrowhead",
+                        highlighted: highlighted
+                    )
+                }
+
+                HTML.span(
+                    [
+                        "class": ClassName.switchLive,
+                        "data-operant-switch-live": "true",
+                        "aria-live": "polite"
+                    ]
+                ) {
+                    HTML.text(switch_status_text(initial))
+                }
+            }
+
+            HTML.el("script") {
+                HTML.raw(Self.switchScript)
+            }
+
+            if let caption, !caption.isEmpty {
+                HTML.figcaption(["class": ClassName.caption]) {
+                    HTML.text(caption)
+                }
+            }
+        }
+    }
+
+    public static func compact_outcome_switch_svg(
+        markerID: String = "operant-compact-switch-arrowhead",
+        highlighted: OperantFlowBox? = .choice
+    ) -> any HTMLNode {
+        HTML.el(
+            "svg",
+            [
+                "class": ClassName.compactSVG,
+                "viewBox": "0 0 760 292",
+                "preserveAspectRatio": "xMidYMid meet",
+                "role": "img",
+                "aria-label": "Prikkel leidt tot keuze. De keuze schakelt naar aantrekker of afstoter. De actieve uitkomst versterkt of verzwakt dezelfde keuze."
+            ]
+        ) {
+            HTML.el("defs") {
+                HTML.el(
+                    "marker",
+                    [
+                        "id": markerID,
+                        "viewBox": "0 0 10 10",
+                        "refX": "9",
+                        "refY": "5",
+                        "markerWidth": "7",
+                        "markerHeight": "7",
+                        "orient": "auto"
+                    ]
+                ) {
+                    HTML.el(
+                        "path",
+                        [
+                            "class": ClassName.compactMarkerHead,
+                            "d": "M 0 0 L 10 5 L 0 10 z"
+                        ]
+                    ) {}
+                }
+            }
+
+            compact_svg_switch_box(
+                x: 28,
+                y: 122,
+                width: 124,
+                height: 50,
+                title: "Prikkel",
+                subtitle: "Omgeving",
+                highlighted: highlighted == .stimulus
+            )
+
+            compact_svg_switch_box(
+                x: 232,
+                y: 122,
+                width: 124,
+                height: 50,
+                title: "Keuze",
+                subtitle: "Gedrag",
+                highlighted: highlighted == .choice
+            )
+
+            compact_svg_switch_box(
+                x: 232,
+                y: 32,
+                width: 124,
+                height: 46,
+                title: "Versterkt",
+                subtitle: "keuze neemt toe",
+                highlighted: false,
+                track: .aantrekker
+            )
+
+            compact_svg_switch_box(
+                x: 232,
+                y: 214,
+                width: 124,
+                height: 46,
+                title: "Verzwakt",
+                subtitle: "keuze neemt af",
+                highlighted: false,
+                track: .afstoter
+            )
+
+            compact_svg_switch_box(
+                x: 582,
+                y: 66,
+                width: 134,
+                height: 54,
+                title: "Aantrekker",
+                subtitle: "toegang / behoud",
+                highlighted: highlighted == .outcome,
+                track: .aantrekker,
+                interactive: true
+            )
+
+            compact_svg_switch_box(
+                x: 582,
+                y: 174,
+                width: 134,
+                height: 54,
+                title: "Afstoter",
+                subtitle: "vermijding / opheffing",
+                highlighted: highlighted == .outcome,
+                track: .afstoter,
+                interactive: true
+            )
+
+            compact_svg_path(
+                d: "M 154 147 H 220",
+                markerID: markerID,
+                kind: .forward
+            )
+
+            compact_svg_switch_path(
+                d: "M 358 147 H 458 V 93 H 570",
+                markerID: markerID,
+                kind: .forward,
+                track: .aantrekker
+            )
+
+            compact_svg_switch_path(
+                d: "M 358 147 H 458 V 201 H 570",
+                markerID: markerID,
+                kind: .forward,
+                track: .afstoter
+            )
+
+            compact_svg_switch_path(
+                d: "M 649 66 V 24 H 294 V 30",
+                markerID: markerID,
+                kind: .returning,
+                track: .aantrekker
+            )
+
+            compact_svg_switch_path(
+                d: "M 294 80 V 118",
+                markerID: markerID,
+                kind: .returning,
+                track: .aantrekker
+            )
+
+            compact_svg_switch_path(
+                d: "M 649 228 V 268 H 294 V 262",
+                markerID: markerID,
+                kind: .returning,
+                track: .afstoter
+            )
+
+            compact_svg_switch_path(
+                d: "M 294 212 V 176",
+                markerID: markerID,
+                kind: .returning,
+                track: .afstoter
             )
         }
     }
@@ -709,6 +949,89 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         ]
     }
 
+    private static func compact_svg_switch_box(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        title: String,
+        subtitle: String,
+        highlighted: Bool,
+        track: OperantOutcomeTarget? = nil,
+        interactive: Bool = false
+    ) -> HTMLFragment {
+        let rectClassName = highlighted
+            ? "\(ClassName.compactBox) \(ClassName.compactBoxHighlighted)"
+            : ClassName.compactBox
+
+        let centerX = x + (width / 2)
+
+        var attrs: HTMLAttribute = [
+            "class": ClassName.compactGroup
+        ]
+
+        if let track {
+            attrs.merge([
+                "data-operant-switch-track": track.rawValue
+            ])
+        }
+
+        if interactive, let track {
+            attrs.merge([
+                "data-operant-switch-option": "true",
+                "data-operant-switch-box": track.rawValue,
+                "data-track": track.rawValue,
+                "role": "button",
+                "tabindex": "0",
+                "aria-pressed": "false"
+            ])
+        }
+
+        return [
+            HTML.el(
+                "g",
+                attrs
+            ) {
+                HTML.el(
+                    "rect",
+                    [
+                        "class": rectClassName,
+                        "x": "\(x)",
+                        "y": "\(y)",
+                        "width": "\(width)",
+                        "height": "\(height)",
+                        "rx": "12",
+                        "ry": "12"
+                    ]
+                ) {}
+
+                HTML.el(
+                    "text",
+                    [
+                        "class": ClassName.compactTitle,
+                        "x": "\(centerX)",
+                        "y": "\(y + 20)",
+                        "text-anchor": "middle"
+                    ]
+                ) {
+                    HTML.text(title)
+                }
+
+                HTML.el(
+                    "text",
+                    [
+                        "class": ClassName.compactSubtitle,
+                        "x": "\(centerX)",
+                        "y": "\(y + 37)",
+                        "text-anchor": "middle"
+                    ]
+                ) {
+                    HTML.text(subtitle)
+                }
+            }
+        ]
+    }
+
     private static func compact_svg_path(
         d: String,
         markerID: String,
@@ -728,6 +1051,33 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             "path",
             [
                 "class": "\(ClassName.compactPath) \(kindClass)",
+                "d": d,
+                "marker-end": "url(#\(markerID))"
+            ]
+        ) {}
+    }
+
+    private static func compact_svg_switch_path(
+        d: String,
+        markerID: String,
+        kind: CompactPathKind,
+        track: OperantOutcomeTarget
+    ) -> any HTMLNode {
+        let kindClass: String = {
+            switch kind {
+            case .forward:
+                return ClassName.compactForward
+
+            case .returning:
+                return ClassName.compactReturn
+            }
+        }()
+
+        return HTML.el(
+            "path",
+            [
+                "class": "\(ClassName.compactPath) \(kindClass)",
+                "data-operant-switch-track": track.rawValue,
                 "d": d,
                 "marker-end": "url(#\(markerID))"
             ]
@@ -824,6 +1174,116 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             }
         }
     }
+
+    private static func switch_button(
+        _ target: OperantOutcomeTarget,
+        active: Bool
+    ) -> any HTMLNode {
+        HTML.el(
+            "button",
+            [
+                "type": "button",
+                "class": ClassName.switchButton,
+                "data-operant-switch-option": "true",
+                "data-track": target.rawValue,
+                "aria-pressed": active ? "true" : "false"
+            ]
+        ) {
+            HTML.text(target.title)
+        }
+    }
+
+    private static func switch_status_text(
+        _ target: OperantOutcomeTarget
+    ) -> String {
+        switch target {
+        case .aantrekker:
+            return "Aantrekker geselecteerd: de uitkomst versterkt dezelfde keuze."
+
+        case .afstoter:
+            return "Afstoter geselecteerd: de uitkomst verzwakt dezelfde keuze."
+        }
+    }
+
+    private static let switchScript = #"""
+    (() => {
+        if (window.wcOperantOutcomeSwitch?.initialized) return;
+
+        function statusText(track) {
+            if (track === 'afstoter') {
+                return 'Afstoter geselecteerd: de uitkomst verzwakt dezelfde keuze.';
+            }
+
+            return 'Aantrekker geselecteerd: de uitkomst versterkt dezelfde keuze.';
+        }
+
+        function setState(root, track) {
+            if (!root) return;
+            if (track !== 'aantrekker' && track !== 'afstoter') return;
+
+            root.setAttribute('data-state', track);
+
+            root.querySelectorAll('[data-operant-switch-option]').forEach((option) => {
+                const active = option.getAttribute('data-track') === track;
+                option.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+
+            const live = root.querySelector('[data-operant-switch-live]');
+
+            if (live) {
+                live.textContent = statusText(track);
+            }
+        }
+
+        function activate(option) {
+            const root = option.closest('[data-operant-switch]');
+            const track = option.getAttribute('data-track');
+
+            setState(root, track);
+        }
+
+        document.addEventListener('click', (event) => {
+            const option = event.target.closest('[data-operant-switch-option]');
+
+            if (!option) return;
+
+            event.preventDefault();
+            activate(option);
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+
+            const option = event.target.closest('[data-operant-switch-option]');
+
+            if (!option) return;
+
+            event.preventDefault();
+            activate(option);
+        });
+
+        function init(root = document) {
+            root.querySelectorAll('[data-operant-switch]').forEach((switchRoot) => {
+                setState(
+                    switchRoot,
+                    switchRoot.getAttribute('data-state') || 'aantrekker'
+                );
+            });
+        }
+
+        window.wcOperantOutcomeSwitch = {
+            initialized: true,
+            init,
+            setState
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => init());
+        } else {
+            init();
+        }
+    })();
+    """#
 
     public static func stylesheet() -> CSSStyleSheet {
         CSSStyleSheet(
@@ -973,7 +1433,8 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     CSS.decl("font-size", "13px"),
                     CSS.decl("font-weight", "760"),
                     CSS.decl("line-height", "1"),
-                    CSS.decl("fill", "var(--text-color, #0f172a)")
+                    CSS.decl("fill", "var(--text-color, #0f172a)"),
+                    CSS.decl("pointer-events", "none")
                 ),
 
                 CSS.rule(
@@ -981,7 +1442,8 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     CSS.decl("font-size", "11px"),
                     CSS.decl("font-weight", "430"),
                     CSS.decl("line-height", "1"),
-                    CSS.decl("fill", "color-mix(in srgb, var(--text-color, #0f172a) 74%, transparent)")
+                    CSS.decl("fill", "color-mix(in srgb, var(--text-color, #0f172a) 74%, transparent)"),
+                    CSS.decl("pointer-events", "none")
                 ),
 
                 CSS.rule(
@@ -1002,6 +1464,83 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.compactMarkerHead)",
                     CSS.decl("fill", "var(--flow-arrow-color, var(--text-color, #0f172a))")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchFigure)",
+                    CSS.decl("width", "min(760px, 100%)"),
+                    CSS.decl("margin", "24px 0 30px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchRoot)",
+                    CSS.decl("position", "relative"),
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "10px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchControls)",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("flex-wrap", "wrap"),
+                    CSS.decl("gap", "8px"),
+                    CSS.decl("align-items", "center")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchButton)",
+                    CSS.decl("appearance", "none"),
+                    CSS.decl("border", "1px solid var(--border-color, rgba(0,0,0,0.12))"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("padding", "7px 12px"),
+                    CSS.decl("background", "var(--background-color, #fff)"),
+                    CSS.decl("color", "var(--text-color, #0f172a)"),
+                    CSS.decl("font", "inherit"),
+                    CSS.decl("font-size", ".86rem"),
+                    CSS.decl("font-weight", "720"),
+                    CSS.decl("cursor", "pointer")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchButton)[aria-pressed=\"true\"]",
+                    CSS.decl("background", "color-mix(in srgb, var(--link-color) 13%, var(--background-color, #fff))"),
+                    CSS.decl("border-color", "color-mix(in srgb, var(--link-color) 45%, var(--border-color))"),
+                    CSS.decl("box-shadow", "0 10px 26px color-mix(in srgb, var(--link-color) 13%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchRoot) [data-operant-switch-track]",
+                    CSS.decl("opacity", ".18"),
+                    CSS.decl("transition", "opacity 140ms ease, filter 140ms ease")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchRoot)[data-state=\"aantrekker\"] [data-operant-switch-track=\"aantrekker\"], .\(ClassName.switchRoot)[data-state=\"afstoter\"] [data-operant-switch-track=\"afstoter\"]",
+                    CSS.decl("opacity", "1")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchRoot) [data-operant-switch-option]",
+                    CSS.decl("cursor", "pointer")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchRoot) [data-operant-switch-option]:focus .\(ClassName.compactBox)",
+                    CSS.decl("stroke", "color-mix(in srgb, var(--link-color) 62%, var(--border-color))"),
+                    CSS.decl("stroke-width", "1.8")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchLive)",
+                    CSS.decl("position", "absolute"),
+                    CSS.decl("width", "1px"),
+                    CSS.decl("height", "1px"),
+                    CSS.decl("padding", "0"),
+                    CSS.decl("margin", "-1px"),
+                    CSS.decl("overflow", "hidden"),
+                    CSS.decl("clip", "rect(0, 0, 0, 0)"),
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("border", "0")
                 ),
 
                 CSS.rule(
@@ -1086,6 +1625,17 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     CSS.rule(
                         ".\(ClassName.compactSubtitle)",
                         CSS.decl("font-size", "10px")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.switchControls)",
+                        CSS.decl("gap", "6px")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.switchButton)",
+                        CSS.decl("padding", "6px 10px"),
+                        CSS.decl("font-size", ".8rem")
                     ),
 
                     CSS.rule(
