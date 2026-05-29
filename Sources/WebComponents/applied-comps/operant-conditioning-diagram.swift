@@ -96,14 +96,14 @@ public enum OperantOutcomeTarget: String, Sendable, CaseIterable {
         switch self {
         case .voordeel:
             return [
-                "winst",
+                "winst (resultaat, effect)",
                 "toegang tot aantrekker",
                 "verlichting van afstoter"
             ]
 
         case .nadeel:
             return [
-                "verlies",
+                "kost (resultaatloos)",
                 "verlies van aantrekker",
                 "activatie van afstoter"
             ]
