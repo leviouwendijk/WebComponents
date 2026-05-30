@@ -803,7 +803,18 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.switchRoot) .\(ClassName.pathActive)[data-drive-obstacle-track], .\(ClassName.switchRoot) .\(ClassName.pathPressure)[data-drive-obstacle-track]",
+                    CSS.decl("opacity", "0")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.afstoter.rawValue)\"] .\(ClassName.pathPressure)[data-drive-obstacle-track=\"\(DriveObstacleTarget.afstoter.rawValue)\"]",
+                    CSS.decl("opacity", ".84")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.afstoter.rawValue)\"] .\(ClassName.pathActive)[data-drive-obstacle-track=\"\(DriveObstacleTarget.afstoter.rawValue)\"], .\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.aantrekker.rawValue)\"] .\(ClassName.pathActive)[data-drive-obstacle-track=\"\(DriveObstacleTarget.aantrekker.rawValue)\"]",
+                    CSS.decl("opacity", ".92"),
                     CSS.decl("animation", "wc-drive-obstacle-flow 900ms linear infinite")
                 ),
 
