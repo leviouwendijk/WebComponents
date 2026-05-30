@@ -19,10 +19,10 @@ public enum DriveObstacleTarget: String, Sendable, CaseIterable {
     public var statusText: String {
         switch self {
         case .afstoter:
-            return "Afstoter geselecteerd: de hond overwint een obstakel om afstand te vergroten."
+            return "Afstoter geselecteerd: vermijding brengt de hond richting afstand nemen, ook wanneer daar een obstakel tussen ligt."
 
         case .aantrekker:
-            return "Aantrekker geselecteerd: de hond overwint een obstakel om dichterbij te komen."
+            return "Aantrekker geselecteerd: toenadering brengt de hond richting de aantrekker, ook wanneer daar een obstakel tussen ligt."
         }
     }
 }
@@ -56,11 +56,8 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
 
         static let path = "wc-drive-obstacle-diagram__path"
         static let pathActive = "wc-drive-obstacle-diagram__path--active"
-        static let pathPressure = "wc-drive-obstacle-diagram__path--pressure"
-        static let pathInactive = "wc-drive-obstacle-diagram__path--inactive"
         static let markerHead = "wc-drive-obstacle-diagram__marker-head"
 
-        static let routeLabel = "wc-drive-obstacle-diagram__route-label"
         static let routePill = "wc-drive-obstacle-diagram__route-pill"
         static let routePillText = "wc-drive-obstacle-diagram__route-pill-text"
     }
@@ -120,7 +117,7 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                             [
                                 "class": ClassName.stage,
                                 "role": "img",
-                                "aria-label": "Drijfveren met obstakel: de hond overwint een obstakel om afstand te vergroten tot een afstoter of om dichterbij een aantrekker te komen."
+                                "aria-label": "Drijfveren met obstakel: bij een afstoter toont de route vermijding; bij een aantrekker toont de route toenadering."
                             ]
                         ) {
                             Self.svg(
@@ -165,10 +162,10 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
             "svg",
             [
                 "class": ClassName.svg,
-                "viewBox": "0 0 760 320",
+                "viewBox": "0 0 760 280",
                 "preserveAspectRatio": "xMidYMid meet",
                 "role": "img",
-                "aria-label": "Afstoter links, aantrekker rechts, hond in het midden, obstakel op de route."
+                "aria-label": "Afstoter of aantrekker, hond, obstakel en actieve route."
             ]
         ) {
             HTML.el("defs") {
@@ -201,16 +198,16 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                     "x": "18",
                     "y": "18",
                     "width": "724",
-                    "height": "284",
+                    "height": "244",
                     "rx": "28",
                     "ry": "28"
                 ]
             ) {}
 
             card(
-                x: 50,
-                y: 48,
-                width: 210,
+                x: 56,
+                y: 52,
+                width: 218,
                 height: 70,
                 title: "Afstoter",
                 subtitle: "aversieve prikkel",
@@ -218,80 +215,30 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
             )
 
             card(
-                x: 500,
-                y: 48,
-                width: 210,
+                x: 486,
+                y: 52,
+                width: 218,
                 height: 70,
                 title: "Aantrekker",
-                subtitle: "motiverende prikkel",
+                subtitle: "appetetieve prikkel",
                 track: .aantrekker
             )
-
-            HTML.el(
-                "g",
-                [
-                    "class": ClassName.obstacle,
-                    "transform": "translate(362 144)"
-                ]
-            ) {
-                HTML.el(
-                    "rect",
-                    [
-                        "x": "0",
-                        "y": "0",
-                        "width": "58",
-                        "height": "92",
-                        "rx": "14",
-                        "ry": "14"
-                    ]
-                ) {}
-
-                HTML.el(
-                    "path",
-                    [
-                        "class": ClassName.obstacleRidge,
-                        "d": "M 16 18 V 74 M 30 14 V 78 M 44 18 V 74"
-                    ]
-                ) {}
-
-                HTML.el(
-                    "text",
-                    [
-                        "class": ClassName.obstacleLabel,
-                        "x": "29",
-                        "y": "112",
-                        "text-anchor": "middle"
-                    ]
-                ) {
-                    HTML.text("obstakel")
-                }
-            }
-
-            HTML.el(
-                "path",
-                [
-                    "class": "\(ClassName.path) \(ClassName.pathPressure)",
-                    "data-drive-obstacle-track": DriveObstacleTarget.afstoter.rawValue,
-                    "d": "M 260 84 C 294 112, 304 148, 284 174",
-                    "marker-end": "url(#\(markerID))"
-                ]
-            ) {}
 
             HTML.el(
                 "path",
                 [
                     "class": "\(ClassName.path) \(ClassName.pathActive)",
                     "data-drive-obstacle-track": DriveObstacleTarget.afstoter.rawValue,
-                    "d": "M 282 184 C 324 210, 356 238, 414 248 C 506 264, 596 218, 674 168",
+                    "d": "M 274 87 C 292 94, 308 112, 316 138 C 338 154, 364 160, 390 152",
                     "marker-end": "url(#\(markerID))"
                 ]
             ) {}
 
             route_pill(
-                x: 486,
-                y: 226,
-                width: 154,
-                text: "afstand vergroten",
+                x: 248,
+                y: 114,
+                width: 126,
+                text: "vermijding",
                 track: .afstoter
             )
 
@@ -300,32 +247,28 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 [
                     "class": "\(ClassName.path) \(ClassName.pathActive)",
                     "data-drive-obstacle-track": DriveObstacleTarget.aantrekker.rawValue,
-                    "d": "M 282 184 C 326 128, 386 106, 456 126 C 504 140, 552 136, 604 124",
+                    "d": "M 316 148 C 350 166, 382 160, 416 138 C 448 118, 466 98, 486 87",
                     "marker-end": "url(#\(markerID))"
                 ]
             ) {}
 
             route_pill(
-                x: 452,
-                y: 142,
-                width: 152,
-                text: "dichterbij komen",
+                x: 456,
+                y: 128,
+                width: 132,
+                text: "toenadering",
                 track: .aantrekker
             )
 
-            subject()
+            subject(
+                x: 316,
+                y: 148
+            )
 
-            HTML.el(
-                "text",
-                [
-                    "class": ClassName.routeLabel,
-                    "x": "380",
-                    "y": "282",
-                    "text-anchor": "middle"
-                ]
-            ) {
-                HTML.text("de moeite is afhankelijk van wat aantrekt of afstoot")
-            }
+            obstacle(
+                x: 390,
+                y: 100
+            )
         }
     }
 
@@ -425,12 +368,15 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
         }
     }
 
-    private static func subject() -> any HTMLNode {
+    private static func subject(
+        x: Int,
+        y: Int
+    ) -> any HTMLNode {
         HTML.el(
             "g",
             [
                 "class": ClassName.subject,
-                "transform": "translate(276 184)"
+                "transform": "translate(\(x) \(y))"
             ]
         ) {
             HTML.el(
@@ -439,7 +385,7 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                     "class": ClassName.subjectDot,
                     "cx": "0",
                     "cy": "0",
-                    "r": "14"
+                    "r": "12"
                 ]
             ) {}
 
@@ -448,11 +394,56 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 [
                     "class": ClassName.subjectLabel,
                     "x": "0",
-                    "y": "34",
+                    "y": "32",
                     "text-anchor": "middle"
                 ]
             ) {
                 HTML.text("hond")
+            }
+        }
+    }
+
+    private static func obstacle(
+        x: Int,
+        y: Int
+    ) -> any HTMLNode {
+        HTML.el(
+            "g",
+            [
+                "class": ClassName.obstacle,
+                "transform": "translate(\(x) \(y))"
+            ]
+        ) {
+            HTML.el(
+                "rect",
+                [
+                    "x": "0",
+                    "y": "0",
+                    "width": "58",
+                    "height": "92",
+                    "rx": "14",
+                    "ry": "14"
+                ]
+            ) {}
+
+            HTML.el(
+                "path",
+                [
+                    "class": ClassName.obstacleRidge,
+                    "d": "M 16 18 V 74 M 30 14 V 78 M 44 18 V 74"
+                ]
+            ) {}
+
+            HTML.el(
+                "text",
+                [
+                    "class": ClassName.obstacleLabel,
+                    "x": "29",
+                    "y": "112",
+                    "text-anchor": "middle"
+                ]
+            ) {
+                HTML.text("obstakel")
             }
         }
     }
@@ -484,10 +475,10 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
 
         function statusText(track) {
             if (track === afstoterTrack) {
-                return 'Afstoter geselecteerd: de hond overwint een obstakel om afstand te vergroten.';
+                return 'Afstoter geselecteerd: vermijding brengt de hond richting afstand nemen, ook wanneer daar een obstakel tussen ligt.';
             }
 
-            return 'Aantrekker geselecteerd: de hond overwint een obstakel om dichterbij te komen.';
+            return 'Aantrekker geselecteerd: toenadering brengt de hond richting de aantrekker, ook wanneer daar een obstakel tussen ligt.';
         }
 
         function setState(root, track) {
@@ -682,6 +673,20 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.subjectDot)",
+                    CSS.decl("fill", "var(--text-color, #0f172a)"),
+                    CSS.decl("filter", "drop-shadow(0 8px 14px rgba(15, 23, 42, .16))")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.subjectLabel)",
+                    CSS.decl("font-size", "12px"),
+                    CSS.decl("font-weight", "760"),
+                    CSS.decl("letter-spacing", ".04em"),
+                    CSS.decl("fill", "color-mix(in srgb, var(--text-color, #0f172a) 64%, transparent)")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.obstacle) rect",
                     CSS.decl("fill", "color-mix(in srgb, var(--background-color, #fff) 78%, var(--text-color) 22%)"),
                     CSS.decl("stroke", "color-mix(in srgb, var(--text-color) 28%, var(--border-color))"),
@@ -706,20 +711,6 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.subjectDot)",
-                    CSS.decl("fill", "var(--text-color, #0f172a)"),
-                    CSS.decl("filter", "drop-shadow(0 8px 14px rgba(15, 23, 42, .16))")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.subjectLabel)",
-                    CSS.decl("font-size", "12px"),
-                    CSS.decl("font-weight", "760"),
-                    CSS.decl("letter-spacing", ".04em"),
-                    CSS.decl("fill", "color-mix(in srgb, var(--text-color, #0f172a) 64%, transparent)")
-                ),
-
-                CSS.rule(
                     ".\(ClassName.path)",
                     CSS.decl("fill", "none"),
                     CSS.decl("stroke", "var(--flow-arrow-color, var(--text-color, #0f172a))"),
@@ -728,20 +719,8 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.pathInactive)",
-                    CSS.decl("stroke-width", "1.6"),
-                    CSS.decl("opacity", ".22")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.pathPressure)",
-                    CSS.decl("stroke-width", "2"),
-                    CSS.decl("stroke-dasharray", "6 7"),
-                    CSS.decl("opacity", ".84")
-                ),
-
-                CSS.rule(
                     ".\(ClassName.pathActive)",
+                    CSS.decl("display", "none"),
                     CSS.decl("stroke-width", "3"),
                     CSS.decl("stroke-dasharray", "10 8"),
                     CSS.decl("stroke-dashoffset", "0"),
@@ -751,6 +730,11 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.markerHead)",
                     CSS.decl("fill", "var(--flow-arrow-color, var(--text-color, #0f172a))")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.routePill)",
+                    CSS.decl("display", "none")
                 ),
 
                 CSS.rule(
@@ -769,50 +753,17 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.routeLabel)",
-                    CSS.decl("font-size", "12px"),
-                    CSS.decl("font-weight", "560"),
-                    CSS.decl("fill", "color-mix(in srgb, var(--text-color, #0f172a) 58%, transparent)")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.switchRoot) [data-drive-obstacle-track]",
-                    CSS.decl("opacity", ".16"),
-                    CSS.decl("transition", "opacity 140ms ease, filter 140ms ease")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.switchRoot) .\(ClassName.pathActive)[data-drive-obstacle-track], .\(ClassName.switchRoot) .\(ClassName.pathPressure)[data-drive-obstacle-track]",
-                    CSS.decl("display", "none"),
-                    CSS.decl("opacity", "0")
+                    ".\(ClassName.card)[data-drive-obstacle-track]",
+                    CSS.decl("display", "none")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.afstoter.rawValue)\"] [data-drive-obstacle-track=\"\(DriveObstacleTarget.afstoter.rawValue)\"], .\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.aantrekker.rawValue)\"] [data-drive-obstacle-track=\"\(DriveObstacleTarget.aantrekker.rawValue)\"]",
-                    CSS.decl("opacity", "1")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.afstoter.rawValue)\"] .\(ClassName.pathPressure)[data-drive-obstacle-track=\"\(DriveObstacleTarget.afstoter.rawValue)\"]",
-                    CSS.decl("display", "block"),
-                    CSS.decl("opacity", ".84")
+                    CSS.decl("display", "block")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.afstoter.rawValue)\"] .\(ClassName.pathActive)[data-drive-obstacle-track=\"\(DriveObstacleTarget.afstoter.rawValue)\"], .\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.aantrekker.rawValue)\"] .\(ClassName.pathActive)[data-drive-obstacle-track=\"\(DriveObstacleTarget.aantrekker.rawValue)\"]",
-                    CSS.decl("display", "block"),
-                    CSS.decl("opacity", ".92"),
-                    CSS.decl("animation", "wc-drive-obstacle-flow 900ms linear infinite")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.afstoter.rawValue)\"] .\(ClassName.pathPressure)[data-drive-obstacle-track=\"\(DriveObstacleTarget.afstoter.rawValue)\"]",
-                    CSS.decl("opacity", ".84")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.afstoter.rawValue)\"] .\(ClassName.pathActive)[data-drive-obstacle-track=\"\(DriveObstacleTarget.afstoter.rawValue)\"], .\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.aantrekker.rawValue)\"] .\(ClassName.pathActive)[data-drive-obstacle-track=\"\(DriveObstacleTarget.aantrekker.rawValue)\"]",
-                    CSS.decl("opacity", ".92"),
                     CSS.decl("animation", "wc-drive-obstacle-flow 900ms linear infinite")
                 ),
 
@@ -857,6 +808,19 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                         CSS.decl("min-width", "760px"),
                         CSS.decl("max-width", "none"),
                         CSS.decl("height", "auto")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.switchControls)",
+                        CSS.decl("gap", "6px")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.switchButton)",
+                        CSS.decl("height", "28px"),
+                        CSS.decl("padding", "0 10px"),
+                        CSS.decl("font-size", ".8rem"),
+                        CSS.decl("line-height", "28px")
                     )
                 ),
 
