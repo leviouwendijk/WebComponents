@@ -13,6 +13,7 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
         static let fieldDot = "wc-habituation-pathway-diagram__field-dot"
 
         static let connection = "wc-habituation-pathway-diagram__connection"
+        static let connectionMedium = "wc-habituation-pathway-diagram__connection--medium"
         static let connectionWeak = "wc-habituation-pathway-diagram__connection--weak"
         static let connectionDetached = "wc-habituation-pathway-diagram__connection--detached"
 
@@ -21,7 +22,9 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
         static let activePulse = "wc-habituation-pathway-diagram__active-pulse"
 
         static let node = "wc-habituation-pathway-diagram__node"
+        static let nodeHub = "wc-habituation-pathway-diagram__node--hub"
         static let nodeActive = "wc-habituation-pathway-diagram__node--active"
+        static let nodeMedium = "wc-habituation-pathway-diagram__node--medium"
         static let nodeWeak = "wc-habituation-pathway-diagram__node--weak"
         static let nodeDetached = "wc-habituation-pathway-diagram__node--detached"
 
@@ -37,7 +40,7 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
 
     public init(
         id: String = "habituation-pathway-diagram",
-        caption: String? = "Bij herhaling zonder wezenlijke verandering wordt dezelfde verwerkingsroute makkelijker beschikbaar. Andere routes blijven mogelijk, maar worden minder vanzelfsprekend geactiveerd.",
+        caption: String? = "Bij herhaling zonder wezenlijke verandering wordt één route sterker en makkelijker beschikbaar, terwijl alternatieve routes zwakker blijven of los staan.",
         includeStyles: Bool = true
     ) {
         self.id = id
@@ -58,7 +61,7 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                         [
                             "class": ClassName.stage,
                             "role": "img",
-                            "aria-label": "Vergewoontelijking: herhaling maakt een route sterker, terwijl zwakkere en nog losstaande routes minder beschikbaar blijven."
+                            "aria-label": "Vergewoontelijking: vanuit één beginpunt vertakken meerdere routes. Eén herhaald gebruikte route wordt dikker en sterker; andere routes blijven zwakker of nog losstaand."
                         ]
                     ) {
                         Self.svg()
@@ -71,11 +74,7 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                     }
                 }
             ],
-            stylesheets: includeStyles
-                ? [
-                    Self.stylesheet()
-                ]
-                : []
+            stylesheets: includeStyles ? [Self.stylesheet()] : []
         )
     }
 
@@ -88,10 +87,10 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
             "svg",
             [
                 "class": ClassName.svg,
-                "viewBox": "0 0 760 360",
+                "viewBox": "0 0 760 320",
                 "preserveAspectRatio": "xMidYMid meet",
                 "role": "img",
-                "aria-label": "Een veld met neurale knooppunten. Een centrale route is dik en actief; zijroutes zijn dunner; losstaande routes zijn gestippeld."
+                "aria-label": "Een centraal beginpunt vertakt in meerdere mogelijke routes. Eén route is dik en ingesleten; andere zijn dunner of gestippeld."
             ]
         ) {
             HTML.el("defs") {
@@ -100,8 +99,8 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                     [
                         "id": "habituation-field-glow",
                         "cx": "50%",
-                        "cy": "48%",
-                        "r": "70%"
+                        "cy": "46%",
+                        "r": "76%"
                     ]
                 ) {
                     HTML.el(
@@ -109,16 +108,16 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                         [
                             "offset": "0%",
                             "stop-color": "currentColor",
-                            "stop-opacity": ".09"
+                            "stop-opacity": ".08"
                         ]
                     ) {}
 
                     HTML.el(
                         "stop",
                         [
-                            "offset": "58%",
+                            "offset": "62%",
                             "stop-color": "currentColor",
-                            "stop-opacity": ".035"
+                            "stop-opacity": ".028"
                         ]
                     ) {}
 
@@ -146,7 +145,7 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                         "feDropShadow",
                         [
                             "dx": "0",
-                            "dy": "8",
+                            "dy": "10",
                             "stdDeviation": "8",
                             "flood-color": "currentColor",
                             "flood-opacity": ".10"
@@ -162,114 +161,103 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                     "x": "18",
                     "y": "18",
                     "width": "724",
-                    "height": "324",
-                    "rx": "28",
-                    "ry": "28"
+                    "height": "284",
+                    "rx": "26",
+                    "ry": "26"
                 ]
             ) {}
 
-            field_dot(x: 86, y: 82, r: 3)
-            field_dot(x: 134, y: 136, r: 2)
-            field_dot(x: 162, y: 62, r: 2)
-            field_dot(x: 210, y: 266, r: 3)
-            field_dot(x: 252, y: 96, r: 2)
-            field_dot(x: 322, y: 292, r: 2)
-            field_dot(x: 408, y: 72, r: 3)
-            field_dot(x: 478, y: 278, r: 2)
-            field_dot(x: 544, y: 92, r: 2)
-            field_dot(x: 614, y: 250, r: 3)
-            field_dot(x: 668, y: 118, r: 2)
-            field_dot(x: 690, y: 300, r: 2)
+            field_dot(x: 86, y: 78, r: 2)
+            field_dot(x: 138, y: 120, r: 2)
+            field_dot(x: 232, y: 76, r: 3)
+            field_dot(x: 292, y: 244, r: 2)
+            field_dot(x: 412, y: 70, r: 3)
+            field_dot(x: 474, y: 258, r: 2)
+            field_dot(x: 602, y: 88, r: 2)
+            field_dot(x: 682, y: 198, r: 3)
 
             path(
-                className: "\(ClassName.connection) \(ClassName.connectionWeak)",
-                d: "M 164 190 C 222 132, 285 112, 348 128"
+                className: "\(ClassName.connection) \(ClassName.connectionMedium)",
+                d: "M 182 172 C 214 142, 262 114, 320 104 C 364 96, 394 98, 430 114"
             )
 
             path(
                 className: "\(ClassName.connection) \(ClassName.connectionWeak)",
-                d: "M 348 128 C 430 120, 486 150, 544 116"
+                d: "M 182 172 C 228 198, 276 238, 336 252 C 380 262, 420 254, 464 228"
             )
 
             path(
                 className: "\(ClassName.connection) \(ClassName.connectionWeak)",
-                d: "M 280 210 C 330 264, 410 282, 480 244"
+                d: "M 182 172 C 232 170, 290 176, 338 194"
             )
 
             path(
                 className: "\(ClassName.connection) \(ClassName.connectionDetached)",
-                d: "M 92 274 C 132 238, 170 238, 210 266"
-            )
-
-            path(
-                className: "\(ClassName.connection) \(ClassName.connectionDetached)",
-                d: "M 552 244 C 602 216, 650 222, 690 254"
-            )
-
-            path(
-                className: "\(ClassName.connection) \(ClassName.connectionDetached)",
-                d: "M 570 154 C 616 126, 652 134, 688 166"
+                d: "M 516 228 C 560 206, 620 212, 682 244"
             )
 
             path(
                 className: ClassName.groove,
-                d: "M 88 198 C 166 174, 210 224, 284 204 C 370 180, 422 136, 506 154 C 584 170, 630 144, 690 112"
+                d: "M 182 172 C 242 160, 294 170, 364 198 C 438 226, 506 196, 586 138"
             )
 
             path(
                 className: ClassName.activePath,
-                d: "M 88 198 C 166 174, 210 224, 284 204 C 370 180, 422 136, 506 154 C 584 170, 630 144, 690 112"
+                d: "M 182 172 C 242 160, 294 170, 364 198 C 438 226, 506 196, 586 138"
             )
 
             path(
                 className: ClassName.activePulse,
-                d: "M 88 198 C 166 174, 210 224, 284 204 C 370 180, 422 136, 506 154 C 584 170, 630 144, 690 112"
+                d: "M 182 172 C 242 160, 294 170, 364 198 C 438 226, 506 196, 586 138"
             )
 
-            active_node(x: 88, y: 198, label: "1")
-            active_node(x: 164, y: 190, label: "2")
-            active_node(x: 284, y: 204, label: "3")
-            active_node(x: 410, y: 148, label: "4")
-            active_node(x: 506, y: 154, label: "5")
-            active_node(x: 610, y: 144, label: "6")
-            active_node(x: 690, y: 112, label: "7")
+            hub_node(x: 182, y: 172)
+            active_node(x: 364, y: 198)
+            active_node(x: 586, y: 138)
 
-            weak_node(x: 348, y: 128)
-            weak_node(x: 544, y: 116)
-            weak_node(x: 480, y: 244)
+            medium_node(x: 320, y: 104)
+            medium_node(x: 430, y: 114)
 
-            detached_node(x: 92, y: 274)
-            detached_node(x: 210, y: 266)
-            detached_node(x: 552, y: 244)
-            detached_node(x: 690, y: 254)
-            detached_node(x: 570, y: 154)
-            detached_node(x: 688, y: 166)
+            weak_node(x: 336, y: 252)
+            weak_node(x: 464, y: 228)
+
+            detached_node(x: 516, y: 228)
+            detached_node(x: 682, y: 244)
 
             callout(
-                x: 70,
-                y: 54,
-                width: 170,
-                title: "Herhaling",
-                body: "dezelfde route vuurt opnieuw",
-                lineD: "M 154 112 C 140 140, 118 168, 88 198"
+                x: 82,
+                y: 42,
+                width: 180,
+                title: "Beginpunt",
+                body: "vanuit dezelfde prikkel kunnen meerdere routes vertrekken",
+                lineD: "M 176 104 C 170 128, 172 148, 182 172"
             )
 
             callout(
-                x: 300,
-                y: 234,
-                width: 188,
+                x: 286,
+                y: 228,
+                width: 214,
                 title: "Ingesleten route",
-                body: "sterker, dikker, makkelijker beschikbaar",
-                lineD: "M 394 234 C 402 208, 416 178, 410 148"
+                body: "de herhaalde route wordt dikker en makkelijker beschikbaar",
+                lineD: "M 394 228 C 392 218, 382 208, 364 198"
             )
 
             callout(
-                x: 530,
-                y: 36,
-                width: 166,
+                x: 468,
+                y: 38,
+                width: 190,
+                title: "Zwakkere routes",
+                body: "alternatieven bestaan, maar zijn minder dominant",
+                lineD: "M 520 100 C 496 106, 468 112, 430 114"
+            )
+
+            callout(
+                x: 520,
+                y: 248,
+                width: 174,
                 title: "Losse routes",
-                body: "mogelijk, maar nog niet stabiel verbonden",
-                lineD: "M 590 96 C 600 124, 604 142, 570 154"
+                body: "nog niet stevig verbonden",
+                lineD: "M 564 248 C 554 240, 542 234, 516 228"
             )
         }
     }
@@ -303,15 +291,14 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
         ) {}
     }
 
-    private static func active_node(
+    private static func hub_node(
         x: Int,
-        y: Int,
-        label: String
+        y: Int
     ) -> any HTMLNode {
         HTML.el(
             "g",
             [
-                "class": "\(ClassName.node) \(ClassName.nodeActive)"
+                "class": "\(ClassName.node) \(ClassName.nodeHub)"
             ]
         ) {
             HTML.el(
@@ -319,21 +306,49 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                 [
                     "cx": "\(x)",
                     "cy": "\(y)",
-                    "r": "11"
+                    "r": "14"
                 ]
             ) {}
 
             HTML.el(
-                "text",
+                "circle",
                 [
-                    "x": "\(x)",
-                    "y": "\(y + 4)",
-                    "text-anchor": "middle"
+                    "cx": "\(x)",
+                    "cy": "\(y)",
+                    "r": "7"
                 ]
-            ) {
-                HTML.text(label)
-            }
+            ) {}
         }
+    }
+
+    private static func active_node(
+        x: Int,
+        y: Int
+    ) -> any HTMLNode {
+        HTML.el(
+            "circle",
+            [
+                "class": "\(ClassName.node) \(ClassName.nodeActive)",
+                "cx": "\(x)",
+                "cy": "\(y)",
+                "r": "12"
+            ]
+        ) {}
+    }
+
+    private static func medium_node(
+        x: Int,
+        y: Int
+    ) -> any HTMLNode {
+        HTML.el(
+            "circle",
+            [
+                "class": "\(ClassName.node) \(ClassName.nodeMedium)",
+                "cx": "\(x)",
+                "cy": "\(y)",
+                "r": "9"
+            ]
+        ) {}
     }
 
     private static func weak_node(
@@ -479,18 +494,25 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.connectionMedium)",
+                    CSS.decl("stroke", "color-mix(in srgb, var(--text-color) 26%, var(--border-color))"),
+                    CSS.decl("stroke-width", "2.6"),
+                    CSS.decl("opacity", ".58")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.connectionWeak)",
                     CSS.decl("stroke", "color-mix(in srgb, var(--text-color) 22%, var(--border-color))"),
-                    CSS.decl("stroke-width", "1.6"),
-                    CSS.decl("opacity", ".54")
+                    CSS.decl("stroke-width", "1.7"),
+                    CSS.decl("opacity", ".48")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.connectionDetached)",
-                    CSS.decl("stroke", "color-mix(in srgb, var(--text-color) 26%, var(--border-color))"),
+                    CSS.decl("stroke", "color-mix(in srgb, var(--text-color) 24%, var(--border-color))"),
                     CSS.decl("stroke-width", "1.6"),
                     CSS.decl("stroke-dasharray", "3 8"),
-                    CSS.decl("opacity", ".46")
+                    CSS.decl("opacity", ".42")
                 ),
 
                 CSS.rule(
@@ -511,21 +533,21 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                     CSS.decl("stroke-width", "6.5"),
                     CSS.decl("stroke-linecap", "round"),
                     CSS.decl("stroke-linejoin", "round"),
-                    CSS.decl("opacity", ".86"),
+                    CSS.decl("opacity", ".88"),
                     CSS.decl("animation", "wc-habituation-path-deepen 2400ms ease-in-out infinite")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.activePulse)",
                     CSS.decl("fill", "none"),
-                    CSS.decl("stroke", "color-mix(in srgb, var(--link-color) 72%, var(--background-color, #fff) 28%)"),
+                    CSS.decl("stroke", "color-mix(in srgb, var(--link-color) 76%, var(--background-color, #fff) 24%)"),
                     CSS.decl("stroke-width", "3"),
                     CSS.decl("stroke-linecap", "round"),
                     CSS.decl("stroke-linejoin", "round"),
-                    CSS.decl("stroke-dasharray", "28 440"),
+                    CSS.decl("stroke-dasharray", "24 320"),
                     CSS.decl("stroke-dashoffset", "0"),
-                    CSS.decl("opacity", ".95"),
-                    CSS.decl("animation", "wc-habituation-firing 1650ms linear infinite")
+                    CSS.decl("opacity", ".92"),
+                    CSS.decl("animation", "wc-habituation-firing 1500ms linear infinite")
                 ),
 
                 CSS.rule(
@@ -534,28 +556,41 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.nodeActive) circle",
-                    CSS.decl("fill", "color-mix(in srgb, var(--link-color) 20%, var(--background-color, #fff))"),
-                    CSS.decl("stroke", "color-mix(in srgb, var(--link-color) 58%, var(--text-color) 42%)"),
-                    CSS.decl("stroke-width", "2"),
-                    CSS.decl("filter", "drop-shadow(0 5px 10px rgba(15, 23, 42, .16))"),
-                    CSS.decl("animation", "wc-habituation-node-fire 1650ms ease-in-out infinite")
+                    ".\(ClassName.nodeHub) circle:first-child",
+                    CSS.decl("fill", "color-mix(in srgb, var(--link-color) 12%, var(--background-color, #fff))"),
+                    CSS.decl("stroke", "color-mix(in srgb, var(--link-color) 52%, var(--text-color) 48%)"),
+                    CSS.decl("stroke-width", "2.2"),
+                    CSS.decl("filter", "drop-shadow(0 5px 10px rgba(15, 23, 42, .14))")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.nodeActive) text",
-                    CSS.decl("font-size", "9px"),
-                    CSS.decl("font-weight", "760"),
-                    CSS.decl("fill", "var(--text-color, #0f172a)"),
-                    CSS.decl("pointer-events", "none")
+                    ".\(ClassName.nodeHub) circle:last-child",
+                    CSS.decl("fill", "color-mix(in srgb, var(--link-color) 66%, var(--background-color, #fff) 34%)"),
+                    CSS.decl("opacity", ".95")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.nodeActive)",
+                    CSS.decl("fill", "color-mix(in srgb, var(--link-color) 18%, var(--background-color, #fff))"),
+                    CSS.decl("stroke", "color-mix(in srgb, var(--link-color) 58%, var(--text-color) 42%)"),
+                    CSS.decl("stroke-width", "2"),
+                    CSS.decl("filter", "drop-shadow(0 5px 10px rgba(15, 23, 42, .14))")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.nodeMedium)",
+                    CSS.decl("fill", "var(--background-color, #fff)"),
+                    CSS.decl("stroke", "color-mix(in srgb, var(--text-color) 32%, var(--border-color))"),
+                    CSS.decl("stroke-width", "1.7"),
+                    CSS.decl("opacity", ".72")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.nodeWeak)",
                     CSS.decl("fill", "var(--background-color, #fff)"),
-                    CSS.decl("stroke", "color-mix(in srgb, var(--text-color) 30%, var(--border-color))"),
+                    CSS.decl("stroke", "color-mix(in srgb, var(--text-color) 28%, var(--border-color))"),
                     CSS.decl("stroke-width", "1.5"),
-                    CSS.decl("opacity", ".68")
+                    CSS.decl("opacity", ".62")
                 ),
 
                 CSS.rule(
@@ -564,7 +599,7 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                     CSS.decl("stroke", "color-mix(in srgb, var(--text-color) 24%, var(--border-color))"),
                     CSS.decl("stroke-width", "1.25"),
                     CSS.decl("stroke-dasharray", "2 3"),
-                    CSS.decl("opacity", ".58")
+                    CSS.decl("opacity", ".54")
                 ),
 
                 CSS.rule(
@@ -633,7 +668,7 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                 CSS.media(
                     "(prefers-reduced-motion: reduce)",
                     CSS.rule(
-                        ".\(ClassName.activePath), .\(ClassName.activePulse), .\(ClassName.nodeActive) circle",
+                        ".\(ClassName.activePath), .\(ClassName.activePulse)",
                         CSS.decl("animation", "none")
                     )
                 )
@@ -641,7 +676,7 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
             keyframes: [
                 CSS.keyframes("wc-habituation-firing") {
                     CSS.to {
-                        CSS.decl("stroke-dashoffset", "-468")
+                        CSS.decl("stroke-dashoffset", "-344")
                     }
                 },
 
@@ -651,17 +686,7 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                     }
 
                     CSS.step("45%") {
-                        CSS.decl("stroke-width", "8.4")
-                    }
-                },
-
-                CSS.keyframes("wc-habituation-node-fire") {
-                    CSS.step("0%, 100%") {
-                        CSS.decl("transform", "scale(1)")
-                    }
-
-                    CSS.step("42%") {
-                        CSS.decl("transform", "scale(1.08)")
+                        CSS.decl("stroke-width", "8.1")
                     }
                 }
             ]
