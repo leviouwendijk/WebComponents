@@ -675,7 +675,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 124,
                 height: 46,
                 title: "Versterkt",
-                subtitle: "koppeling neemt toe",
+                subtitle: "reactie neemt toe",
                 highlighted: false,
                 track: .voordeel
             )
@@ -686,7 +686,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 124,
                 height: 46,
                 title: "Verzwakt",
-                subtitle: "koppeling neemt af",
+                subtitle: "reactie neemt af",
                 highlighted: false,
                 track: .nadeel
             )
