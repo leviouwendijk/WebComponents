@@ -736,7 +736,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             )
 
             compact_svg_switch_path(
-                d: "M 649 60 V 12 H 318 V 18 H 294 V 30",
+                d: "M 649 60 V 12 H 294 V 30",
                 markerID: markerID,
                 kind: .returning,
                 track: .voordeel
@@ -750,7 +750,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             )
 
             compact_svg_switch_path(
-                d: "M 649 234 V 280 H 318 V 274 H 294 V 262",
+                d: "M 649 234 V 280 H 294 V 262",
                 markerID: markerID,
                 kind: .returning,
                 track: .nadeel
