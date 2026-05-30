@@ -180,8 +180,6 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         static let compactGroup = "wc-operant-conditioning-diagram__compact-group"
         static let compactBox = "wc-operant-conditioning-diagram__compact-box"
         static let compactBoxHighlighted = "wc-operant-conditioning-diagram__compact-box--highlighted"
-        static let compactRelationFrame = "wc-operant-conditioning-diagram__compact-relation-frame"
-        static let compactRelationLabel = "wc-operant-conditioning-diagram__compact-relation-label"
         static let compactTitle = "wc-operant-conditioning-diagram__compact-title"
         static let compactSubtitle = "wc-operant-conditioning-diagram__compact-subtitle"
         static let compactPath = "wc-operant-conditioning-diagram__compact-path"
@@ -195,6 +193,9 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         static let switchButton = "wc-operant-conditioning-diagram__switch-button"
         static let switchStage = "wc-operant-conditioning-diagram__switch-stage"
         static let switchLive = "wc-operant-conditioning-diagram__switch-live"
+
+        static let compactRelationFrame = "wc-operant-conditioning-diagram__compact-relation-frame"
+        static let compactRelationLabel = "wc-operant-conditioning-diagram__compact-relation-label"
     }
 
     public let id: String
@@ -325,6 +326,197 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     highlighted: highlighted
                 ).nodes.body[0]
             ]
+        }
+    }
+
+    public static func split_outcome_flow_node(
+        id: String = "operant-conditioning-split-outcome-flow",
+        caption: String? = "De keuze leidt naar een uitkomst. Die uitkomst werkt via versterking of verzwakking terug op de waarschijnlijkheid van die keuze.",
+        highlighted: OperantFlowBox? = .choice
+    ) -> any HTMLNode {
+        compact_outcome_flow_node(
+            id: id,
+            caption: caption,
+            highlighted: highlighted
+        )
+    }
+
+    public static func split_outcome_flow_body(
+        markerID: String = "operant-split-flow-arrowhead",
+        highlighted: OperantFlowBox? = .choice
+    ) -> any HTMLNode {
+        HTML.div(["class": ClassName.compactStage]) {
+            compact_outcome_flow_svg(
+                markerID: markerID,
+                highlighted: highlighted
+            )
+        }
+    }
+
+    public static func compact_outcome_flow_node(
+        id: String = "operant-conditioning-compact-outcome-flow",
+        caption: String? = "De terugkoppeling: een aantrekker versterkt de volgende keuze; een afstoter verzwakt die keuze.",
+        highlighted: OperantFlowBox? = .choice
+    ) -> any HTMLNode {
+        HTML.figure(
+            [
+                "id": id,
+                "class": "\(ClassName.root) \(ClassName.compactFigure)"
+            ]
+        ) {
+            HTML.div(["class": ClassName.compactStage]) {
+                compact_outcome_flow_svg(
+                    markerID: "\(id)-arrowhead",
+                    highlighted: highlighted
+                )
+            }
+
+            if let caption, !caption.isEmpty {
+                HTML.figcaption(["class": ClassName.caption]) {
+                    HTML.text(caption)
+                }
+            }
+        }
+    }
+
+    public static func compact_outcome_flow_svg(
+        markerID: String = "operant-compact-flow-arrowhead",
+        highlighted: OperantFlowBox? = .choice
+    ) -> any HTMLNode {
+        HTML.el(
+            "svg",
+            [
+                "class": ClassName.compactSVG,
+                "viewBox": "0 0 760 292",
+                "preserveAspectRatio": "xMidYMid meet",
+                "role": "img",
+                "aria-label": "Prikkel leidt tot keuze. Keuze leidt tot voordeel of nadeel. Voordeel versterkt dezelfde keuze; nadeel verzwakt dezelfde keuze."
+            ]
+        ) {
+            HTML.el("defs") {
+                HTML.el(
+                    "marker",
+                    [
+                        "id": markerID,
+                        "viewBox": "0 0 10 10",
+                        "refX": "9",
+                        "refY": "5",
+                        "markerWidth": "7",
+                        "markerHeight": "7",
+                        "orient": "auto"
+                    ]
+                ) {
+                    HTML.el(
+                        "path",
+                        [
+                            "class": ClassName.compactMarkerHead,
+                            "d": "M 0 0 L 10 5 L 0 10 z"
+                        ]
+                    ) {}
+                }
+            }
+
+            compact_svg_box(
+                x: 28,
+                y: 122,
+                width: 124,
+                height: 50,
+                title: "Prikkel",
+                subtitle: "Omgeving",
+                highlighted: highlighted == .stimulus
+            )
+
+            compact_svg_box(
+                x: 232,
+                y: 122,
+                width: 124,
+                height: 50,
+                title: "Keuze",
+                subtitle: "Gedrag",
+                highlighted: highlighted == .choice
+            )
+
+            compact_svg_box(
+                x: 232,
+                y: 32,
+                width: 124,
+                height: 46,
+                title: "Versterkt",
+                subtitle: "keuze neemt toe",
+                highlighted: false
+            )
+
+            compact_svg_box(
+                x: 232,
+                y: 214,
+                width: 124,
+                height: 46,
+                title: "Verzwakt",
+                subtitle: "keuze neemt af",
+                highlighted: false
+            )
+
+            compact_svg_box(
+                x: 572,
+                y: 60,
+                width: 154,
+                height: 66,
+                title: OperantOutcomeTarget.voordeel.title,
+                subtitles: OperantOutcomeTarget.voordeel.subtitles,
+                highlighted: highlighted == .outcome
+            )
+
+            compact_svg_box(
+                x: 572,
+                y: 168,
+                width: 154,
+                height: 66,
+                title: OperantOutcomeTarget.nadeel.title,
+                subtitles: OperantOutcomeTarget.nadeel.subtitles,
+                highlighted: highlighted == .outcome
+            )
+
+            compact_svg_path(
+                d: "M 154 147 H 220",
+                markerID: markerID,
+                kind: .forward
+            )
+
+            compact_svg_path(
+                d: "M 358 147 H 458 V 93 H 570",
+                markerID: markerID,
+                kind: .forward
+            )
+
+            compact_svg_path(
+                d: "M 358 147 H 458 V 201 H 570",
+                markerID: markerID,
+                kind: .forward
+            )
+
+            compact_svg_path(
+                d: "M 649 60 V 24 H 294 V 30",
+                markerID: markerID,
+                kind: .returning
+            )
+
+            compact_svg_path(
+                d: "M 294 80 V 118",
+                markerID: markerID,
+                kind: .returning
+            )
+
+            compact_svg_path(
+                d: "M 649 234 V 268 H 294 V 262",
+                markerID: markerID,
+                kind: .returning
+            )
+
+            compact_svg_path(
+                d: "M 294 212 V 176",
+                markerID: markerID,
+                kind: .returning
+            )
         }
     }
 
@@ -573,6 +765,253 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         }
     }
 
+    public static func split_outcome_code_node(
+        id: String = "operant-conditioning-split-outcome-code",
+        caption: String? = "De terugkoppeling als codeblok: voordeel versterkt de volgende keuze; nadeel verzwakt die keuze."
+    ) -> any HTMLNode {
+        HTML.figure(
+            [
+                "id": id,
+                "class": "\(ClassName.root) \(ClassName.codeFigure)"
+            ]
+        ) {
+            HTML.pre(
+                [
+                    "class": ClassName.codeBlock,
+                    "aria-label": "Operante terugkoppeling als codeblok."
+                ]
+            ) {
+                HTML.code {
+                    HTML.text(Self.splitOutcomeCodeText)
+                }
+            }
+
+            if let caption, !caption.isEmpty {
+                HTML.figcaption(["class": ClassName.caption]) {
+                    HTML.text(caption)
+                }
+            }
+        }
+    }
+
+    public static let splitOutcomeCodeText = """
+    Prikkel ------> [keuze] Gedrag <-----------------------------.
+                         |                                      |
+                     uitkomst?                                  |
+                     |-- Voordeel                               |
+                     |   -> Versterkt --------------------------|
+                     |                                          |
+                     `-- Nadeel                                 |
+                         -> Verzwakt ---------------------------'
+    """
+
+    public static func matrix() -> MatrixDiagram {
+        MatrixDiagram(
+            columns: 2,
+            rows: 2,
+            cells: [
+                [
+                    quadrant_cell(.positive.reinforcement),
+                    quadrant_cell(.positive.punishment)
+                ],
+                [
+                    quadrant_cell(.negative.reinforcement),
+                    quadrant_cell(.negative.punishment)
+                ]
+            ],
+            columnHeaders: [
+                matrix_label(
+                    title: "Aansporing (Versterking)",
+                    arrow: "↓"
+                ),
+                matrix_label(
+                    title: "Ontmoediging (Ontkrachting)",
+                    arrow: "↓"
+                )
+            ],
+            rowHeaders: [
+                matrix_label(
+                    title: "Toevoeging",
+                    arrow: "→"
+                ),
+                matrix_label(
+                    title: "Opheffing",
+                    arrow: "→"
+                )
+            ]
+        )
+    }
+
+    public static func matrix_node(
+        id: String = "operant-conditioning-matrix",
+        caption: String? = nil
+    ) -> any HTMLNode {
+        figure(
+            id: id,
+            className: "\(ClassName.root) \(ClassName.matrixFigure)",
+            roleLabel: "Matrix met de vier operante kwadranten.",
+            caption: caption
+        ) {
+            [
+                matrix().nodes.body[0]
+            ]
+        }
+    }
+
+    public static func quadrant_cell(
+        _ quadrant: OperantQuadrant
+    ) -> MatrixDiagram.Cell {
+        .box(
+            quadrant_box(quadrant)
+        )
+    }
+
+    public static func quadrant_box(
+        _ quadrant: OperantQuadrant
+    ) -> Box {
+        Box(
+            classes: [
+                .raw(ClassName.quadrantBox),
+                .raw("\(ClassName.quadrantBox)--\(quadrant.rawValue)")
+            ],
+            align: .start
+        ) {
+            [
+                HTML.div(["class": ClassName.quadrantHeader]) {
+                    HTML.b(["class": ClassName.quadrantCode]) {
+                        HTML.text(quadrant.code)
+                    }
+
+                    HTML.span(["class": ClassName.quadrantFamily]) {
+                        HTML.text(quadrant.family)
+                    }
+                },
+
+                HTML.hr(["class": ClassName.quadrantRule]),
+
+                HTML.div(["class": ClassName.quadrantBody]) {
+                    HTML.span(["class": ClassName.quadrantObject]) {
+                        HTML.text(quadrant.object)
+                    }
+
+                    HTML.span(["class": ClassName.quadrantDirection]) {
+                        HTML.text(quadrant.direction)
+                    }
+                }
+            ]
+        }
+    }
+
+    public static func quadrant_node(
+        _ quadrant: OperantQuadrant,
+        id: String? = nil,
+        caption: String? = nil
+    ) -> any HTMLNode {
+        let resolvedID = id ?? "operant-quadrant-\(quadrant.rawValue)"
+
+        return figure(
+            id: resolvedID,
+            className: "\(ClassName.root) \(ClassName.quadrantFigure)",
+            roleLabel: "Operant kwadrant \(quadrant.code): \(quadrant.family), \(quadrant.object), \(quadrant.direction).",
+            caption: caption
+        ) {
+            [
+                MatrixDiagram(
+                    columns: 1,
+                    rows: 1,
+                    cells: [
+                        [
+                            quadrant_cell(quadrant)
+                        ]
+                    ]
+                ).nodes.body[0]
+            ]
+        }
+    }
+
+    private enum CompactPathKind {
+        case forward
+        case returning
+    }
+
+    private static func compact_svg_box(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        title: String,
+        subtitle: String,
+        highlighted: Bool
+    ) -> HTMLFragment {
+        compact_svg_box(
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            title: title,
+            subtitles: [subtitle],
+            highlighted: highlighted
+        )
+    }
+
+    private static func compact_svg_box(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        title: String,
+        subtitles: [String],
+        highlighted: Bool
+    ) -> HTMLFragment {
+        let className = highlighted
+            ? "\(ClassName.compactBox) \(ClassName.compactBoxHighlighted)"
+            : ClassName.compactBox
+
+        let centerX = x + (width / 2)
+        let cleanedSubtitles = subtitles
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+
+        let titleY = cleanedSubtitles.count > 1
+            ? y + 17
+            : y + 20
+
+        let subtitleStartY = cleanedSubtitles.count > 1
+            ? y + 34
+            : y + 37
+
+        return [
+            HTML.el(
+                "rect",
+                [
+                    "class": className,
+                    "x": "\(x)",
+                    "y": "\(y)",
+                    "width": "\(width)",
+                    "height": "\(height)",
+                    "rx": "12",
+                    "ry": "12"
+                ]
+            ) {},
+
+            HTML.el(
+                "text",
+                [
+                    "class": ClassName.compactTitle,
+                    "x": "\(centerX)",
+                    "y": "\(titleY)",
+                    "text-anchor": "middle"
+                ]
+            ) {
+                HTML.text(title)
+            }
+        ] + compact_svg_subtitle_nodes(
+            centerX: centerX,
+            startY: subtitleStartY,
+            subtitles: cleanedSubtitles
+        )
+    }
+
     private static func compact_svg_switch_box(
         x: Int,
         y: Int,
@@ -757,9 +1196,95 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
         ) {}
     }
 
-    private enum CompactPathKind {
-        case forward
-        case returning
+    private static func flow_box(
+        kind: OperantFlowBox,
+        highlighted: OperantFlowBox?,
+        content: @escaping @Sendable () -> HTMLFragment
+    ) -> Box {
+        var classes: [HTMLClassToken] = [
+            .raw(ClassName.flowBox),
+            .raw(flow_box_class(kind))
+        ]
+
+        if highlighted == kind {
+            classes.append(
+                .raw(ClassName.highlighted)
+            )
+        }
+
+        return Box(
+            classes: classes,
+            content: content
+        )
+    }
+
+    private static func flow_box_class(
+        _ kind: OperantFlowBox
+    ) -> String {
+        switch kind {
+        case .stimulus:
+            return ClassName.flowBoxStimulus
+
+        case .choice:
+            return ClassName.flowBoxChoice
+
+        case .outcome:
+            return ClassName.flowBoxOutcome
+        }
+    }
+
+    private static func matrix_label(
+        title: String,
+        arrow: String
+    ) -> MatrixDiagram.Cell {
+        .box(
+            .init(
+                classes: [
+                    "wc-matrix__label"
+                ],
+                align: .center
+            ) {
+                [
+                    HTML.span {
+                        HTML.text(title)
+                    },
+                    HTML.span(["style": "font-size:1.2rem;line-height:1;"]) {
+                        HTML.text(arrow)
+                    }
+                ]
+            }
+        )
+    }
+
+    private static func figure(
+        id: String,
+        className: String,
+        roleLabel: String,
+        caption: String?,
+        body: @escaping @Sendable () -> HTMLFragment
+    ) -> any HTMLNode {
+        HTML.figure(
+            [
+                "id": id,
+                "class": className
+            ]
+        ) {
+            HTML.div(
+                [
+                    "class": ClassName.stage,
+                    "role": "img",
+                    "aria-label": roleLabel
+                ]
+            ) {
+                body()
+            }
+
+            if let caption, !caption.isEmpty {
+                HTML.figcaption(["class": ClassName.caption]) {
+                    HTML.text(caption)
+                }
+            }
+        }
     }
 
     private static func switch_button(
@@ -785,10 +1310,10 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
     ) -> String {
         switch target {
         case .voordeel:
-            return "Voordeel geselecteerd: de uitkomst versterkt de prikkel-keuze-koppeling."
+            return "Voordeel geselecteerd: de uitkomst versterkt deze keuze tegenover de prikkel."
 
         case .nadeel:
-            return "Nadeel geselecteerd: de uitkomst verzwakt de prikkel-keuze-koppeling."
+            return "Nadeel geselecteerd: de uitkomst verzwakt deze keuze tegenover de prikkel."
         }
     }
 
@@ -875,178 +1400,6 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
     })();
     """#
 
-    private static func flow_box(
-        kind: OperantFlowBox,
-        highlighted: OperantFlowBox?,
-        content: @escaping @Sendable () -> HTMLFragment
-    ) -> Box {
-        var classes: [HTMLClassToken] = [
-            .raw(ClassName.flowBox),
-            .raw(flow_box_class(kind))
-        ]
-
-        if highlighted == kind {
-            classes.append(
-                .raw(ClassName.highlighted)
-            )
-        }
-
-        return Box(
-            classes: classes,
-            content: content
-        )
-    }
-
-    private static func flow_box_class(
-        _ kind: OperantFlowBox
-    ) -> String {
-        switch kind {
-        case .stimulus:
-            return ClassName.flowBoxStimulus
-
-        case .choice:
-            return ClassName.flowBoxChoice
-
-        case .outcome:
-            return ClassName.flowBoxOutcome
-        }
-    }
-
-    private static func matrix_label(
-        title: String,
-        arrow: String
-    ) -> MatrixDiagram.Cell {
-        .box(
-            .init(
-                classes: [
-                    "wc-matrix__label"
-                ],
-                align: .center
-            ) {
-                [
-                    HTML.span {
-                        HTML.text(title)
-                    },
-                    HTML.span(["style": "font-size:1.2rem;line-height:1;"]) {
-                        HTML.text(arrow)
-                    }
-                ]
-            }
-        )
-    }
-
-    public static func matrix() -> MatrixDiagram {
-        MatrixDiagram(
-            columns: 2,
-            rows: 2,
-            cells: [
-                [
-                    quadrant_cell(.positive.reinforcement),
-                    quadrant_cell(.positive.punishment)
-                ],
-                [
-                    quadrant_cell(.negative.reinforcement),
-                    quadrant_cell(.negative.punishment)
-                ]
-            ],
-            columnHeaders: [
-                matrix_label(
-                    title: "Aansporing (Versterking)",
-                    arrow: "↓"
-                ),
-                matrix_label(
-                    title: "Ontmoediging (Ontkrachting)",
-                    arrow: "↓"
-                )
-            ],
-            rowHeaders: [
-                matrix_label(
-                    title: "Toevoeging",
-                    arrow: "→"
-                ),
-                matrix_label(
-                    title: "Opheffing",
-                    arrow: "→"
-                )
-            ]
-        )
-    }
-
-    public static func quadrant_cell(
-        _ quadrant: OperantQuadrant
-    ) -> MatrixDiagram.Cell {
-        .box(
-            quadrant_box(quadrant)
-        )
-    }
-
-    public static func quadrant_box(
-        _ quadrant: OperantQuadrant
-    ) -> Box {
-        Box(
-            classes: [
-                .raw(ClassName.quadrantBox),
-                .raw("\(ClassName.quadrantBox)--\(quadrant.rawValue)")
-            ],
-            align: .start
-        ) {
-            [
-                HTML.div(["class": ClassName.quadrantHeader]) {
-                    HTML.b(["class": ClassName.quadrantCode]) {
-                        HTML.text(quadrant.code)
-                    }
-
-                    HTML.span(["class": ClassName.quadrantFamily]) {
-                        HTML.text(quadrant.family)
-                    }
-                },
-
-                HTML.hr(["class": ClassName.quadrantRule]),
-
-                HTML.div(["class": ClassName.quadrantBody]) {
-                    HTML.span(["class": ClassName.quadrantObject]) {
-                        HTML.text(quadrant.object)
-                    }
-
-                    HTML.span(["class": ClassName.quadrantDirection]) {
-                        HTML.text(quadrant.direction)
-                    }
-                }
-            ]
-        }
-    }
-
-    private static func figure(
-        id: String,
-        className: String,
-        roleLabel: String,
-        caption: String?,
-        body: @escaping @Sendable () -> HTMLFragment
-    ) -> any HTMLNode {
-        HTML.figure(
-            [
-                "id": id,
-                "class": className
-            ]
-        ) {
-            HTML.div(
-                [
-                    "class": ClassName.stage,
-                    "role": "img",
-                    "aria-label": roleLabel
-                ]
-            ) {
-                body()
-            }
-
-            if let caption, !caption.isEmpty {
-                HTML.figcaption(["class": ClassName.caption]) {
-                    HTML.text(caption)
-                }
-            }
-        }
-    }
-
     public static func stylesheet() -> CSSStyleSheet {
         CSSStyleSheet(
             rules: [
@@ -1075,7 +1428,83 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.compactFigure), .\(ClassName.switchFigure)",
+                    ".\(ClassName.flow).wc-flow, .\(ClassName.flow) .wc-flow",
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("margin", "0"),
+                    CSS.decl("min-width", "0"),
+                    CSS.decl("max-width", "100%"),
+                    CSS.decl("width", "100%")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.flow).wc-flow--row, .\(ClassName.flow) .wc-flow--row",
+                    CSS.decl("flex-wrap", "nowrap"),
+                    CSS.decl("align-items", "stretch")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.flow).wc-flow .wc-flow__box, .\(ClassName.flow) .wc-flow__box",
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("min-width", "0"),
+                    CSS.decl("max-width", "100%"),
+                    CSS.decl("flex", "1 1 0")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.flow).wc-flow .wc-flow__box-inner, .\(ClassName.flow) .wc-flow__box-inner",
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("max-width", "100%")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.flow).wc-flow .wc-flow__arrow-wrap, .\(ClassName.flow) .wc-flow__arrow-wrap",
+                    CSS.decl("flex", "0 0 44px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.flowBox)",
+                    CSS.decl("position", "relative")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.highlighted)",
+                    CSS.decl("background", "color-mix(in srgb, var(--link-color) 10%, var(--surface-color, #fff))"),
+                    CSS.decl("border-color", "color-mix(in srgb, var(--link-color) 38%, var(--border-color))"),
+                    CSS.decl("box-shadow", "0 18px 44px color-mix(in srgb, var(--link-color) 15%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.matrix) .wc-matrix-wrap, .\(ClassName.matrixFigure) .wc-matrix-wrap, .\(ClassName.quadrantFigure) .wc-matrix-wrap",
+                    CSS.decl("margin", "0")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.quadrantHeader), .\(ClassName.quadrantBody)",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("justify-content", "space-between"),
+                    CSS.decl("gap", "12px"),
+                    CSS.decl("align-items", "baseline")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.quadrantFamily), .\(ClassName.quadrantObject)",
+                    CSS.decl("font-style", "italic")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.quadrantDirection)",
+                    CSS.decl("font-size", ".9rem")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.quadrantRule)",
+                    CSS.decl("border", "0"),
+                    CSS.decl("border-top", "1px solid var(--border-color, rgba(0,0,0,0.12))"),
+                    CSS.decl("margin", "10px 0")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.compactFigure)",
                     CSS.decl("width", "min(760px, 100%)"),
                     CSS.decl("margin", "24px 0 30px")
                 ),
@@ -1115,24 +1544,6 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.compactRelationFrame)",
-                    CSS.decl("fill", "color-mix(in srgb, var(--link-color) 5%, transparent)"),
-                    CSS.decl("stroke", "color-mix(in srgb, var(--link-color) 36%, var(--border-color))"),
-                    CSS.decl("stroke-width", "1.25"),
-                    CSS.decl("stroke-dasharray", "7 5"),
-                    CSS.decl("filter", "drop-shadow(0 10px 18px rgba(15, 23, 42, .04))")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.compactRelationLabel)",
-                    CSS.decl("font-size", "11px"),
-                    CSS.decl("font-weight", "780"),
-                    CSS.decl("letter-spacing", ".03em"),
-                    CSS.decl("fill", "color-mix(in srgb, var(--text-color, #0f172a) 68%, transparent)"),
-                    CSS.decl("pointer-events", "none")
-                ),
-
-                CSS.rule(
                     ".\(ClassName.compactTitle)",
                     CSS.decl("font-size", "13px"),
                     CSS.decl("font-weight", "760"),
@@ -1168,6 +1579,12 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.compactMarkerHead)",
                     CSS.decl("fill", "var(--flow-arrow-color, var(--text-color, #0f172a))")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchFigure)",
+                    CSS.decl("width", "min(760px, 100%)"),
+                    CSS.decl("margin", "24px 0 30px")
                 ),
 
                 CSS.rule(
@@ -1276,16 +1693,91 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.codeFigure)",
+                    CSS.decl("width", "min(860px, 100%)"),
+                    CSS.decl("margin", "24px 0 30px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.codeBlock)",
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("max-width", "100%"),
+                    CSS.decl("margin", "0"),
+                    CSS.decl("padding", "18px"),
+                    CSS.decl("overflow-x", "auto"),
+                    CSS.decl("border", "1px solid var(--border-color)"),
+                    CSS.decl("border-radius", "16px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, var(--background-color)) 94%, var(--text-color) 6%)"),
+                    CSS.decl("box-shadow", "0 18px 40px rgba(15, 23, 42, .06)"),
+                    CSS.decl("font-family", "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"),
+                    CSS.decl("font-size", "clamp(.78rem, 2.8vw, .92rem)"),
+                    CSS.decl("line-height", "1.65"),
+                    CSS.decl("white-space", "pre"),
+                    CSS.decl("color", "var(--text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.codeBlock) code",
+                    CSS.decl("font", "inherit"),
+                    CSS.decl("color", "inherit")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.caption)",
                     CSS.decl("margin", "10px 0 0"),
                     CSS.decl("font-size", ".9rem"),
                     CSS.decl("line-height", "1.48"),
                     CSS.decl("color", "var(--muted-text-color)")
-                )
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.compactRelationFrame)",
+                    CSS.decl("fill", "color-mix(in srgb, var(--link-color) 5%, transparent)"),
+                    CSS.decl("stroke", "color-mix(in srgb, var(--link-color) 36%, var(--border-color))"),
+                    CSS.decl("stroke-width", "1.25"),
+                    CSS.decl("stroke-dasharray", "7 5"),
+                    CSS.decl("filter", "drop-shadow(0 10px 18px rgba(15, 23, 42, .04))")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.compactRelationLabel)",
+                    CSS.decl("font-size", "11px"),
+                    CSS.decl("font-weight", "780"),
+                    CSS.decl("letter-spacing", ".03em"),
+                    CSS.decl("fill", "color-mix(in srgb, var(--text-color, #0f172a) 68%, transparent)"),
+                    CSS.decl("pointer-events", "none")
+                ),
             ],
             media: [
                 CSS.media(
                     "(max-width: 720px)",
+                    CSS.rule(
+                        ".\(ClassName.stage)",
+                        CSS.decl("padding", "14px"),
+                        CSS.decl("gap", "16px")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.flow).wc-flow--row, .\(ClassName.flow) .wc-flow--row",
+                        CSS.decl("flex-direction", "column"),
+                        CSS.decl("align-items", "stretch")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.flow).wc-flow .wc-flow__box, .\(ClassName.flow) .wc-flow__box",
+                        CSS.decl("width", "100%"),
+                        CSS.decl("flex", "0 1 auto")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.flow).wc-flow .wc-flow__arrow-wrap, .\(ClassName.flow) .wc-flow__arrow-wrap",
+                        CSS.decl("width", "100%"),
+                        CSS.decl("min-width", "0"),
+                        CSS.decl("height", "34px"),
+                        CSS.decl("flex", "0 0 34px"),
+                        CSS.decl("transform", "rotate(90deg)")
+                    ),
+
                     CSS.rule(
                         ".\(ClassName.compactStage)",
                         CSS.decl("padding", "8px"),
@@ -1316,8 +1808,14 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                         CSS.decl("padding", "0 10px"),
                         CSS.decl("font-size", ".8rem"),
                         CSS.decl("line-height", "28px")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.codeBlock)",
+                        CSS.decl("padding", "14px"),
+                        CSS.decl("font-size", ".78rem")
                     )
-                )
+                ),
             ],
             keyframes: [
                 CSS.keyframes("wc-operant-conditioning-path-flow") {
