@@ -162,10 +162,10 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
             "svg",
             [
                 "class": ClassName.svg,
-                "viewBox": "0 0 760 280",
+                "viewBox": "0 0 760 320",
                 "preserveAspectRatio": "xMidYMid meet",
                 "role": "img",
-                "aria-label": "Afstoter of aantrekker, hond, obstakel en actieve route."
+                "aria-label": "Afstoter links, aantrekker rechts, hond en obstakel in het midden, met een actieve route voor vermijding of toenadering."
             ]
         ) {
             HTML.el("defs") {
@@ -198,16 +198,16 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                     "x": "18",
                     "y": "18",
                     "width": "724",
-                    "height": "244",
+                    "height": "284",
                     "rx": "28",
                     "ry": "28"
                 ]
             ) {}
 
             card(
-                x: 56,
+                x: 52,
                 y: 52,
-                width: 218,
+                width: 220,
                 height: 70,
                 title: "Afstoter",
                 subtitle: "aversieve prikkel",
@@ -215,9 +215,9 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
             )
 
             card(
-                x: 486,
+                x: 488,
                 y: 52,
-                width: 218,
+                width: 220,
                 height: 70,
                 title: "Aantrekker",
                 subtitle: "appetetieve prikkel",
@@ -229,14 +229,14 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 [
                     "class": "\(ClassName.path) \(ClassName.pathActive)",
                     "data-drive-obstacle-track": DriveObstacleTarget.afstoter.rawValue,
-                    "d": "M 274 87 C 292 94, 308 112, 316 138 C 338 154, 364 160, 390 152",
+                    "d": "M 272 87 C 308 112, 314 148, 286 176 C 344 224, 434 238, 536 214 C 590 202, 636 184, 678 160",
                     "marker-end": "url(#\(markerID))"
                 ]
             ) {}
 
             route_pill(
-                x: 248,
-                y: 114,
+                x: 282,
+                y: 118,
                 width: 126,
                 text: "vermijding",
                 track: .afstoter
@@ -247,27 +247,27 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 [
                     "class": "\(ClassName.path) \(ClassName.pathActive)",
                     "data-drive-obstacle-track": DriveObstacleTarget.aantrekker.rawValue,
-                    "d": "M 316 148 C 350 166, 382 160, 416 138 C 448 118, 466 98, 486 87",
+                    "d": "M 286 176 C 334 132, 390 118, 448 104 C 462 100, 474 94, 488 87",
                     "marker-end": "url(#\(markerID))"
                 ]
             ) {}
 
             route_pill(
-                x: 456,
-                y: 128,
+                x: 442,
+                y: 138,
                 width: 132,
                 text: "toenadering",
                 track: .aantrekker
             )
 
             subject(
-                x: 316,
-                y: 148
+                x: 286,
+                y: 176
             )
 
             obstacle(
-                x: 390,
-                y: 100
+                x: 372,
+                y: 130
             )
         }
     }
@@ -650,6 +650,17 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.card)",
+                    CSS.decl("opacity", ".18"),
+                    CSS.decl("transition", "opacity 140ms ease, filter 140ms ease")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.afstoter.rawValue)\"] .\(ClassName.card)[data-drive-obstacle-track=\"\(DriveObstacleTarget.afstoter.rawValue)\"], .\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.aantrekker.rawValue)\"] .\(ClassName.card)[data-drive-obstacle-track=\"\(DriveObstacleTarget.aantrekker.rawValue)\"]",
+                    CSS.decl("opacity", "1")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.card) rect",
                     CSS.decl("fill", "var(--background-color, #fff)"),
                     CSS.decl("stroke", "var(--border-color, rgba(0,0,0,0.12))"),
@@ -753,18 +764,14 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.card)[data-drive-obstacle-track]",
-                    CSS.decl("display", "none")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.afstoter.rawValue)\"] [data-drive-obstacle-track=\"\(DriveObstacleTarget.afstoter.rawValue)\"], .\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.aantrekker.rawValue)\"] [data-drive-obstacle-track=\"\(DriveObstacleTarget.aantrekker.rawValue)\"]",
-                    CSS.decl("display", "block")
-                ),
-
-                CSS.rule(
                     ".\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.afstoter.rawValue)\"] .\(ClassName.pathActive)[data-drive-obstacle-track=\"\(DriveObstacleTarget.afstoter.rawValue)\"], .\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.aantrekker.rawValue)\"] .\(ClassName.pathActive)[data-drive-obstacle-track=\"\(DriveObstacleTarget.aantrekker.rawValue)\"]",
+                    CSS.decl("display", "inline"),
                     CSS.decl("animation", "wc-drive-obstacle-flow 900ms linear infinite")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.afstoter.rawValue)\"] .\(ClassName.routePill)[data-drive-obstacle-track=\"\(DriveObstacleTarget.afstoter.rawValue)\"], .\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.aantrekker.rawValue)\"] .\(ClassName.routePill)[data-drive-obstacle-track=\"\(DriveObstacleTarget.aantrekker.rawValue)\"]",
+                    CSS.decl("display", "inline")
                 ),
 
                 CSS.rule(
