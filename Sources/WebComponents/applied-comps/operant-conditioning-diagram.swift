@@ -274,7 +274,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     ) {
                         [
                             HTML.b { HTML.text("Prikkel") },
-                            HTML.span { HTML.text("Omgeving") }
+                            HTML.span { HTML.text("omgeving") }
                         ]
                     }
                 ),
@@ -288,7 +288,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     ) {
                         [
                             HTML.b { HTML.text("Keuze") },
-                            HTML.span { HTML.text("Gedrag") }
+                            HTML.span { HTML.text("reactie") }
                         ]
                     }
                 ),
@@ -302,7 +302,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     ) {
                         [
                             HTML.b { HTML.text("Uitkomst") },
-                            HTML.span { HTML.text("Gevolg") }
+                            HTML.span { HTML.text("gevolg") }
                         ]
                     }
                 )
@@ -422,7 +422,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 124,
                 height: 50,
                 title: "Prikkel",
-                subtitle: "Omgeving",
+                subtitle: "omgeving",
                 highlighted: highlighted == .stimulus
             )
 
@@ -432,7 +432,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 124,
                 height: 50,
                 title: "Keuze",
-                subtitle: "Gedrag",
+                subtitle: "reactie",
                 highlighted: highlighted == .choice
             )
 
@@ -646,7 +646,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                     "text-anchor": "middle"
                 ]
             ) {
-                HTML.text("Prikkel + keuze")
+                HTML.text("Prikkel & Keuze")
             }
 
             compact_svg_switch_box(
@@ -655,7 +655,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 124,
                 height: 50,
                 title: "Prikkel",
-                subtitle: "Omgeving",
+                subtitle: "omgeving",
                 highlighted: highlighted == .stimulus
             )
 
@@ -665,7 +665,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                 width: 124,
                 height: 50,
                 title: "Keuze",
-                subtitle: "Gedrag",
+                subtitle: "reactie",
                 highlighted: highlighted == .choice
             )
 
