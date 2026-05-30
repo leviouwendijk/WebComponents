@@ -270,22 +270,6 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
             HTML.el(
                 "path",
                 [
-                    "class": "\(ClassName.path) \(ClassName.pathInactive)",
-                    "d": "M 276 184 C 320 120, 378 104, 446 126 C 492 140, 530 136, 574 112"
-                ]
-            ) {}
-
-            HTML.el(
-                "path",
-                [
-                    "class": "\(ClassName.path) \(ClassName.pathInactive)",
-                    "d": "M 278 184 C 330 226, 402 252, 486 226 C 540 210, 596 176, 656 148"
-                ]
-            ) {}
-
-            HTML.el(
-                "path",
-                [
                     "class": "\(ClassName.path) \(ClassName.pathPressure)",
                     "data-drive-obstacle-track": DriveObstacleTarget.afstoter.rawValue,
                     "d": "M 260 84 C 294 112, 304 148, 284 174",
@@ -316,7 +300,7 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 [
                     "class": "\(ClassName.path) \(ClassName.pathActive)",
                     "data-drive-obstacle-track": DriveObstacleTarget.aantrekker.rawValue,
-                    "d": "M 282 184 C 326 128, 386 106, 456 126 C 504 140, 542 126, 584 96",
+                    "d": "M 282 184 C 326 128, 386 106, 456 126 C 504 140, 552 136, 604 124",
                     "marker-end": "url(#\(markerID))"
                 ]
             ) {}
@@ -798,13 +782,27 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.switchRoot) .\(ClassName.pathActive)[data-drive-obstacle-track], .\(ClassName.switchRoot) .\(ClassName.pathPressure)[data-drive-obstacle-track]",
+                    CSS.decl("display", "none"),
+                    CSS.decl("opacity", "0")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.afstoter.rawValue)\"] [data-drive-obstacle-track=\"\(DriveObstacleTarget.afstoter.rawValue)\"], .\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.aantrekker.rawValue)\"] [data-drive-obstacle-track=\"\(DriveObstacleTarget.aantrekker.rawValue)\"]",
                     CSS.decl("opacity", "1")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.switchRoot) .\(ClassName.pathActive)[data-drive-obstacle-track], .\(ClassName.switchRoot) .\(ClassName.pathPressure)[data-drive-obstacle-track]",
-                    CSS.decl("opacity", "0")
+                    ".\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.afstoter.rawValue)\"] .\(ClassName.pathPressure)[data-drive-obstacle-track=\"\(DriveObstacleTarget.afstoter.rawValue)\"]",
+                    CSS.decl("display", "block"),
+                    CSS.decl("opacity", ".84")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.afstoter.rawValue)\"] .\(ClassName.pathActive)[data-drive-obstacle-track=\"\(DriveObstacleTarget.afstoter.rawValue)\"], .\(ClassName.switchRoot)[data-state=\"\(DriveObstacleTarget.aantrekker.rawValue)\"] .\(ClassName.pathActive)[data-drive-obstacle-track=\"\(DriveObstacleTarget.aantrekker.rawValue)\"]",
+                    CSS.decl("display", "block"),
+                    CSS.decl("opacity", ".92"),
+                    CSS.decl("animation", "wc-drive-obstacle-flow 900ms linear infinite")
                 ),
 
                 CSS.rule(
