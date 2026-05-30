@@ -229,7 +229,7 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                 y: 42,
                 width: 180,
                 title: "Beginpunt",
-                body: "vanuit dezelfde prikkel kunnen meerdere routes vertrekken",
+                body: "meerdere routes vertrekken",
                 lineD: "M 176 104 C 170 128, 172 148, 182 172"
             )
 
@@ -238,7 +238,7 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                 y: 228,
                 width: 214,
                 title: "Ingesleten route",
-                body: "de herhaalde route wordt dikker en makkelijker beschikbaar",
+                body: "dikker en sneller beschikbaar",
                 lineD: "M 394 228 C 392 218, 382 208, 364 198"
             )
 
@@ -247,7 +247,7 @@ public struct HabituationPathwayDiagram: ReusableComponent, Sendable {
                 y: 38,
                 width: 190,
                 title: "Zwakkere routes",
-                body: "alternatieven bestaan, maar zijn minder dominant",
+                body: "minder dominant",
                 lineD: "M 520 100 C 496 106, 468 112, 430 114"
             )
 
