@@ -200,6 +200,16 @@ public enum QuizCSS {
                 ),
 
                 CSS.rule(
+                    ".wc-quiz-panel:focus",
+                    CSS.decl("outline", "none")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-panel:focus-visible",
+                    CSS.decl("box-shadow", "0 32px 90px rgba(15, 23, 42, .28), inset 0 0 0 2px color-mix(in srgb, var(--link-color) 42%, transparent)")
+                ),
+
+                CSS.rule(
                     ".wc-quiz-is-open",
                     CSS.decl("overflow", "hidden")
                 ),
@@ -245,12 +255,53 @@ public enum QuizCSS {
                 ),
 
                 CSS.rule(
+                    ".wc-quiz-item__kicker",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("justify-content", "space-between"),
+                    CSS.decl("gap", "12px")
+                ),
+
+                CSS.rule(
                     ".wc-quiz-item__eyebrow",
-                    CSS.decl("font-size", ".78rem"),
+                    CSS.decl("font-size", ".76rem"),
                     CSS.decl("font-weight", "780"),
                     CSS.decl("letter-spacing", ".12em"),
                     CSS.decl("text-transform", "uppercase"),
                     CSS.decl("color", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer",
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("gap", "7px"),
+                    CSS.decl("height", "30px"),
+                    CSS.decl("padding", "0 10px"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 8%, transparent)"),
+                    CSS.decl("color", "var(--muted-text-color)"),
+                    CSS.decl("font-size", ".78rem"),
+                    CSS.decl("font-weight", "720"),
+                    CSS.decl("white-space", "nowrap")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer strong",
+                    CSS.decl("font-family", "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"),
+                    CSS.decl("font-size", ".82rem"),
+                    CSS.decl("color", "var(--text-color)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer[data-quiz-timer-state=\"danger\"]",
+                    CSS.decl("background", "color-mix(in srgb, var(--danger, #D64545) 14%, transparent)"),
+                    CSS.decl("color", "var(--danger, #D64545)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer[data-quiz-timer-state=\"danger\"] strong",
+                    CSS.decl("color", "var(--danger, #D64545)")
                 ),
 
                 CSS.rule(
@@ -266,9 +317,9 @@ public enum QuizCSS {
                     ".wc-quiz-item__head h1",
                     CSS.decl("max-width", "780px"),
                     CSS.decl("margin", "0"),
-                    CSS.decl("font-size", "clamp(1.75rem, 3.6vw, 3rem)"),
-                    CSS.decl("line-height", "1.08"),
-                    CSS.decl("letter-spacing", "-.04em")
+                    CSS.decl("font-size", "clamp(1.65rem, 3.25vw, 2.55rem)"),
+                    CSS.decl("line-height", "1.1"),
+                    CSS.decl("letter-spacing", "-.038em")
                 ),
 
                 CSS.rule(
@@ -299,11 +350,11 @@ public enum QuizCSS {
                     ".wc-quiz-option",
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "22px minmax(0, 1fr)"),
-                    CSS.decl("gap", "12px"),
+                    CSS.decl("gap", "11px"),
                     CSS.decl("align-items", "start"),
-                    CSS.decl("padding", "16px 18px"),
+                    CSS.decl("padding", "14px 16px"),
                     CSS.decl("border", "1px solid var(--border-color)"),
-                    CSS.decl("border-radius", "18px"),
+                    CSS.decl("border-radius", "17px"),
                     CSS.decl("background", "var(--surface-color, var(--background-color))"),
                     CSS.decl("cursor", "pointer"),
                     CSS.decl("transition", "border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease")
@@ -332,8 +383,8 @@ public enum QuizCSS {
                 CSS.rule(
                     ".wc-quiz-option__note",
                     CSS.decl("grid-column", "2"),
-                    CSS.decl("font-size", ".86rem"),
-                    CSS.decl("line-height", "1.45"),
+                    CSS.decl("font-size", ".84rem"),
+                    CSS.decl("line-height", "1.42"),
                     CSS.decl("color", "var(--muted-text-color)")
                 ),
 
@@ -347,6 +398,16 @@ public enum QuizCSS {
                     ".wc-quiz-option[data-quiz-option-state=\"wrong\"]",
                     CSS.decl("border-color", "color-mix(in srgb, var(--danger, #D64545) 48%, var(--border-color))"),
                     CSS.decl("background", "color-mix(in srgb, var(--danger, #D64545) 10%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-option input:disabled",
+                    CSS.decl("cursor", "not-allowed")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-item[data-quiz-locked] .wc-quiz-option",
+                    CSS.decl("cursor", "default")
                 ),
 
                 CSS.rule(
@@ -419,6 +480,19 @@ public enum QuizCSS {
                 ),
 
                 CSS.rule(
+                    ".wc-quiz-btn--reset",
+                    CSS.decl("border-color", "transparent"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 6%, transparent)"),
+                    CSS.decl("color", "var(--text-color)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-btn--reset:hover",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--text-color) 12%, transparent)"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 9%, transparent)")
+                ),
+
+                CSS.rule(
                     ".wc-quiz-feedback",
                     CSS.decl("display", "grid"),
                     CSS.decl("gap", "6px"),
@@ -464,6 +538,17 @@ public enum QuizCSS {
 
                 CSS.rule(
                     ".wc-quiz-feedback--wrong h2",
+                    CSS.decl("color", "var(--danger, #D64545)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-feedback--timeout",
+                    CSS.decl("background", "color-mix(in srgb, var(--danger, #D64545) 10%, transparent)"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--danger, #D64545) 28%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-feedback--timeout h2",
                     CSS.decl("color", "var(--danger, #D64545)")
                 ),
 
@@ -514,6 +599,13 @@ public enum QuizCSS {
                     ".wc-quiz-nav__link strong",
                     CSS.decl("font-size", ".96rem"),
                     CSS.decl("line-height", "1.25")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-nav__empty",
+                    CSS.decl("opacity", ".64"),
+                    CSS.decl("box-shadow", "none"),
+                    CSS.decl("background", "transparent")
                 )
             ],
             media: [
@@ -563,6 +655,12 @@ public enum QuizCSS {
                     CSS.rule(
                         ".wc-quiz-item",
                         CSS.decl("padding", "22px 18px")
+                    ),
+
+                    CSS.rule(
+                        ".wc-quiz-item__kicker",
+                        CSS.decl("align-items", "flex-start"),
+                        CSS.decl("flex-direction", "column")
                     )
                 )
             ]

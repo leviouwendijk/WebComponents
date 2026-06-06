@@ -5,17 +5,26 @@ import HTML
 public struct QuizList: ReusableComponent, Sendable {
     public let set: QuizSet
     public let eyebrow: String
+    public let timerSeconds: Int?
     public let styles: Bool
     public let script: Bool
 
     public init(
         set: QuizSet,
         eyebrow: String = "Oefenen",
+        timerSeconds: Int? = nil,
         styles: Bool = true,
         script: Bool = true
     ) {
         self.set = set
         self.eyebrow = eyebrow
+
+        if let timerSeconds, timerSeconds > 0 {
+            self.timerSeconds = timerSeconds
+        } else {
+            self.timerSeconds = nil
+        }
+
         self.styles = styles
         self.script = script
     }
@@ -99,7 +108,10 @@ public struct QuizList: ReusableComponent, Sendable {
     }
 
     private func json() -> String {
-        let payload = QuizData(set)
+        let payload = QuizData(
+            set,
+            timerSeconds: timerSeconds
+        )
         let encoder = JSONEncoder()
         encoder.outputFormatting = [
             .sortedKeys

@@ -50,12 +50,19 @@ public struct QuizScript: ReusableComponent {
             const items = Array.isArray(parsed.items) ? parsed.items : [];
             const byID = new Map(items.map((item) => [item.id, item]));
             const bySlug = new Map(items.map((item) => [item.slug, item]));
+            const rawSeconds = Number(parsed.timerSeconds);
+            const timerSeconds = Number.isFinite(rawSeconds)
+                ? Math.max(0, Math.floor(rawSeconds))
+                : 0;
 
             return {
                 set: parsed,
                 items,
                 byID,
                 bySlug,
+                timerSeconds,
+                timerID: null,
+                remaining: timerSeconds,
                 active: null
             };
         }
@@ -89,6 +96,53 @@ public struct QuizScript: ReusableComponent {
                 picked(panel),
                 [...item.rule.ids].sort()
             );
+        }
+
+        function formatTime(seconds) {
+            const safe = Math.max(0, Number(seconds) || 0);
+            const minutes = Math.floor(safe / 60);
+            const rest = safe % 60;
+
+            if (minutes <= 0) {
+                return `${rest}s`;
+            }
+
+            return `${minutes}:${String(rest).padStart(2, '0')}`;
+        }
+
+        function hasTimer(data) {
+            return Number.isFinite(data.timerSeconds) && data.timerSeconds > 0;
+        }
+
+        function timerHTML(data) {
+            if (!hasTimer(data)) return '';
+
+            return `
+                <div class="wc-quiz-timer" data-quiz-timer data-quiz-timer-state="active" aria-live="polite">
+                    <span>Tijd</span>
+                    <strong data-quiz-timer-value>${esc(formatTime(data.timerSeconds))}</strong>
+                </div>
+            `;
+        }
+
+        function focusFirstControl(panel) {
+            const control = panel.querySelector('[data-quiz-option] input, [data-quiz-input]');
+
+            if (control) {
+                control.focus();
+            } else {
+                panel.focus();
+            }
+        }
+
+        function lock(panel, locked) {
+            panel.toggleAttribute('data-quiz-locked', locked);
+
+            panel
+                .querySelectorAll('input, button[type="submit"]')
+                .forEach((control) => {
+                    control.disabled = locked;
+                });
         }
 
         function clear(panel) {
@@ -126,11 +180,83 @@ public struct QuizScript: ReusableComponent {
                 });
         }
 
-        function check(panel, item) {
+        function stopTimer(root) {
+            const data = state(root);
+
+            if (data.timerID) {
+                window.clearInterval(data.timerID);
+                data.timerID = null;
+            }
+        }
+
+        function updateTimer(root, panel, remaining) {
+            const value = panel.querySelector('[data-quiz-timer-value]');
+            const timer = panel.querySelector('[data-quiz-timer]');
+
+            if (value) {
+                value.textContent = formatTime(remaining);
+            }
+
+            if (timer) {
+                timer.setAttribute(
+                    'data-quiz-timer-state',
+                    remaining <= 5 ? 'danger' : 'active'
+                );
+            }
+        }
+
+        function timeout(root, panel) {
+            clear(panel);
+            lock(panel, true);
+            panel.setAttribute('data-quiz-state', 'timeout');
+
+            const feedback = panel.querySelector('[data-quiz-feedback="timeout"]');
+
+            if (feedback) {
+                feedback.hidden = false;
+            }
+
+            panel.querySelector('[data-quiz-reset]')?.focus();
+        }
+
+        function startTimer(root, panel) {
+            const data = state(root);
+            stopTimer(root);
+
+            if (!hasTimer(data)) return;
+
+            data.remaining = data.timerSeconds;
+            updateTimer(root, panel, data.remaining);
+
+            data.timerID = window.setInterval(() => {
+                const current = root.querySelector('[data-quiz-panel]');
+
+                if (!current || current !== panel || !data.active) {
+                    stopTimer(root);
+                    return;
+                }
+
+                if (panel.hasAttribute('data-quiz-state')) {
+                    stopTimer(root);
+                    return;
+                }
+
+                data.remaining -= 1;
+                updateTimer(root, panel, data.remaining);
+
+                if (data.remaining <= 0) {
+                    stopTimer(root);
+                    timeout(root, panel);
+                }
+            }, 1000);
+        }
+
+        function check(root, panel, item) {
             const ok = item.rule.mode === 'text'
                 ? textOk(panel, item)
                 : selectedOk(panel, item);
 
+            stopTimer(root);
             clear(panel);
 
             const result = ok ? 'right' : 'wrong';
@@ -139,6 +265,8 @@ public struct QuizScript: ReusableComponent {
             if (item.rule.mode !== 'text') {
                 mark(panel, item);
             }
+
+            lock(panel, true);
 
             const feedback = panel.querySelector(`[data-quiz-feedback="${result}"]`);
 
@@ -229,8 +357,11 @@ public struct QuizScript: ReusableComponent {
 
                 <article class="wc-quiz-item" data-quiz-item>
                     <header class="wc-quiz-item__head">
-                        <div class="wc-quiz-item__eyebrow">
-                            ${esc(item.group)} · ${esc(item.levelLabel)}
+                        <div class="wc-quiz-item__kicker">
+                            <div class="wc-quiz-item__eyebrow">
+                                ${esc(item.group)} · ${esc(item.levelLabel)}
+                            </div>
+                            ${timerHTML(data)}
                         </div>
 
                         <p class="wc-quiz-topic">${esc(item.title)}</p>
@@ -246,7 +377,7 @@ public struct QuizScript: ReusableComponent {
                                 Controleer
                             </button>
 
-                            <button class="wc-quiz-btn" type="button" data-quiz-reset>
+                            <button class="wc-quiz-btn wc-quiz-btn--reset" type="button" data-quiz-reset>
                                 Opnieuw
                             </button>
                         </div>
@@ -260,6 +391,11 @@ public struct QuizScript: ReusableComponent {
                     <div class="wc-quiz-feedback wc-quiz-feedback--wrong" data-quiz-feedback="wrong" hidden>
                         <h2>Incorrect</h2>
                         <p>${esc(item.explanation)}</p>
+                    </div>
+
+                    <div class="wc-quiz-feedback wc-quiz-feedback--timeout" data-quiz-feedback="timeout" hidden>
+                        <h2>Tijd verstreken</h2>
+                        <p>Je hebt niet op tijd geantwoord. Probeer opnieuw om dezelfde vraag nog eens te beantwoorden.</p>
                     </div>
                 </article>
 
@@ -284,21 +420,25 @@ public struct QuizScript: ReusableComponent {
 
             if (!shell || !panel) return;
 
+            stopTimer(root);
             data.active = item;
             panel.innerHTML = render(data, item);
             shell.hidden = false;
             document.documentElement.classList.add('wc-quiz-is-open');
+            startTimer(root, panel);
 
             if (updateHash) {
                 setHash(item);
             }
 
-            panel.focus();
+            focusFirstControl(panel);
         }
 
         function close(root, updateHash = true) {
             const shell = root.querySelector('[data-quiz-shell]');
             const panel = root.querySelector('[data-quiz-panel]');
+
+            stopTimer(root);
 
             if (shell) {
                 shell.hidden = true;
@@ -395,15 +535,19 @@ public struct QuizScript: ReusableComponent {
             if (!item) return;
 
             event.preventDefault();
-            check(panel, item);
+            check(root, panel, item);
         });
 
         document.addEventListener('click', (event) => {
             const reset = event.target?.closest?.('[data-quiz-reset]');
             if (!reset) return;
 
+            const root = reset.closest(rootSelector);
             const panel = reset.closest('[data-quiz-panel]');
-            if (!panel) return;
+            if (!root || !panel) return;
+
+            stopTimer(root);
+            lock(panel, false);
 
             panel.querySelectorAll('input').forEach((input) => {
                 if (input.type === 'radio' || input.type === 'checkbox') {
@@ -414,6 +558,8 @@ public struct QuizScript: ReusableComponent {
             });
 
             clear(panel);
+            startTimer(root, panel);
+            focusFirstControl(panel);
         });
 
         document.addEventListener('keydown', (event) => {

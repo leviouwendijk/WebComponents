@@ -2,14 +2,23 @@ internal struct QuizData: Encodable {
     let id: String
     let title: String
     let lead: String
+    let timerSeconds: Int?
     let items: [Item]
 
     init(
-        _ set: QuizSet
+        _ set: QuizSet,
+        timerSeconds: Int? = nil
     ) {
         self.id = set.id
         self.title = set.title
         self.lead = set.lead
+
+        if let timerSeconds, timerSeconds > 0 {
+            self.timerSeconds = timerSeconds
+        } else {
+            self.timerSeconds = nil
+        }
+
         self.items = set.items.map(Item.init)
     }
 
