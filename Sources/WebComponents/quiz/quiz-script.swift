@@ -18,6 +18,8 @@ public struct QuizScript: ReusableComponent {
 
         const rootSelector = '[data-quiz-root]';
         const stateByRoot = new WeakMap();
+        const storageVersion = 1;
+        const storageTTL = 1000 * 60 * 60 * 24 * 30;
 
         function esc(value) {
             return String(value ?? '')
@@ -44,6 +46,135 @@ public struct QuizScript: ReusableComponent {
             return left.every((value, index) => value === right[index]);
         }
 
+        function now() {
+            return Date.now();
+        }
+
+        function storageKey(setID) {
+            return `wcQuiz:${setID}:v${storageVersion}`;
+        }
+
+        function blankProgress(setID, timerEnabled) {
+            const timestamp = now();
+
+            return {
+                version: storageVersion,
+                setID,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+                expiresAt: timestamp + storageTTL,
+                settings: {
+                    timerEnabled
+                },
+                items: {}
+            };
+        }
+
+        function normalizeProgress(raw, setID, timerEnabled) {
+            if (!raw || raw.version !== storageVersion || raw.setID !== setID) {
+                return blankProgress(setID, timerEnabled);
+            }
+
+            if (!Number.isFinite(Number(raw.expiresAt)) || Number(raw.expiresAt) <= now()) {
+                return blankProgress(setID, timerEnabled);
+            }
+
+            const progress = {
+                version: storageVersion,
+                setID,
+                createdAt: Number(raw.createdAt) || now(),
+                updatedAt: Number(raw.updatedAt) || now(),
+                expiresAt: now() + storageTTL,
+                settings: {
+                    timerEnabled: Boolean(raw.settings?.timerEnabled)
+                },
+                items: {}
+            };
+
+            if (raw.items && typeof raw.items === 'object') {
+                Object.entries(raw.items).forEach(([id, entry]) => {
+                    const attempts = Math.max(0, Math.floor(Number(entry?.attempts) || 0));
+                    const history = Array.isArray(entry?.history)
+                        ? entry.history.filter(isResult).slice(-20)
+                        : [];
+
+                    if (attempts <= 0 && history.length === 0) {
+                        return;
+                    }
+
+                    const lastResult = isResult(entry?.lastResult)
+                        ? entry.lastResult
+                        : history.at(-1) || 'wrong';
+
+                    progress.items[id] = {
+                        attempts: Math.max(attempts, history.length),
+                        lastResult,
+                        status: lastResult,
+                        selected: Array.isArray(entry?.selected)
+                            ? entry.selected.map(String)
+                            : [],
+                        history,
+                        updatedAt: Number(entry?.updatedAt) || now()
+                    };
+                });
+            }
+
+            return progress;
+        }
+
+        function loadProgress(setID, timerEnabled) {
+            try {
+                const stored = window.localStorage?.getItem(storageKey(setID));
+                const raw = stored ? JSON.parse(stored) : null;
+
+                return normalizeProgress(raw, setID, timerEnabled);
+            } catch {
+                return blankProgress(setID, timerEnabled);
+            }
+        }
+
+        function saveProgress(data) {
+            const timestamp = now();
+
+            data.progress.updatedAt = timestamp;
+            data.progress.expiresAt = timestamp + storageTTL;
+            data.progress.settings.timerEnabled = data.timerEnabled;
+
+            try {
+                window.localStorage?.setItem(
+                    storageKey(data.set.id),
+                    JSON.stringify(data.progress)
+                );
+            } catch {}
+        }
+
+        function isResult(value) {
+            return value === 'right' || value === 'wrong' || value === 'timeout';
+        }
+
+        function labelForResult(value) {
+            switch (value) {
+            case 'right':
+                return 'Correct';
+            case 'wrong':
+                return 'Incorrect';
+            case 'timeout':
+                return 'Tijd verstreken';
+            default:
+                return 'Onbeantwoord';
+            }
+        }
+
+        function attemptLabel(attempts) {
+            const count = Math.max(0, Number(attempts) || 0);
+
+            if (count === 1) {
+                return '1 poging';
+            }
+
+            return `${count} pogingen`;
+        }
+
         function parse(root) {
             const data = root.querySelector('[data-quiz-data]');
             const parsed = JSON.parse(data?.textContent || '{}');
@@ -52,6 +183,8 @@ public struct QuizScript: ReusableComponent {
             const timerSeconds = Number.isFinite(rawSeconds)
                 ? Math.max(0, Math.floor(rawSeconds))
                 : 0;
+            const initialTimerEnabled = timerSeconds > 0;
+            const progress = loadProgress(parsed.id || 'quiz', initialTimerEnabled);
 
             return {
                 set: parsed,
@@ -59,10 +192,11 @@ public struct QuizScript: ReusableComponent {
                 byID: new Map(items.map((item) => [item.id, item])),
                 bySlug: new Map(items.map((item) => [item.slug, item])),
                 timerSeconds,
-                timerEnabled: timerSeconds > 0,
+                timerEnabled: timerSeconds > 0 && progress.settings.timerEnabled !== false,
                 timerID: null,
                 remaining: timerSeconds,
-                active: null
+                active: null,
+                progress
             };
         }
 
@@ -72,6 +206,54 @@ public struct QuizScript: ReusableComponent {
             }
 
             return stateByRoot.get(root);
+        }
+
+        function itemProgress(data, itemID) {
+            return data.progress.items[itemID] || null;
+        }
+
+        function selectedForStore(panel, item) {
+            if (item.rule.mode === 'text') {
+                return [];
+            }
+
+            return picked(panel);
+        }
+
+        function recordAttempt(root, item, result, selected = []) {
+            const data = state(root);
+            const previous = itemProgress(data, item.id);
+            const history = previous?.history ? [...previous.history] : [];
+
+            history.push(result);
+
+            data.progress.items[item.id] = {
+                attempts: (previous?.attempts || 0) + 1,
+                lastResult: result,
+                status: result,
+                selected: item.rule.mode === 'text' ? [] : selected,
+                history: history.slice(-20),
+                updatedAt: now()
+            };
+
+            saveProgress(data);
+            renderProgress(root);
+        }
+
+        function resetItemProgress(root, itemID) {
+            const data = state(root);
+
+            delete data.progress.items[itemID];
+            saveProgress(data);
+            renderProgress(root);
+        }
+
+        function resetAllProgress(root) {
+            const data = state(root);
+
+            data.progress.items = {};
+            saveProgress(data);
+            renderProgress(root);
         }
 
         function radioInputFromEvent(event) {
@@ -193,6 +375,35 @@ public struct QuizScript: ReusableComponent {
             `;
         }
 
+        function progressHTML(data, item) {
+            const entry = itemProgress(data, item.id);
+
+            if (!entry) {
+                return `
+                    <div class="wc-quiz-prior" data-quiz-prior hidden>
+                        <span data-quiz-prior-text></span>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="wc-quiz-prior" data-quiz-prior data-quiz-prior-state="${esc(entry.lastResult)}">
+                    <span data-quiz-prior-text>${priorText(entry)}</span>
+                </div>
+            `;
+        }
+
+        function priorText(entry) {
+            const label = labelForResult(entry.lastResult);
+            const attempts = attemptLabel(entry.attempts);
+
+            if (entry.lastResult === 'timeout') {
+                return `Eerder afgebroken: ${label.toLowerCase()} · ${attempts}`;
+            }
+
+            return `Eerder beantwoord: ${label} · ${attempts}`;
+        }
+
         function focusFirstControl(panel) {
             panel.focus(
                 {
@@ -306,6 +517,8 @@ public struct QuizScript: ReusableComponent {
             }
 
             data.timerEnabled = Boolean(enabled);
+            data.progress.settings.timerEnabled = data.timerEnabled;
+            saveProgress(data);
             stopTimer(root);
 
             if (!data.timerEnabled) {
@@ -322,9 +535,17 @@ public struct QuizScript: ReusableComponent {
         }
 
         function timeout(root, panel) {
+            const data = state(root);
+            const item = data.active;
+
             clear(panel);
             lock(panel, true);
             panel.setAttribute('data-quiz-state', 'timeout');
+
+            if (item) {
+                recordAttempt(root, item, 'timeout', []);
+                updatePrior(root, panel, item);
+            }
 
             const feedback = panel.querySelector('[data-quiz-feedback="timeout"]');
 
@@ -380,6 +601,7 @@ public struct QuizScript: ReusableComponent {
             const ok = item.rule.mode === 'text'
                 ? textOk(panel, item)
                 : selectedOk(panel, item);
+            const selected = selectedForStore(panel, item);
 
             stopTimer(root);
             clear(panel);
@@ -392,6 +614,8 @@ public struct QuizScript: ReusableComponent {
             }
 
             lock(panel, true);
+            recordAttempt(root, item, result, selected);
+            updatePrior(root, panel, item);
 
             const feedback = panel.querySelector(`[data-quiz-feedback="${result}"]`);
 
@@ -475,6 +699,9 @@ public struct QuizScript: ReusableComponent {
         }
 
         function render(data, item) {
+            const entry = itemProgress(data, item.id);
+            const resetDisabled = entry ? '' : 'disabled';
+
             return `
                 <button class="wc-quiz__back" type="button" data-quiz-close>
                     Alle vragen
@@ -492,6 +719,8 @@ public struct QuizScript: ReusableComponent {
                         <p class="wc-quiz-topic">${esc(item.title)}</p>
 
                         <h1 id="wc-quiz-panel-title">${esc(item.prompt)}</h1>
+
+                        ${progressHTML(data, item)}
                     </header>
 
                     <form class="wc-quiz-form" data-quiz-form>
@@ -504,6 +733,10 @@ public struct QuizScript: ReusableComponent {
 
                             <button class="wc-quiz-btn wc-quiz-btn--reset" type="button" data-quiz-reset>
                                 Opnieuw
+                            </button>
+
+                            <button class="wc-quiz-btn wc-quiz-btn--clear" type="button" data-quiz-reset-item ${resetDisabled}>
+                                Reset dit antwoord
                             </button>
                         </div>
                     </form>
@@ -528,6 +761,69 @@ public struct QuizScript: ReusableComponent {
             `;
         }
 
+        function restoreStoredSelection(root, panel, item) {
+            const data = state(root);
+            const entry = itemProgress(data, item.id);
+
+            if (!entry || item.rule.mode === 'text') {
+                return;
+            }
+
+            const selected = new Set(entry.selected || []);
+
+            panel
+                .querySelectorAll('input[type="radio"], input[type="checkbox"]')
+                .forEach((input) => {
+                    input.checked = selected.has(input.value);
+                });
+        }
+
+        function updatePrior(root, panel, item) {
+            const data = state(root);
+            const entry = itemProgress(data, item.id);
+            const prior = panel.querySelector('[data-quiz-prior]');
+            const text = panel.querySelector('[data-quiz-prior-text]');
+            const reset = panel.querySelector('[data-quiz-reset-item]');
+
+            if (!prior || !text) {
+                return;
+            }
+
+            if (!entry) {
+                prior.hidden = true;
+                prior.removeAttribute('data-quiz-prior-state');
+                text.textContent = '';
+
+                if (reset) {
+                    reset.disabled = true;
+                }
+
+                return;
+            }
+
+            prior.hidden = false;
+            prior.setAttribute('data-quiz-prior-state', entry.lastResult);
+            text.textContent = priorText(entry);
+
+            if (reset) {
+                reset.disabled = false;
+            }
+        }
+
+        function resetPanelAttempt(panel) {
+            lock(panel, false);
+
+            panel.querySelectorAll('input').forEach((input) => {
+                if (input.type === 'radio' || input.type === 'checkbox') {
+                    input.checked = false;
+                } else {
+                    input.value = '';
+                }
+            });
+
+            clear(panel);
+        }
+
         function setHash(item) {
             const next = `${window.location.pathname}${window.location.search}#${encodeURIComponent(item.slug)}`;
             history.pushState({}, '', next);
@@ -550,6 +846,7 @@ public struct QuizScript: ReusableComponent {
             panel.innerHTML = render(data, item);
             shell.hidden = false;
             document.documentElement.classList.add('wc-quiz-is-open');
+            restoreStoredSelection(root, panel, item);
             startTimer(root, panel);
 
             if (updateHash) {
@@ -597,6 +894,89 @@ public struct QuizScript: ReusableComponent {
             }
         }
 
+        function statusForCard(entry) {
+            if (!entry) {
+                return 'unanswered';
+            }
+
+            return entry.lastResult || 'unanswered';
+        }
+
+        function renderHistory(entry) {
+            if (!entry?.history?.length) {
+                return '';
+            }
+
+            return entry.history
+                .slice(-5)
+                .map((result) => `<span class="wc-quiz-card__history-dot" data-quiz-history-result="${esc(result)}"></span>`)
+                .join('');
+        }
+
+        function renderProgress(root) {
+            const data = state(root);
+            let answered = 0;
+            let right = 0;
+            let wrong = 0;
+            let timeoutCount = 0;
+
+            root.querySelectorAll('[data-quiz-card]').forEach((card) => {
+                const id = card.getAttribute('data-quiz-open');
+                const entry = itemProgress(data, id);
+                const status = statusForCard(entry);
+                const attempts = entry?.attempts || 0;
+
+                if (entry) {
+                    answered += 1;
+
+                    if (entry.lastResult === 'right') {
+                        right += 1;
+                    } else if (entry.lastResult === 'wrong') {
+                        wrong += 1;
+                    } else if (entry.lastResult === 'timeout') {
+                        timeoutCount += 1;
+                    }
+                }
+
+                card.setAttribute('data-quiz-card-state', status);
+                card.setAttribute('data-quiz-card-attempts', String(attempts));
+
+                const statusNode = card.querySelector('[data-quiz-card-status]');
+                const attemptsNode = card.querySelector('[data-quiz-card-attempts-label]');
+                const historyNode = card.querySelector('[data-quiz-card-history]');
+
+                if (statusNode) {
+                    statusNode.textContent = labelForResult(status);
+                }
+
+                if (attemptsNode) {
+                    attemptsNode.textContent = attemptLabel(attempts);
+                }
+
+                if (historyNode) {
+                    historyNode.innerHTML = renderHistory(entry);
+                }
+            });
+
+            const count = root.querySelector('[data-quiz-progress-count]');
+            const detail = root.querySelector('[data-quiz-progress-detail]');
+            const reset = root.querySelector('[data-quiz-reset-all]');
+
+            if (count) {
+                count.textContent = `${answered} van ${data.items.length} beantwoord`;
+            }
+
+            if (detail) {
+                detail.textContent = answered > 0
+                    ? `${right} correct · ${wrong} incorrect · ${timeoutCount} tijd verstreken`
+                    : 'Nog geen antwoorden';
+            }
+
+            if (reset) {
+                reset.disabled = answered === 0;
+            }
+        }
+
         function init(scope = document) {
             const roots = scope.matches?.(rootSelector)
                 ? [scope]
@@ -604,6 +984,7 @@ public struct QuizScript: ReusableComponent {
 
             roots.forEach((root) => {
                 state(root);
+                renderProgress(root);
                 openFromHash(root);
             });
         }
@@ -639,6 +1020,38 @@ public struct QuizScript: ReusableComponent {
                     timerToggle.getAttribute('aria-checked') !== 'true'
                 );
 
+                return;
+            }
+
+            const resetAll = event.target?.closest?.('[data-quiz-reset-all]');
+
+            if (resetAll) {
+                const root = resetAll.closest(rootSelector);
+                if (!root) return;
+
+                event.preventDefault();
+                resetAllProgress(root);
+                return;
+            }
+
+            const resetItem = event.target?.closest?.('[data-quiz-reset-item]');
+
+            if (resetItem) {
+                const root = resetItem.closest(rootSelector);
+                const panel = resetItem.closest('[data-quiz-panel]');
+
+                if (!root || !panel) return;
+
+                const item = state(root).active;
+                if (!item) return;
+
+                event.preventDefault();
+                stopTimer(root);
+                resetItemProgress(root, item.id);
+                resetPanelAttempt(panel);
+                updatePrior(root, panel, item);
+                startTimer(root, panel);
+                focusFirstControl(panel);
                 return;
             }
 
@@ -705,17 +1118,7 @@ public struct QuizScript: ReusableComponent {
             if (!root || !panel) return;
 
             stopTimer(root);
-            lock(panel, false);
-
-            panel.querySelectorAll('input').forEach((input) => {
-                if (input.type === 'radio' || input.type === 'checkbox') {
-                    input.checked = false;
-                } else {
-                    input.value = '';
-                }
-            });
-
-            clear(panel);
+            resetPanelAttempt(panel);
             startTimer(root, panel);
             focusFirstControl(panel);
         });

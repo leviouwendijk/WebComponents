@@ -52,6 +52,29 @@ public struct QuizList: ReusableComponent, Sendable {
                         HTML.p(["class": "wc-quiz__lead"]) {
                             HTML.text(set.lead)
                         }
+
+                        HTML.div(["class": "wc-quiz-progress", "data-quiz-progress": ""]) {
+                            HTML.div(["class": "wc-quiz-progress__text"]) {
+                                HTML.strong(["data-quiz-progress-count": ""]) {
+                                    HTML.text("0 van \(set.items.count) beantwoord")
+                                }
+
+                                HTML.span(["data-quiz-progress-detail": ""]) {
+                                    HTML.text("Nog geen antwoorden")
+                                }
+                            }
+
+                            HTML.button(
+                                [
+                                    "type": "button",
+                                    "class": "wc-quiz-progress__reset",
+                                    "data-quiz-reset-all": "",
+                                    "disabled": ""
+                                ]
+                            ) {
+                                HTML.text("Reset alle antwoorden")
+                            }
+                        }
                     }
 
                     HTML.el("section", ["class": "wc-quiz-list", "aria-label": "Vragen"]) {

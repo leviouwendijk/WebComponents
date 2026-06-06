@@ -44,6 +44,59 @@ public enum QuizCSS {
                 ),
 
                 CSS.rule(
+                    ".wc-quiz-progress",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("justify-content", "space-between"),
+                    CSS.decl("gap", "16px"),
+                    CSS.decl("margin-top", "20px"),
+                    CSS.decl("padding", "14px 16px"),
+                    CSS.decl("border", "1px solid var(--border-color)"),
+                    CSS.decl("border-radius", "18px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, var(--background-color)) 92%, var(--text-color) 8%)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-progress__text",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "4px")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-progress__text strong",
+                    CSS.decl("font-size", ".95rem"),
+                    CSS.decl("line-height", "1.2")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-progress__text span",
+                    CSS.decl("font-size", ".84rem"),
+                    CSS.decl("color", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-progress__reset",
+                    CSS.decl("appearance", "none"),
+                    CSS.decl("flex", "0 0 auto"),
+                    CSS.decl("height", "34px"),
+                    CSS.decl("padding", "0 12px"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--danger, #D64545) 28%, var(--border-color))"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--danger, #D64545) 7%, transparent)"),
+                    CSS.decl("color", "var(--danger, #D64545)"),
+                    CSS.decl("font", "inherit"),
+                    CSS.decl("font-size", ".82rem"),
+                    CSS.decl("font-weight", "760"),
+                    CSS.decl("cursor", "pointer")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-progress__reset:disabled",
+                    CSS.decl("opacity", ".44"),
+                    CSS.decl("cursor", "not-allowed")
+                ),
+
+                CSS.rule(
                     ".wc-quiz-list",
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "1fr"),
@@ -60,6 +113,7 @@ public enum QuizCSS {
 
                 CSS.rule(
                     ".wc-quiz-card",
+                    CSS.decl("position", "relative"),
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "58px minmax(0, 1fr)"),
                     CSS.decl("gap", "16px"),
@@ -67,7 +121,50 @@ public enum QuizCSS {
                     CSS.decl("padding", "16px"),
                     CSS.decl("color", "var(--text-color)"),
                     CSS.decl("text-decoration", "none"),
+                    CSS.decl("overflow", "hidden"),
                     CSS.decl("transition", "transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease, background-color 140ms ease")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card::before",
+                    CSS.decl("content", "\"\""),
+                    CSS.decl("position", "absolute"),
+                    CSS.decl("inset", "0 auto 0 0"),
+                    CSS.decl("width", "4px"),
+                    CSS.decl("background", "transparent")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card[data-quiz-card-state=\"right\"]::before",
+                    CSS.decl("background", "var(--success, #2E8B57)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card[data-quiz-card-state=\"wrong\"]::before",
+                    CSS.decl("background", "var(--danger, #D64545)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card[data-quiz-card-state=\"timeout\"]::before",
+                    CSS.decl("background", "var(--danger, #D64545)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card[data-quiz-card-state=\"right\"]",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--success, #2E8B57) 28%, var(--border-color))"),
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, var(--background-color)) 94%, var(--success, #2E8B57) 6%)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card[data-quiz-card-state=\"wrong\"]",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--danger, #D64545) 28%, var(--border-color))"),
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, var(--background-color)) 94%, var(--danger, #D64545) 6%)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card[data-quiz-card-state=\"timeout\"]",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--danger, #D64545) 24%, var(--border-color))"),
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, var(--background-color)) 95%, var(--danger, #D64545) 5%)")
                 ),
 
                 CSS.rule(
@@ -147,6 +244,61 @@ public enum QuizCSS {
                     CSS.decl("font-size", ".74rem"),
                     CSS.decl("font-weight", "680"),
                     CSS.decl("color", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card__meta .wc-quiz-card__status",
+                    CSS.decl("font-weight", "760")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card[data-quiz-card-state=\"right\"] .wc-quiz-card__status",
+                    CSS.decl("background", "color-mix(in srgb, var(--success, #2E8B57) 13%, transparent)"),
+                    CSS.decl("color", "var(--success, #2E8B57)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card[data-quiz-card-state=\"wrong\"] .wc-quiz-card__status",
+                    CSS.decl("background", "color-mix(in srgb, var(--danger, #D64545) 12%, transparent)"),
+                    CSS.decl("color", "var(--danger, #D64545)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card[data-quiz-card-state=\"timeout\"] .wc-quiz-card__status",
+                    CSS.decl("background", "color-mix(in srgb, var(--danger, #D64545) 10%, transparent)"),
+                    CSS.decl("color", "var(--danger, #D64545)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card__history",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("gap", "5px"),
+                    CSS.decl("min-height", "8px")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card__history-dot",
+                    CSS.decl("display", "inline-block"),
+                    CSS.decl("width", "7px"),
+                    CSS.decl("height", "7px"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 18%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card__history-dot[data-quiz-history-result=\"right\"]",
+                    CSS.decl("background", "var(--success, #2E8B57)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card__history-dot[data-quiz-history-result=\"wrong\"]",
+                    CSS.decl("background", "var(--danger, #D64545)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-card__history-dot[data-quiz-history-result=\"timeout\"]",
+                    CSS.decl("background", "color-mix(in srgb, var(--danger, #D64545) 68%, var(--warning, #E7A94E) 32%)")
                 ),
 
                 CSS.rule(
@@ -424,6 +576,46 @@ public enum QuizCSS {
                 ),
 
                 CSS.rule(
+                    ".wc-quiz-prior",
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("width", "fit-content"),
+                    CSS.decl("max-width", "100%"),
+                    CSS.decl("padding", "8px 10px"),
+                    CSS.decl("border", "1px solid var(--border-color)"),
+                    CSS.decl("border-radius", "14px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 6%, transparent)"),
+                    CSS.decl("font-size", ".86rem"),
+                    CSS.decl("font-weight", "700"),
+                    CSS.decl("color", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-prior[hidden]",
+                    CSS.decl("display", "none")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-prior[data-quiz-prior-state=\"right\"]",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--success, #2E8B57) 30%, var(--border-color))"),
+                    CSS.decl("background", "color-mix(in srgb, var(--success, #2E8B57) 10%, transparent)"),
+                    CSS.decl("color", "var(--success, #2E8B57)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-prior[data-quiz-prior-state=\"wrong\"]",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--danger, #D64545) 30%, var(--border-color))"),
+                    CSS.decl("background", "color-mix(in srgb, var(--danger, #D64545) 9%, transparent)"),
+                    CSS.decl("color", "var(--danger, #D64545)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-prior[data-quiz-prior-state=\"timeout\"]",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--danger, #D64545) 24%, var(--border-color))"),
+                    CSS.decl("background", "color-mix(in srgb, var(--danger, #D64545) 8%, transparent)"),
+                    CSS.decl("color", "var(--danger, #D64545)")
+                ),
+
+                CSS.rule(
                     ".wc-quiz-form",
                     CSS.decl("display", "grid"),
                     CSS.decl("gap", "20px")
@@ -574,6 +766,12 @@ public enum QuizCSS {
                 ),
 
                 CSS.rule(
+                    ".wc-quiz-btn:disabled",
+                    CSS.decl("opacity", ".48"),
+                    CSS.decl("cursor", "not-allowed")
+                ),
+
+                CSS.rule(
                     ".wc-quiz-btn--main",
                     CSS.decl("border-color", "var(--link-color)"),
                     CSS.decl("background", "var(--link-color)"),
@@ -591,6 +789,13 @@ public enum QuizCSS {
                     ".wc-quiz-btn--reset:hover",
                     CSS.decl("border-color", "color-mix(in srgb, var(--text-color) 12%, transparent)"),
                     CSS.decl("background", "color-mix(in srgb, var(--text-color) 9%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-btn--clear",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--danger, #D64545) 20%, var(--border-color))"),
+                    CSS.decl("background", "color-mix(in srgb, var(--danger, #D64545) 6%, transparent)"),
+                    CSS.decl("color", "var(--danger, #D64545)")
                 ),
 
                 CSS.rule(
@@ -716,6 +921,18 @@ public enum QuizCSS {
                         ".wc-quiz",
                         CSS.decl("width", "calc(100% - 32px)"),
                         CSS.decl("padding", "42px 0 78px")
+                    ),
+
+                    CSS.rule(
+                        ".wc-quiz-progress",
+                        CSS.decl("align-items", "flex-start"),
+                        CSS.decl("flex-direction", "column")
+                    ),
+
+                    CSS.rule(
+                        ".wc-quiz-progress__reset",
+                        CSS.decl("width", "100%"),
+                        CSS.decl("justify-content", "center")
                     ),
 
                     CSS.rule(
