@@ -1,3 +1,4 @@
+import Foundation
 import Constructors
 import CSS
 import HTML
@@ -191,7 +192,8 @@ public struct QuizList: ReusableComponent, Sendable {
                     "main",
                     [
                         "id": "content-area",
-                        "class": "wc-quiz wc-quiz--list"
+                        "class": "wc-quiz wc-quiz--list",
+                        "data-quiz-root": ""
                     ]
                 ) {
                     HTML.el("section", ["class": "wc-quiz__hero"]) {
@@ -213,11 +215,71 @@ public struct QuizList: ReusableComponent, Sendable {
                             QuizCard(item: item).nodes.body
                         }
                     }
+
+                    HTML.el(
+                        "script",
+                        [
+                            "type": "application/json",
+                            "data-quiz-data": ""
+                        ]
+                    ) {
+                        HTML.raw(json())
+                    }
+
+                    HTML.div(
+                        [
+                            "class": "wc-quiz-shell",
+                            "data-quiz-shell": "",
+                            "hidden": ""
+                        ]
+                    ) {
+                        HTML.button(
+                            [
+                                "class": "wc-quiz-backdrop",
+                                "type": "button",
+                                "aria-label": "Sluit vraag",
+                                "data-quiz-close": ""
+                            ]
+                        ) {}
+
+                        HTML.div(
+                            [
+                                "class": "wc-quiz-panel",
+                                "data-quiz-panel": "",
+                                "role": "dialog",
+                                "aria-modal": "true",
+                                "aria-labelledby": "wc-quiz-panel-title",
+                                "tabindex": "-1"
+                            ]
+                        ) {}
+                    }
                 }
             ],
             stylesheets: styles ? [QuizCSS.sheet()] : [],
             scripts: script ? QuizScript().nodes.scripts : []
         )
+    }
+
+    private func json() -> String {
+        let payload = QuizData(set)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [
+            .sortedKeys
+        ]
+
+        guard let data = try? encoder.encode(payload) else {
+            return "{}"
+        }
+
+        let raw = String(
+            decoding: data,
+            as: UTF8.self
+        )
+
+        return raw
+            .replacingOccurrences(of: "&", with: "\\u0026")
+            .replacingOccurrences(of: "<", with: "\\u003C")
+            .replacingOccurrences(of: ">", with: "\\u003E")
     }
 }
 
@@ -234,15 +296,24 @@ public struct QuizCard: ReusableComponent, Sendable {
         .body(
             [
                 HTML.a(
-                    item.href,
+                    "#\(item.slug)",
                     [
                         "class": "wc-quiz-card",
                         "data-quiz-card": "",
+                        "data-quiz-open": item.id,
                         "data-quiz-group": item.group,
                         "data-quiz-level": item.level.rawValue
                     ]
                 ) {
-                    meta(item)
+                    HTML.div(["class": "wc-quiz-meta"]) {
+                        HTML.span {
+                            HTML.text(item.group)
+                        }
+
+                        HTML.span {
+                            HTML.text(item.level.label)
+                        }
+                    }
 
                     HTML.h2 {
                         HTML.text(item.title)
@@ -261,294 +332,74 @@ public struct QuizCard: ReusableComponent, Sendable {
     }
 }
 
-public struct QuizView: ReusableComponent, Sendable {
-    public let set: QuizSet
-    public let item: String
-    public let home: String
-    public let styles: Bool
-    public let script: Bool
+private struct QuizData: Encodable {
+    let id: String
+    let title: String
+    let lead: String
+    let items: [Item]
 
-    public init(
-        set: QuizSet,
-        item: String,
-        home: String,
-        styles: Bool = true,
-        script: Bool = true
+    init(
+        _ set: QuizSet
     ) {
-        self.set = set
-        self.item = item
-        self.home = home
-        self.styles = styles
-        self.script = script
+        self.id = set.id
+        self.title = set.title
+        self.lead = set.lead
+        self.items = set.items.map(Item.init)
     }
 
-    public var nodes: ReusableComponentNodes {
-        guard let item = set.item(item) else {
-            return missing()
-        }
+    struct Item: Encodable {
+        let id: String
+        let slug: String
+        let title: String
+        let prompt: String
+        let group: String
+        let level: String
+        let levelLabel: String
+        let choices: [Choice]
+        let rule: Rule
+        let explanation: String
 
-        return .body(
-            [
-                HTML.el(
-                    "main",
-                    [
-                        "id": "content-area",
-                        "class": "wc-quiz wc-quiz--view"
-                    ]
-                ) {
-                    HTML.a(home, ["class": "wc-quiz__back"]) {
-                        HTML.text("Alle vragen")
-                    }
-
-                    HTML.el(
-                        "article",
-                        [
-                            "class": "wc-quiz-item",
-                            "data-quiz-item": "",
-                            "data-quiz-mode": item.rule.mode,
-                            "data-quiz-ids": item.rule.ids.sorted().joined(separator: ","),
-                            "data-quiz-text": item.rule.accepted.joined(separator: "|")
-                        ]
-                    ) {
-                        HTML.el("header", ["class": "wc-quiz-item__head"]) {
-                            meta(item)
-
-                            HTML.h1 {
-                                HTML.text(item.title)
-                            }
-
-                            HTML.p {
-                                HTML.text(item.prompt)
-                            }
-                        }
-
-                        form(item)
-
-                        feedback(
-                            state: "right",
-                            title: "Goed",
-                            text: item.explanation
-                        )
-
-                        feedback(
-                            state: "wrong",
-                            title: "Nog niet",
-                            text: item.explanation
-                        )
-                    }
-
-                    nav(item)
-                }
-            ],
-            stylesheets: styles ? [QuizCSS.sheet()] : [],
-            scripts: script ? QuizScript().nodes.scripts : []
-        )
-    }
-
-    private func missing() -> ReusableComponentNodes {
-        .body(
-            [
-                HTML.el(
-                    "main",
-                    [
-                        "id": "content-area",
-                        "class": "wc-quiz wc-quiz--missing"
-                    ]
-                ) {
-                    HTML.h1 {
-                        HTML.text("Vraag niet gevonden")
-                    }
-
-                    HTML.a(home, ["class": "wc-quiz__back"]) {
-                        HTML.text("Terug naar alle vragen")
-                    }
-                }
-            ],
-            stylesheets: styles ? [QuizCSS.sheet()] : []
-        )
-    }
-
-    private func form(
-        _ item: QuizItem
-    ) -> any HTMLNode {
-        HTML.el("form", ["class": "wc-quiz-form", "data-quiz-form": ""]) {
-            switch item.rule {
-            case .one:
-                choices(item, type: "radio")
-
-            case .many:
-                choices(item, type: "checkbox")
-
-            case .text:
-                HTML.el("label", ["class": "wc-quiz-text"]) {
-                    HTML.span {
-                        HTML.text("Jouw antwoord")
-                    }
-
-                    HTML.el(
-                        "input",
-                        [
-                            "type": "text",
-                            "autocomplete": "off",
-                            "data-quiz-input": ""
-                        ]
-                    )
-                }
-            }
-
-            HTML.div(["class": "wc-quiz-form__actions"]) {
-                HTML.el(
-                    "button",
-                    [
-                        "type": "submit",
-                        "class": "wc-quiz-btn wc-quiz-btn--main"
-                    ]
-                ) {
-                    HTML.text("Controleer")
-                }
-
-                HTML.el(
-                    "button",
-                    [
-                        "type": "button",
-                        "class": "wc-quiz-btn",
-                        "data-quiz-reset": ""
-                    ]
-                ) {
-                    HTML.text("Opnieuw")
-                }
-            }
-        }
-    }
-
-    private func choices(
-        _ item: QuizItem,
-        type: String
-    ) -> any HTMLNode {
-        HTML.el("fieldset", ["class": "wc-quiz-options"]) {
-            HTML.el("legend", ["class": "wc-quiz-options__legend"]) {
-                HTML.text("Kies je antwoord")
-            }
-
-            for choice in item.choices {
-                let input = "\(item.id)-\(choice.id)"
-
-                HTML.el(
-                    "label",
-                    [
-                        "class": "wc-quiz-option",
-                        "for": input,
-                        "data-quiz-option": choice.id
-                    ]
-                ) {
-                    HTML.el(
-                        "input",
-                        [
-                            "id": input,
-                            "type": type,
-                            "name": "quiz-\(item.id)",
-                            "value": choice.id
-                        ]
-                    )
-
-                    HTML.span(["class": "wc-quiz-option__text"]) {
-                        HTML.text(choice.text)
-                    }
-
-                    if let note = choice.note {
-                        HTML.span(["class": "wc-quiz-option__note"]) {
-                            HTML.text(note)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private func feedback(
-        state: String,
-        title: String,
-        text: String
-    ) -> any HTMLNode {
-        HTML.div(
-            [
-                "class": "wc-quiz-feedback wc-quiz-feedback--\(state)",
-                "data-quiz-feedback": state,
-                "hidden": ""
-            ]
+        init(
+            _ item: QuizItem
         ) {
-            HTML.h2 {
-                HTML.text(title)
-            }
-
-            HTML.p {
-                HTML.text(text)
-            }
+            self.id = item.id
+            self.slug = item.slug
+            self.title = item.title
+            self.prompt = item.prompt
+            self.group = item.group
+            self.level = item.level.rawValue
+            self.levelLabel = item.level.label
+            self.choices = item.choices.map(Choice.init)
+            self.rule = Rule(item.rule)
+            self.explanation = item.explanation
         }
     }
 
-    private func nav(
-        _ item: QuizItem
-    ) -> any HTMLNode {
-        HTML.el("nav", ["class": "wc-quiz-nav", "aria-label": "Vraag-navigatie"]) {
-            if let prev = set.prev(item.id) {
-                navLink(prev, label: "Vorige")
-            } else {
-                HTML.span(["class": "wc-quiz-nav__empty"]) {
-                    HTML.text("Geen vorige vraag")
-                }
-            }
+    struct Choice: Encodable {
+        let id: String
+        let text: String
+        let note: String?
 
-            if let next = set.next(item.id) {
-                navLink(next, label: "Volgende", next: true)
-            } else {
-                HTML.a(home, ["class": "wc-quiz-nav__link wc-quiz-nav__link--next"]) {
-                    HTML.span {
-                        HTML.text("Klaar")
-                    }
-
-                    HTML.strong {
-                        HTML.text("Alle vragen")
-                    }
-                }
-            }
-        }
-    }
-
-    private func navLink(
-        _ item: QuizItem,
-        label: String,
-        next: Bool = false
-    ) -> any HTMLNode {
-        HTML.a(
-            item.href,
-            [
-                "class": next
-                    ? "wc-quiz-nav__link wc-quiz-nav__link--next"
-                    : "wc-quiz-nav__link"
-            ]
+        init(
+            _ choice: QuizChoice
         ) {
-            HTML.span {
-                HTML.text(label)
-            }
-
-            HTML.strong {
-                HTML.text(item.title)
-            }
+            self.id = choice.id
+            self.text = choice.text
+            self.note = choice.note
         }
     }
-}
 
-private func meta(
-    _ item: QuizItem
-) -> any HTMLNode {
-    HTML.div(["class": "wc-quiz-meta"]) {
-        HTML.span {
-            HTML.text(item.group)
-        }
+    struct Rule: Encodable {
+        let mode: String
+        let ids: [String]
+        let accepted: [String]
 
-        HTML.span {
-            HTML.text(item.level.label)
+        init(
+            _ rule: QuizRule
+        ) {
+            self.mode = rule.mode
+            self.ids = rule.ids.sorted()
+            self.accepted = rule.accepted
         }
     }
 }
@@ -568,7 +419,17 @@ public struct QuizScript: ReusableComponent {
     (() => {
         if (window.wcQuiz?.ready) return;
 
-        const rootSelector = '[data-quiz-item]';
+        const rootSelector = '[data-quiz-root]';
+        const stateByRoot = new WeakMap();
+
+        function esc(value) {
+            return String(value ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
 
         function norm(value) {
             return String(value || '')
@@ -580,58 +441,79 @@ public struct QuizScript: ReusableComponent {
                 .trim();
         }
 
-        function picked(root) {
+        function same(left, right) {
+            if (left.length !== right.length) return false;
+
+            return left.every((value, index) => value === right[index]);
+        }
+
+        function parse(root) {
+            const data = root.querySelector('[data-quiz-data]');
+            const parsed = JSON.parse(data?.textContent || '{}');
+            const items = Array.isArray(parsed.items) ? parsed.items : [];
+            const byID = new Map(items.map((item) => [item.id, item]));
+            const bySlug = new Map(items.map((item) => [item.slug, item]));
+
+            return {
+                set: parsed,
+                items,
+                byID,
+                bySlug,
+                active: null
+            };
+        }
+
+        function state(root) {
+            if (!stateByRoot.has(root)) {
+                stateByRoot.set(root, parse(root));
+            }
+
+            return stateByRoot.get(root);
+        }
+
+        function picked(panel) {
             return Array
-                .from(root.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked'))
+                .from(panel.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked'))
                 .map((input) => input.value)
                 .sort();
         }
 
-        function wanted(root) {
-            return String(root.getAttribute('data-quiz-ids') || '')
-                .split(',')
-                .map((value) => value.trim())
-                .filter(Boolean)
-                .sort();
-        }
-
-        function same(left, right) {
-            if (left.length !== right.length) return false;
-            return left.every((value, index) => value === right[index]);
-        }
-
-        function textOk(root) {
-            const input = root.querySelector('[data-quiz-input]');
+        function textOk(panel, item) {
+            const input = panel.querySelector('[data-quiz-input]');
             const answer = norm(input?.value || '');
 
-            const accepted = String(root.getAttribute('data-quiz-text') || '')
-                .split('|')
+            return item.rule.accepted
                 .map(norm)
-                .filter(Boolean);
-
-            return accepted.includes(answer);
+                .includes(answer);
         }
 
-        function clear(root) {
-            root.removeAttribute('data-quiz-state');
+        function selectedOk(panel, item) {
+            return same(
+                picked(panel),
+                [...item.rule.ids].sort()
+            );
+        }
 
-            root
+        function clear(panel) {
+            panel.removeAttribute('data-quiz-state');
+
+            panel
                 .querySelectorAll('[data-quiz-option]')
                 .forEach((option) => {
                     option.removeAttribute('data-quiz-option-state');
                 });
 
-            root
+            panel
                 .querySelectorAll('[data-quiz-feedback]')
                 .forEach((node) => {
                     node.hidden = true;
                 });
         }
 
-        function mark(root) {
-            const ids = new Set(wanted(root));
+        function mark(panel, item) {
+            const ids = new Set(item.rule.ids);
 
-            root
+            panel
                 .querySelectorAll('[data-quiz-option]')
                 .forEach((option) => {
                     const id = option.getAttribute('data-quiz-option');
@@ -647,47 +529,287 @@ public struct QuizScript: ReusableComponent {
                 });
         }
 
-        function check(root) {
-            const mode = root.getAttribute('data-quiz-mode');
+        function check(panel, item) {
+            const ok = item.rule.mode === 'text'
+                ? textOk(panel, item)
+                : selectedOk(panel, item);
 
-            const ok = mode === 'text'
-                ? textOk(root)
-                : same(picked(root), wanted(root));
+            clear(panel);
 
-            clear(root);
+            const result = ok ? 'right' : 'wrong';
+            panel.setAttribute('data-quiz-state', result);
 
-            const state = ok ? 'right' : 'wrong';
-            root.setAttribute('data-quiz-state', state);
-
-            if (mode !== 'text') {
-                mark(root);
+            if (item.rule.mode !== 'text') {
+                mark(panel, item);
             }
 
-            const feedback = root.querySelector(`[data-quiz-feedback="${state}"]`);
+            const feedback = panel.querySelector(`[data-quiz-feedback="${result}"]`);
+
             if (feedback) {
                 feedback.hidden = false;
             }
         }
+
+        function optionHTML(item) {
+            if (item.rule.mode === 'text') {
+                return `
+                    <label class="wc-quiz-text">
+                        <span>Jouw antwoord</span>
+                        <input type="text" autocomplete="off" data-quiz-input>
+                    </label>
+                `;
+            }
+
+            const type = item.rule.mode === 'many'
+                ? 'checkbox'
+                : 'radio';
+
+            const choices = item.choices.map((choice) => {
+                const input = `${item.id}-${choice.id}`;
+
+                return `
+                    <label class="wc-quiz-option" for="${esc(input)}" data-quiz-option="${esc(choice.id)}">
+                        <input id="${esc(input)}" type="${type}" name="quiz-${esc(item.id)}" value="${esc(choice.id)}">
+                        <span class="wc-quiz-option__text">${esc(choice.text)}</span>
+                        ${choice.note ? `<span class="wc-quiz-option__note">${esc(choice.note)}</span>` : ''}
+                    </label>
+                `;
+            }).join('');
+
+            return `
+                <fieldset class="wc-quiz-options">
+                    <legend class="wc-quiz-options__legend">Kies je antwoord</legend>
+                    ${choices}
+                </fieldset>
+            `;
+        }
+
+        function navHTML(data, item) {
+            const index = data.items.findIndex((candidate) => candidate.id === item.id);
+            const previous = index > 0 ? data.items[index - 1] : null;
+            const next = index >= 0 && index + 1 < data.items.length
+                ? data.items[index + 1]
+                : null;
+
+            const prevHTML = previous
+                ? `
+                    <button class="wc-quiz-nav__link" type="button" data-quiz-goto="${esc(previous.id)}">
+                        <span>Vorige</span>
+                        <strong>${esc(previous.title)}</strong>
+                    </button>
+                `
+                : `
+                    <span class="wc-quiz-nav__empty">Geen vorige vraag</span>
+                `;
+
+            const nextHTML = next
+                ? `
+                    <button class="wc-quiz-nav__link wc-quiz-nav__link--next" type="button" data-quiz-goto="${esc(next.id)}">
+                        <span>Volgende</span>
+                        <strong>${esc(next.title)}</strong>
+                    </button>
+                `
+                : `
+                    <button class="wc-quiz-nav__link wc-quiz-nav__link--next" type="button" data-quiz-close>
+                        <span>Klaar</span>
+                        <strong>Alle vragen</strong>
+                    </button>
+                `;
+
+            return `
+                <nav class="wc-quiz-nav" aria-label="Vraag-navigatie">
+                    ${prevHTML}
+                    ${nextHTML}
+                </nav>
+            `;
+        }
+
+        function render(data, item) {
+            return `
+                <button class="wc-quiz__back" type="button" data-quiz-close>
+                    Alle vragen
+                </button>
+
+                <article class="wc-quiz-item" data-quiz-item>
+                    <header class="wc-quiz-item__head">
+                        <div class="wc-quiz-meta">
+                            <span>${esc(item.group)}</span>
+                            <span>${esc(item.levelLabel)}</span>
+                        </div>
+
+                        <h1 id="wc-quiz-panel-title">${esc(item.title)}</h1>
+
+                        <p>${esc(item.prompt)}</p>
+                    </header>
+
+                    <form class="wc-quiz-form" data-quiz-form>
+                        ${optionHTML(item)}
+
+                        <div class="wc-quiz-form__actions">
+                            <button class="wc-quiz-btn wc-quiz-btn--main" type="submit">
+                                Controleer
+                            </button>
+
+                            <button class="wc-quiz-btn" type="button" data-quiz-reset>
+                                Opnieuw
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="wc-quiz-feedback wc-quiz-feedback--right" data-quiz-feedback="right" hidden>
+                        <h2>Goed</h2>
+                        <p>${esc(item.explanation)}</p>
+                    </div>
+
+                    <div class="wc-quiz-feedback wc-quiz-feedback--wrong" data-quiz-feedback="wrong" hidden>
+                        <h2>Nog niet</h2>
+                        <p>${esc(item.explanation)}</p>
+                    </div>
+                </article>
+
+                ${navHTML(data, item)}
+            `;
+        }
+
+        function setHash(item) {
+            const next = `${window.location.pathname}${window.location.search}#${encodeURIComponent(item.slug)}`;
+            history.pushState({}, '', next);
+        }
+
+        function clearHash() {
+            const next = `${window.location.pathname}${window.location.search}`;
+            history.pushState({}, '', next);
+        }
+
+        function open(root, item, updateHash = true) {
+            const data = state(root);
+            const shell = root.querySelector('[data-quiz-shell]');
+            const panel = root.querySelector('[data-quiz-panel]');
+
+            if (!shell || !panel) return;
+
+            data.active = item;
+            panel.innerHTML = render(data, item);
+            shell.hidden = false;
+            document.documentElement.classList.add('wc-quiz-is-open');
+
+            if (updateHash) {
+                setHash(item);
+            }
+
+            panel.focus();
+        }
+
+        function close(root, updateHash = true) {
+            const shell = root.querySelector('[data-quiz-shell]');
+            const panel = root.querySelector('[data-quiz-panel]');
+
+            if (shell) {
+                shell.hidden = true;
+            }
+
+            if (panel) {
+                panel.innerHTML = '';
+            }
+
+            state(root).active = null;
+            document.documentElement.classList.remove('wc-quiz-is-open');
+
+            if (updateHash) {
+                clearHash();
+            }
+        }
+
+        function openFromHash(root) {
+            const slug = decodeURIComponent(window.location.hash.replace(/^#/, ''));
+
+            if (!slug) {
+                close(root, false);
+                return;
+            }
+
+            const data = state(root);
+            const item = data.bySlug.get(slug);
+
+            if (item) {
+                open(root, item, false);
+            }
+        }
+
+        function init(scope = document) {
+            const roots = scope.matches?.(rootSelector)
+                ? [scope]
+                : Array.from(scope.querySelectorAll?.(rootSelector) || []);
+
+            roots.forEach((root) => {
+                state(root);
+                openFromHash(root);
+            });
+        }
+
+        document.addEventListener('click', (event) => {
+            const opener = event.target?.closest?.('[data-quiz-open]');
+
+            if (opener) {
+                const root = opener.closest(rootSelector);
+                if (!root) return;
+
+                const item = state(root).byID.get(opener.getAttribute('data-quiz-open'));
+                if (!item) return;
+
+                event.preventDefault();
+                open(root, item);
+                return;
+            }
+
+            const closeButton = event.target?.closest?.('[data-quiz-close]');
+
+            if (closeButton) {
+                const root = closeButton.closest(rootSelector);
+                if (!root) return;
+
+                event.preventDefault();
+                close(root);
+                return;
+            }
+
+            const gotoButton = event.target?.closest?.('[data-quiz-goto]');
+
+            if (gotoButton) {
+                const root = gotoButton.closest(rootSelector);
+                if (!root) return;
+
+                const item = state(root).byID.get(gotoButton.getAttribute('data-quiz-goto'));
+                if (!item) return;
+
+                event.preventDefault();
+                open(root, item);
+            }
+        });
 
         document.addEventListener('submit', (event) => {
             const form = event.target?.closest?.('[data-quiz-form]');
             if (!form) return;
 
             const root = form.closest(rootSelector);
-            if (!root) return;
+            const panel = form.closest('[data-quiz-panel]');
+            if (!root || !panel) return;
+
+            const item = state(root).active;
+            if (!item) return;
 
             event.preventDefault();
-            check(root);
+            check(panel, item);
         });
 
         document.addEventListener('click', (event) => {
             const reset = event.target?.closest?.('[data-quiz-reset]');
             if (!reset) return;
 
-            const root = reset.closest(rootSelector);
-            if (!root) return;
+            const panel = reset.closest('[data-quiz-panel]');
+            if (!panel) return;
 
-            root.querySelectorAll('input').forEach((input) => {
+            panel.querySelectorAll('input').forEach((input) => {
                 if (input.type === 'radio' || input.type === 'checkbox') {
                     input.checked = false;
                 } else {
@@ -695,13 +817,38 @@ public struct QuizScript: ReusableComponent {
                 }
             });
 
-            clear(root);
+            clear(panel);
         });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape') return;
+
+            const shell = document.querySelector('[data-quiz-shell]:not([hidden])');
+            if (!shell) return;
+
+            const root = shell.closest(rootSelector);
+            if (!root) return;
+
+            close(root);
+        });
+
+        window.addEventListener('hashchange', () => {
+            document
+                .querySelectorAll(rootSelector)
+                .forEach(openFromHash);
+        });
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => init());
+        } else {
+            init();
+        }
 
         window.wcQuiz = {
             ready: true,
-            check,
-            clear
+            init,
+            open,
+            close
         };
     })();
     """#
@@ -832,6 +979,66 @@ public enum QuizCSS {
                     CSS.decl("color", "var(--muted-text-color)"),
                     CSS.decl("font-weight", "680"),
                     CSS.decl("text-decoration", "none")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-shell[hidden]",
+                    CSS.decl("display", "none")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-shell",
+                    CSS.decl("position", "fixed"),
+                    CSS.decl("inset", "0"),
+                    CSS.decl("z-index", "4000"),
+                    CSS.decl("display", "grid"),
+                    CSS.decl("place-items", "center"),
+                    CSS.decl("padding", "24px"),
+                    CSS.decl("box-sizing", "border-box")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-backdrop",
+                    CSS.decl("position", "absolute"),
+                    CSS.decl("inset", "0"),
+                    CSS.decl("border", "0"),
+                    CSS.decl("padding", "0"),
+                    CSS.decl("background", "rgba(15, 23, 42, .54)"),
+                    CSS.decl("backdrop-filter", "blur(10px)"),
+                    CSS.decl("cursor", "pointer")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-panel",
+                    CSS.decl("position", "relative"),
+                    CSS.decl("z-index", "1"),
+                    CSS.decl("width", "min(860px, 100%)"),
+                    CSS.decl("max-height", "min(820px, calc(100vh - 48px))"),
+                    CSS.decl("overflow", "auto"),
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("padding", "24px"),
+                    CSS.decl("border", "1px solid var(--border-color)"),
+                    CSS.decl("border-radius", "28px"),
+                    CSS.decl("background", "var(--surface-color, var(--background-color))"),
+                    CSS.decl("box-shadow", "0 32px 90px rgba(15, 23, 42, .28)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-is-open",
+                    CSS.decl("overflow", "hidden")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-panel .wc-quiz-item",
+                    CSS.decl("box-shadow", "none")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-nav__link",
+                    CSS.decl("font", "inherit"),
+                    CSS.decl("background", "transparent"),
+                    CSS.decl("cursor", "pointer"),
+                    CSS.decl("text-align", "left")
                 ),
 
                 CSS.rule(
