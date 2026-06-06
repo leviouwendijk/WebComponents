@@ -75,6 +75,63 @@ public struct QuizScript: ReusableComponent {
             return stateByRoot.get(root);
         }
 
+        function radioInputFromEvent(event) {
+            const input = event.target?.closest?.('[data-quiz-option] input[type="radio"]');
+
+            if (input) {
+                return input;
+            }
+
+            const option = event.target?.closest?.('[data-quiz-option]');
+
+            return option?.querySelector?.('input[type="radio"]') || null;
+        }
+
+        function rememberRadioState(event) {
+            const input = radioInputFromEvent(event);
+
+            if (!input || input.disabled) {
+                return;
+            }
+
+            input.setAttribute(
+                'data-quiz-was-checked',
+                input.checked ? 'true' : 'false'
+            );
+        }
+
+        function toggleSelectedRadio(event) {
+            const input = radioInputFromEvent(event);
+
+            if (!input || input.disabled) {
+                return false;
+            }
+
+            const wasChecked = input.getAttribute('data-quiz-was-checked') === 'true';
+            input.removeAttribute('data-quiz-was-checked');
+
+            if (!wasChecked) {
+                return false;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            input.checked = false;
+            input.focus();
+
+            input.dispatchEvent(
+                new Event(
+                    'change',
+                    {
+                        bubbles: true
+                    }
+                )
+            );
+
+            return true;
+        }
+
         function picked(panel) {
             return Array
                 .from(panel.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked'))
@@ -126,13 +183,11 @@ public struct QuizScript: ReusableComponent {
         }
 
         function focusFirstControl(panel) {
-            const control = panel.querySelector('[data-quiz-option] input, [data-quiz-input]');
-
-            if (control) {
-                control.focus();
-            } else {
-                panel.focus();
-            }
+            panel.focus(
+                {
+                    preventScroll: true
+                }
+            );
         }
 
         function lock(panel, locked) {
@@ -482,6 +537,20 @@ public struct QuizScript: ReusableComponent {
                 openFromHash(root);
             });
         }
+
+        document.addEventListener(
+            'pointerdown',
+            rememberRadioState,
+            true
+        );
+
+        document.addEventListener(
+            'click',
+            (event) => {
+                toggleSelectedRadio(event);
+            },
+            true
+        );
 
         document.addEventListener('click', (event) => {
             const opener = event.target?.closest?.('[data-quiz-open]');
