@@ -13,6 +13,7 @@ public struct DocsProjectHubPage: SelectableComponent {
     public let projects: [DocsProject]
     public let eyebrow: String
     public let searchPlaceholder: String?
+    public let afterGrid: HTMLFragment
     public let lexicon: DocsLexicon
     public let includeStyles: Bool
 
@@ -22,6 +23,7 @@ public struct DocsProjectHubPage: SelectableComponent {
         projects: [DocsProject],
         eyebrow: String? = nil,
         searchPlaceholder: String? = nil,
+        afterGrid: HTMLFragment = [],
         lexicon: DocsLexicon = .english,
         includeStyles: Bool = true
     ) {
@@ -31,6 +33,7 @@ public struct DocsProjectHubPage: SelectableComponent {
         self.lexicon = lexicon
         self.eyebrow = eyebrow ?? lexicon.docs
         self.searchPlaceholder = searchPlaceholder ?? lexicon.searchProjectsPlaceholder
+        self.afterGrid = afterGrid
         self.includeStyles = includeStyles
     }
 
@@ -76,6 +79,12 @@ public struct DocsProjectHubPage: SelectableComponent {
                                 lexicon: lexicon,
                                 includeStyles: false
                             ).nodes.body
+                        }
+                    }
+
+                    if !afterGrid.isEmpty {
+                        HTML.section(["class": "docs-project-hub__after-grid \(Self.block)__after-grid"]) {
+                            afterGrid
                         }
                     }
                 }
@@ -162,6 +171,11 @@ public struct DocsProjectHubPage: SelectableComponent {
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "repeat(2, minmax(0, 1fr))"),
                     CSS.decl("gap", "18px")
+                ),
+
+                CSS.rule(
+                    ".\(block)__after-grid",
+                    CSS.decl("margin-top", "22px")
                 )
             ],
             media: [
