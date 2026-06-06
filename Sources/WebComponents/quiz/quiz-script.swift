@@ -70,13 +70,27 @@ public struct QuizScript: ReusableComponent {
             };
         }
 
-        function normalizeProgress(raw, setID, timerEnabled) {
+        function storedTimerEnabled(raw, timerDefaultEnabled) {
+            if (!timerDefaultEnabled) {
+                return false;
+            }
+
+            if (typeof raw?.settings?.timerEnabled === 'boolean') {
+                return raw.settings.timerEnabled;
+            }
+
+            return true;
+        }
+
+        function normalizeProgress(raw, setID, timerDefaultEnabled) {
+            const defaultTimerEnabled = Boolean(timerDefaultEnabled);
+
             if (!raw || raw.version !== storageVersion || raw.setID !== setID) {
-                return blankProgress(setID, timerEnabled);
+                return blankProgress(setID, defaultTimerEnabled);
             }
 
             if (!Number.isFinite(Number(raw.expiresAt)) || Number(raw.expiresAt) <= now()) {
-                return blankProgress(setID, timerEnabled);
+                return blankProgress(setID, defaultTimerEnabled);
             }
 
             const progress = {
@@ -86,7 +100,7 @@ public struct QuizScript: ReusableComponent {
                 updatedAt: Number(raw.updatedAt) || now(),
                 expiresAt: now() + storageTTL,
                 settings: {
-                    timerEnabled: Boolean(raw.settings?.timerEnabled)
+                    timerEnabled: storedTimerEnabled(raw, defaultTimerEnabled)
                 },
                 items: {}
             };
