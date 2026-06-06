@@ -632,14 +632,13 @@ public struct QuizScript: ReusableComponent {
 
                 <article class="wc-quiz-item" data-quiz-item>
                     <header class="wc-quiz-item__head">
-                        <div class="wc-quiz-meta">
-                            <span>${esc(item.group)}</span>
-                            <span>${esc(item.levelLabel)}</span>
+                        <div class="wc-quiz-item__eyebrow">
+                            ${esc(item.group)} · ${esc(item.levelLabel)}
                         </div>
 
-                        <h1 id="wc-quiz-panel-title">${esc(item.title)}</h1>
+                        <p class="wc-quiz-topic">${esc(item.title)}</p>
 
-                        <p>${esc(item.prompt)}</p>
+                        <h1 id="wc-quiz-panel-title">${esc(item.prompt)}</h1>
                     </header>
 
                     <form class="wc-quiz-form" data-quiz-form>
@@ -657,12 +656,12 @@ public struct QuizScript: ReusableComponent {
                     </form>
 
                     <div class="wc-quiz-feedback wc-quiz-feedback--right" data-quiz-feedback="right" hidden>
-                        <h2>Goed</h2>
+                        <h2>Correct</h2>
                         <p>${esc(item.explanation)}</p>
                     </div>
 
                     <div class="wc-quiz-feedback wc-quiz-feedback--wrong" data-quiz-feedback="wrong" hidden>
-                        <h2>Nog niet</h2>
+                        <h2>Incorrect</h2>
                         <p>${esc(item.explanation)}</p>
                     </div>
                 </article>
@@ -882,7 +881,7 @@ public enum QuizCSS {
                 ),
 
                 CSS.rule(
-                    ".wc-quiz__hero h1, .wc-quiz-item__head h1",
+                    ".wc-quiz__hero h1",
                     CSS.decl("margin", "0"),
                     CSS.decl("font-size", "clamp(2.1rem, 5vw, 4.4rem)"),
                     CSS.decl("line-height", ".98"),
@@ -890,11 +889,44 @@ public enum QuizCSS {
                 ),
 
                 CSS.rule(
-                    ".wc-quiz__lead, .wc-quiz-item__head p",
+                    ".wc-quiz__lead",
                     CSS.decl("max-width", "740px"),
                     CSS.decl("font-size", "1.05rem"),
                     CSS.decl("line-height", "1.62"),
                     CSS.decl("color", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-item__head",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "10px")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-item__eyebrow",
+                    CSS.decl("font-size", ".78rem"),
+                    CSS.decl("font-weight", "780"),
+                    CSS.decl("letter-spacing", ".12em"),
+                    CSS.decl("text-transform", "uppercase"),
+                    CSS.decl("color", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-topic",
+                    CSS.decl("margin", "0"),
+                    CSS.decl("font-size", "1rem"),
+                    CSS.decl("font-weight", "760"),
+                    CSS.decl("line-height", "1.25"),
+                    CSS.decl("color", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-item__head h1",
+                    CSS.decl("max-width", "780px"),
+                    CSS.decl("margin", "0"),
+                    CSS.decl("font-size", "clamp(1.75rem, 3.6vw, 3rem)"),
+                    CSS.decl("line-height", "1.08"),
+                    CSS.decl("letter-spacing", "-.04em")
                 ),
 
                 CSS.rule(
@@ -1177,9 +1209,19 @@ public enum QuizCSS {
                 ),
 
                 CSS.rule(
+                    ".wc-quiz-feedback--right h2",
+                    CSS.decl("color", "var(--success, #2E8B57)")
+                ),
+
+                CSS.rule(
                     ".wc-quiz-feedback--wrong",
-                    CSS.decl("background", "color-mix(in srgb, var(--warning, #E7A94E) 14%, transparent)"),
-                    CSS.decl("border", "1px solid color-mix(in srgb, var(--warning, #E7A94E) 30%, transparent)")
+                    CSS.decl("background", "color-mix(in srgb, var(--danger, #D64545) 12%, transparent)"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--danger, #D64545) 32%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-feedback--wrong h2",
+                    CSS.decl("color", "var(--danger, #D64545)")
                 ),
 
                 CSS.rule(
