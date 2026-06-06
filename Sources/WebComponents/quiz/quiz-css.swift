@@ -272,6 +272,16 @@ public enum QuizCSS {
                 ),
 
                 CSS.rule(
+                    ".wc-quiz-timer-controls",
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("justify-content", "flex-end"),
+                    CSS.decl("gap", "8px"),
+                    CSS.decl("flex", "0 0 auto"),
+                    CSS.decl("margin-left", "auto")
+                ),
+
+                CSS.rule(
                     ".wc-quiz-timer",
                     CSS.decl("display", "inline-flex"),
                     CSS.decl("align-items", "center"),
@@ -302,6 +312,97 @@ public enum QuizCSS {
                 CSS.rule(
                     ".wc-quiz-timer[data-quiz-timer-state=\"danger\"] strong",
                     CSS.decl("color", "var(--danger, #D64545)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer[data-quiz-timer-state=\"off\"]",
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 6%, transparent)"),
+                    CSS.decl("color", "color-mix(in srgb, var(--muted-text-color) 72%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer[data-quiz-timer-state=\"off\"] strong",
+                    CSS.decl("color", "color-mix(in srgb, var(--text-color) 54%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer-toggle",
+                    CSS.decl("appearance", "none"),
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("gap", "8px"),
+                    CSS.decl("height", "30px"),
+                    CSS.decl("padding", "0 4px 0 10px"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--text-color) 10%, transparent)"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 5%, transparent)"),
+                    CSS.decl("color", "var(--muted-text-color)"),
+                    CSS.decl("font", "inherit"),
+                    CSS.decl("font-size", ".78rem"),
+                    CSS.decl("font-weight", "740"),
+                    CSS.decl("cursor", "pointer"),
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("transition", "background-color 140ms ease, border-color 140ms ease, color 140ms ease")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer-toggle:hover",
+                    CSS.decl("color", "var(--text-color)"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 8%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer-toggle:focus-visible",
+                    CSS.decl("outline", "2px solid var(--link-color)"),
+                    CSS.decl("outline-offset", "2px")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer-toggle[aria-checked=\"true\"]",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--link-color) 30%, transparent)"),
+                    CSS.decl("background", "color-mix(in srgb, var(--link-color) 7%, transparent)"),
+                    CSS.decl("color", "var(--text-color)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer-toggle__label",
+                    CSS.decl("line-height", "1")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer-toggle__track",
+                    CSS.decl("position", "relative"),
+                    CSS.decl("display", "inline-block"),
+                    CSS.decl("width", "38px"),
+                    CSS.decl("height", "22px"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 16%, transparent)"),
+                    CSS.decl("box-shadow", "inset 0 0 0 1px color-mix(in srgb, var(--text-color) 8%, transparent)"),
+                    CSS.decl("transition", "background-color 140ms ease, box-shadow 140ms ease")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer-toggle__thumb",
+                    CSS.decl("position", "absolute"),
+                    CSS.decl("top", "2px"),
+                    CSS.decl("left", "2px"),
+                    CSS.decl("width", "18px"),
+                    CSS.decl("height", "18px"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "var(--surface-color, var(--background-color))"),
+                    CSS.decl("box-shadow", "0 2px 6px rgba(15, 23, 42, .22)"),
+                    CSS.decl("transition", "transform 140ms ease")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer-toggle[aria-checked=\"true\"] .wc-quiz-timer-toggle__track",
+                    CSS.decl("background", "color-mix(in srgb, var(--link-color) 76%, var(--text-color) 10%)"),
+                    CSS.decl("box-shadow", "inset 0 0 0 1px color-mix(in srgb, var(--link-color) 28%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-timer-toggle[aria-checked=\"true\"] .wc-quiz-timer-toggle__thumb",
+                    CSS.decl("transform", "translateX(16px)")
                 ),
 
                 CSS.rule(
@@ -661,6 +762,13 @@ public enum QuizCSS {
                         ".wc-quiz-item__kicker",
                         CSS.decl("align-items", "flex-start"),
                         CSS.decl("flex-direction", "column")
+                    ),
+
+                    CSS.rule(
+                        ".wc-quiz-timer-controls",
+                        CSS.decl("width", "100%"),
+                        CSS.decl("justify-content", "space-between"),
+                        CSS.decl("margin-left", "0")
                     )
                 )
             ]

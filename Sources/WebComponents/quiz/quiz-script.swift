@@ -48,8 +48,6 @@ public struct QuizScript: ReusableComponent {
             const data = root.querySelector('[data-quiz-data]');
             const parsed = JSON.parse(data?.textContent || '{}');
             const items = Array.isArray(parsed.items) ? parsed.items : [];
-            const byID = new Map(items.map((item) => [item.id, item]));
-            const bySlug = new Map(items.map((item) => [item.slug, item]));
             const rawSeconds = Number(parsed.timerSeconds);
             const timerSeconds = Number.isFinite(rawSeconds)
                 ? Math.max(0, Math.floor(rawSeconds))
@@ -58,9 +56,10 @@ public struct QuizScript: ReusableComponent {
             return {
                 set: parsed,
                 items,
-                byID,
-                bySlug,
+                byID: new Map(items.map((item) => [item.id, item])),
+                bySlug: new Map(items.map((item) => [item.slug, item])),
                 timerSeconds,
+                timerEnabled: timerSeconds > 0,
                 timerID: null,
                 remaining: timerSeconds,
                 active: null
@@ -174,10 +173,22 @@ public struct QuizScript: ReusableComponent {
         function timerHTML(data) {
             if (!hasTimer(data)) return '';
 
+            const checked = data.timerEnabled ? 'true' : 'false';
+            const state = data.timerEnabled ? 'on' : 'off';
+
             return `
-                <div class="wc-quiz-timer" data-quiz-timer data-quiz-timer-state="active" aria-live="polite">
-                    <span>Tijd</span>
-                    <strong data-quiz-timer-value>${esc(formatTime(data.timerSeconds))}</strong>
+                <div class="wc-quiz-timer-controls" data-quiz-timer-controls>
+                    <div class="wc-quiz-timer" data-quiz-timer data-quiz-timer-state="${data.timerEnabled ? 'active' : 'off'}" aria-live="polite">
+                        <span>Tijd</span>
+                        <strong data-quiz-timer-value>${data.timerEnabled ? esc(formatTime(data.timerSeconds)) : 'uit'}</strong>
+                    </div>
+
+                    <button class="wc-quiz-timer-toggle" type="button" role="switch" aria-label="Timer in- of uitschakelen" aria-checked="${checked}" data-quiz-timer-toggle data-quiz-timer-toggle-state="${state}">
+                        <span class="wc-quiz-timer-toggle__label">Timer</span>
+                        <span class="wc-quiz-timer-toggle__track" aria-hidden="true">
+                            <span class="wc-quiz-timer-toggle__thumb"></span>
+                        </span>
+                    </button>
                 </div>
             `;
         }
@@ -244,20 +255,70 @@ public struct QuizScript: ReusableComponent {
             }
         }
 
+        function updateTimerToggle(panel, data) {
+            const toggle = panel.querySelector('[data-quiz-timer-toggle]');
+
+            if (!toggle) {
+                return;
+            }
+
+            toggle.setAttribute(
+                'aria-checked',
+                data.timerEnabled ? 'true' : 'false'
+            );
+
+            toggle.setAttribute(
+                'data-quiz-timer-toggle-state',
+                data.timerEnabled ? 'on' : 'off'
+            );
+        }
+
         function updateTimer(root, panel, remaining) {
+            const data = state(root);
             const value = panel.querySelector('[data-quiz-timer-value]');
             const timer = panel.querySelector('[data-quiz-timer]');
 
             if (value) {
-                value.textContent = formatTime(remaining);
+                value.textContent = data.timerEnabled
+                    ? formatTime(remaining)
+                    : 'uit';
             }
 
             if (timer) {
                 timer.setAttribute(
                     'data-quiz-timer-state',
-                    remaining <= 5 ? 'danger' : 'active'
+                    !data.timerEnabled
+                        ? 'off'
+                        : remaining <= 5
+                            ? 'danger'
+                            : 'active'
                 );
             }
+
+            updateTimerToggle(panel, data);
+        }
+
+        function setTimerEnabled(root, panel, enabled) {
+            const data = state(root);
+
+            if (!hasTimer(data)) {
+                return;
+            }
+
+            data.timerEnabled = Boolean(enabled);
+            stopTimer(root);
+
+            if (!data.timerEnabled) {
+                updateTimer(root, panel, data.remaining);
+                return;
+            }
+
+            if (panel.hasAttribute('data-quiz-state')) {
+                updateTimer(root, panel, data.timerSeconds);
+                return;
+            }
+
+            startTimer(root, panel);
         }
 
         function timeout(root, panel) {
@@ -278,7 +339,10 @@ public struct QuizScript: ReusableComponent {
             const data = state(root);
             stopTimer(root);
 
-            if (!hasTimer(data)) return;
+            if (!hasTimer(data) || !data.timerEnabled) {
+                updateTimer(root, panel, data.remaining);
+                return;
+            }
 
             data.remaining = data.timerSeconds;
             updateTimer(root, panel, data.remaining);
@@ -288,6 +352,12 @@ public struct QuizScript: ReusableComponent {
 
                 if (!current || current !== panel || !data.active) {
                     stopTimer(root);
+                    return;
+                }
+
+                if (!data.timerEnabled) {
+                    stopTimer(root);
+                    updateTimer(root, panel, data.remaining);
                     return;
                 }
 
@@ -553,6 +623,25 @@ public struct QuizScript: ReusableComponent {
         );
 
         document.addEventListener('click', (event) => {
+            const timerToggle = event.target?.closest?.('[data-quiz-timer-toggle]');
+
+            if (timerToggle) {
+                const root = timerToggle.closest(rootSelector);
+                const panel = timerToggle.closest('[data-quiz-panel]');
+
+                if (!root || !panel) return;
+
+                event.preventDefault();
+
+                setTimerEnabled(
+                    root,
+                    panel,
+                    timerToggle.getAttribute('aria-checked') !== 'true'
+                );
+
+                return;
+            }
+
             const opener = event.target?.closest?.('[data-quiz-open]');
 
             if (opener) {
