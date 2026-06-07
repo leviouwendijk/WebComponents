@@ -5,6 +5,7 @@ public struct QuizItem: Sendable, Hashable {
     public let prompt: String
     public let group: String
     public let level: QuizLevel
+    public let hints: [String]
     public let choices: [QuizChoice]
     public let rule: QuizRule
     public let explanation: String
@@ -17,6 +18,7 @@ public struct QuizItem: Sendable, Hashable {
         prompt: String,
         group: String,
         level: QuizLevel = .intro,
+        hints: [String] = [],
         choices: [QuizChoice] = [],
         rule: QuizRule,
         explanation: String,
@@ -28,6 +30,7 @@ public struct QuizItem: Sendable, Hashable {
         self.prompt = prompt
         self.group = group
         self.level = level
+        self.hints = hints
         self.choices = choices
         self.rule = rule
         self.explanation = explanation

@@ -2,23 +2,14 @@ internal struct QuizData: Encodable {
     let id: String
     let title: String
     let lead: String
-    let timerSeconds: Int?
     let items: [Item]
 
     init(
-        _ set: QuizSet,
-        timerSeconds: Int? = nil
+        _ set: QuizSet
     ) {
         self.id = set.id
         self.title = set.title
         self.lead = set.lead
-
-        if let timerSeconds, timerSeconds > 0 {
-            self.timerSeconds = timerSeconds
-        } else {
-            self.timerSeconds = nil
-        }
-
         self.items = set.items.map(Item.init)
     }
 
@@ -30,6 +21,7 @@ internal struct QuizData: Encodable {
         let group: String
         let level: String
         let levelLabel: String
+        let hints: [String]
         let choices: [Choice]
         let rule: Rule
         let explanation: String
@@ -44,6 +36,7 @@ internal struct QuizData: Encodable {
             self.group = item.group
             self.level = item.level.rawValue
             self.levelLabel = item.level.label
+            self.hints = item.hints
             self.choices = item.choices.map(Choice.init)
             self.rule = Rule(item.rule)
             self.explanation = item.explanation
@@ -53,14 +46,14 @@ internal struct QuizData: Encodable {
     struct Choice: Encodable {
         let id: String
         let text: String
-        let note: String?
+        let feedback: String?
 
         init(
             _ choice: QuizChoice
         ) {
             self.id = choice.id
             self.text = choice.text
-            self.note = choice.note
+            self.feedback = choice.feedback
         }
     }
 

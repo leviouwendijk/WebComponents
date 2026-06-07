@@ -632,8 +632,62 @@ public struct QuizScript: ReusableComponent {
             updatePrior(root, panel, item);
 
             const feedback = panel.querySelector(`[data-quiz-feedback="${result}"]`);
+            const copy = feedback?.querySelector?.('[data-quiz-feedback-copy]');
 
-            if (feedback) {
+            if (feedback && copy) {
+                const selectedIDs = new Set(selected);
+                const correctIDs = new Set(item.rule.ids || []);
+                const rows = [];
+
+                if (item.rule.mode !== 'text') {
+                    (item.choices || []).forEach((choice) => {
+                        const choiceFeedback = choice.feedback || choice.note || '';
+
+                        if (!choiceFeedback) {
+                            return;
+                        }
+
+                        if (selectedIDs.has(choice.id)) {
+                            rows.push({
+                                label: 'Gekozen',
+                                text: choice.text,
+                                feedback: choiceFeedback
+                            });
+
+                            return;
+                        }
+
+                        if (result === 'wrong' && correctIDs.has(choice.id)) {
+                            rows.push({
+                                label: 'Juiste optie',
+                                text: choice.text,
+                                feedback: choiceFeedback
+                            });
+                        }
+                    });
+                }
+
+                const details = rows.length
+                    ? `
+                        <div class="wc-quiz-feedback__details">
+                            <h3>Keuzefeedback</h3>
+                            <ul>
+                                ${rows.map((row) => `
+                                    <li>
+                                        <strong>${esc(row.label)}: ${esc(row.text)}</strong>
+                                        <span>${esc(row.feedback)}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `
+                    : '';
+
+                copy.innerHTML = `
+                    <p>${esc(item.explanation)}</p>
+                    ${details}
+                `;
+
                 feedback.hidden = false;
             }
         }
@@ -659,7 +713,6 @@ public struct QuizScript: ReusableComponent {
                     <label class="wc-quiz-option" for="${esc(input)}" data-quiz-option="${esc(choice.id)}">
                         <input id="${esc(input)}" type="${type}" name="quiz-${esc(item.id)}" value="${esc(choice.id)}">
                         <span class="wc-quiz-option__text">${esc(choice.text)}</span>
-                        ${choice.note ? `<span class="wc-quiz-option__note">${esc(choice.note)}</span>` : ''}
                     </label>
                 `;
             }).join('');
@@ -757,12 +810,12 @@ public struct QuizScript: ReusableComponent {
 
                     <div class="wc-quiz-feedback wc-quiz-feedback--right" data-quiz-feedback="right" hidden>
                         <h2>Correct</h2>
-                        <p>${esc(item.explanation)}</p>
+                        <div data-quiz-feedback-copy></div>
                     </div>
 
                     <div class="wc-quiz-feedback wc-quiz-feedback--wrong" data-quiz-feedback="wrong" hidden>
                         <h2>Incorrect</h2>
-                        <p>${esc(item.explanation)}</p>
+                        <div data-quiz-feedback-copy></div>
                     </div>
 
                     <div class="wc-quiz-feedback wc-quiz-feedback--timeout" data-quiz-feedback="timeout" hidden>
