@@ -15,6 +15,19 @@ extension QuizScript.Source {
         );
 
         document.addEventListener('click', (event) => {
+            const hintButton = event.target?.closest?.('[data-quiz-hint]');
+
+            if (hintButton) {
+                const root = hintButton.closest(rootSelector);
+                const panel = hintButton.closest('[data-quiz-panel]');
+
+                if (!root || !panel) return;
+
+                event.preventDefault();
+                revealHint(root, panel);
+                return;
+            }
+
             const timerToggle = event.target?.closest?.('[data-quiz-timer-toggle]');
 
             if (timerToggle) {
@@ -42,6 +55,16 @@ extension QuizScript.Source {
 
                 event.preventDefault();
                 resetAllProgress(root);
+
+                const panel = root.querySelector('[data-quiz-panel]');
+                const item = state(root).active;
+
+                if (panel && item) {
+                    resetPanelAttempt(panel);
+                    updatePrior(root, panel, item);
+                    resetHints(panel);
+                }
+
                 return;
             }
 
@@ -61,6 +84,7 @@ extension QuizScript.Source {
                 resetItemProgress(root, item.id);
                 resetPanelAttempt(panel);
                 updatePrior(root, panel, item);
+                resetHints(panel);
                 startTimer(root, panel);
                 focusFirstControl(panel);
                 return;
@@ -130,6 +154,7 @@ extension QuizScript.Source {
 
             stopTimer(root);
             resetPanelAttempt(panel);
+            resetHints(panel);
             startTimer(root, panel);
             focusFirstControl(panel);
         });

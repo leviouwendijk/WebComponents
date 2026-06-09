@@ -23,24 +23,6 @@ extension QuizScript.Source {
             `;
         }
 
-        function progressHTML(data, item) {
-            const entry = itemProgress(data, item.id);
-
-            if (!entry) {
-                return `
-                    <div class="wc-quiz-prior" data-quiz-prior hidden>
-                        <span data-quiz-prior-text></span>
-                    </div>
-                `;
-            }
-
-            return `
-                <div class="wc-quiz-prior" data-quiz-prior data-quiz-prior-state="${esc(entry.lastResult)}">
-                    <span data-quiz-prior-text>${priorText(entry)}</span>
-                </div>
-            `;
-        }
-
         function optionHTML(item) {
             if (item.rule.mode === 'text') {
                 return `
@@ -74,6 +56,46 @@ extension QuizScript.Source {
             `;
         }
 
+        function navHTML(data, item) {
+            const index = data.items.findIndex((candidate) => candidate.id === item.id);
+            const previous = index > 0 ? data.items[index - 1] : null;
+            const next = index >= 0 && index + 1 < data.items.length
+                ? data.items[index + 1]
+                : null;
+
+            const prevHTML = previous
+                ? `
+                    <button class="wc-quiz-nav__link" type="button" data-quiz-goto="${esc(previous.id)}">
+                        <span>Vorige</span>
+                        <strong>${esc(previous.title)}</strong>
+                    </button>
+                `
+                : `
+                    <span class="wc-quiz-nav__empty">Geen vorige vraag</span>
+                `;
+
+            const nextHTML = next
+                ? `
+                    <button class="wc-quiz-nav__link wc-quiz-nav__link--next" type="button" data-quiz-goto="${esc(next.id)}">
+                        <span>Volgende</span>
+                        <strong>${esc(next.title)}</strong>
+                    </button>
+                `
+                : `
+                    <button class="wc-quiz-nav__link wc-quiz-nav__link--next" type="button" data-quiz-close>
+                        <span>Klaar</span>
+                        <strong>Alle vragen</strong>
+                    </button>
+                `;
+
+            return `
+                <nav class="wc-quiz-nav" aria-label="Vraag-navigatie">
+                    ${prevHTML}
+                    ${nextHTML}
+                </nav>
+            `;
+        }
+
         function render(data, item) {
             const entry = itemProgress(data, item.id);
             const resetDisabled = entry ? '' : 'disabled';
@@ -97,6 +119,7 @@ extension QuizScript.Source {
                         <h1 id="wc-quiz-panel-title">${esc(item.prompt)}</h1>
 
                         ${progressHTML(data, item)}
+                        ${hintsHTML(item)}
                     </header>
 
                     <form class="wc-quiz-form" data-quiz-form>

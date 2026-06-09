@@ -22,6 +22,7 @@ extension QuizScript {
             input,
             timer,
             checking,
+            hints,
             rendering,
             navigation,
             dashboard,

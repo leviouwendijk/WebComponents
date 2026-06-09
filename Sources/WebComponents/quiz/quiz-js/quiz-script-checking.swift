@@ -30,7 +30,7 @@ extension QuizScript.Source {
 
                 if (item.rule.mode !== 'text') {
                     (item.choices || []).forEach((choice) => {
-                        const choiceFeedback = choice.feedback || choice.note || '';
+                        const choiceFeedback = choice.feedback || '';
 
                         if (!choiceFeedback) {
                             return;

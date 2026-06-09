@@ -58,6 +58,7 @@ public struct QuizProgressSummary: ReusableComponent, Sendable {
                     CSS.decl("justify-content", "space-between"),
                     CSS.decl("gap", "16px"),
                     CSS.decl("margin-top", "20px"),
+                    CSS.decl("margin-bottom", "14px"),
                     CSS.decl("padding", "14px 16px"),
                     CSS.decl("border", "1px solid var(--border-color)"),
                     CSS.decl("border-radius", "18px"),
