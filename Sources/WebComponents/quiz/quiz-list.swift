@@ -1,5 +1,5 @@
-import Foundation
 import Constructors
+import CSS
 import HTML
 
 public struct QuizList: ReusableComponent, Sendable {
@@ -30,7 +30,36 @@ public struct QuizList: ReusableComponent, Sendable {
     }
 
     public var nodes: ReusableComponentNodes {
-        .body(
+        let heroNodes = QuizHero(
+            eyebrow: eyebrow,
+            title: set.title,
+            lead: set.lead
+        ).nodes
+
+        let progressNodes = QuizProgressSummary(
+            itemCount: set.items.count
+        ).nodes
+
+        let cardListNodes = QuizCardList(
+            items: set.items
+        ).nodes
+
+        let dataNodes = QuizDataScript(
+            set: set,
+            timerSeconds: timerSeconds
+        ).nodes
+
+        let shellNodes = QuizShell().nodes
+
+        let childNodes = [
+            heroNodes,
+            progressNodes,
+            cardListNodes,
+            dataNodes,
+            shellNodes
+        ]
+
+        return .body(
             [
                 HTML.el(
                     "main",
@@ -40,118 +69,41 @@ public struct QuizList: ReusableComponent, Sendable {
                         "data-quiz-root": ""
                     ]
                 ) {
-                    HTML.el("section", ["class": "wc-quiz__hero"]) {
-                        HTML.p(["class": "wc-quiz__eyebrow"]) {
-                            HTML.text(eyebrow)
-                        }
-
-                        HTML.h1 {
-                            HTML.text(set.title)
-                        }
-
-                        HTML.p(["class": "wc-quiz__lead"]) {
-                            HTML.text(set.lead)
-                        }
-
-                        HTML.div(["class": "wc-quiz-progress", "data-quiz-progress": ""]) {
-                            HTML.div(["class": "wc-quiz-progress__text"]) {
-                                HTML.strong(["data-quiz-progress-count": ""]) {
-                                    HTML.text("0 van \(set.items.count) beantwoord")
-                                }
-
-                                HTML.span(["data-quiz-progress-detail": ""]) {
-                                    HTML.text("Nog geen antwoorden")
-                                }
-                            }
-
-                            HTML.button(
-                                [
-                                    "type": "button",
-                                    "class": "wc-quiz-progress__reset",
-                                    "data-quiz-reset-all": "",
-                                    "disabled": ""
-                                ]
-                            ) {
-                                HTML.text("Reset alle antwoorden")
-                            }
-                        }
-                    }
-
-                    HTML.el("section", ["class": "wc-quiz-list", "aria-label": "Vragen"]) {
-                        for (index, item) in set.items.enumerated() {
-                            QuizCard(
-                                item: item,
-                                index: index + 1
-                            ).nodes.body
-                        }
-                    }
-
-                    HTML.el(
-                        "script",
-                        [
-                            "type": "application/json",
-                            "data-quiz-data": ""
-                        ]
-                    ) {
-                        HTML.raw(json())
-                    }
-
-                    HTML.div(
-                        [
-                            "class": "wc-quiz-shell",
-                            "data-quiz-shell": "",
-                            "hidden": ""
-                        ]
-                    ) {
-                        HTML.button(
-                            [
-                                "class": "wc-quiz-backdrop",
-                                "type": "button",
-                                "aria-label": "Sluit vraag",
-                                "data-quiz-close": ""
-                            ]
-                        ) {}
-
-                        HTML.div(
-                            [
-                                "class": "wc-quiz-panel",
-                                "data-quiz-panel": "",
-                                "role": "dialog",
-                                "aria-modal": "true",
-                                "aria-labelledby": "wc-quiz-panel-title",
-                                "tabindex": "-1"
-                            ]
-                        ) {}
-                    }
+                    heroNodes.body
+                    progressNodes.body
+                    cardListNodes.body
+                    dataNodes.body
+                    shellNodes.body
                 }
             ],
-            stylesheets: styles ? [QuizCSS.sheet()] : [],
+            stylesheets: styles
+                ? [Self.stylesheet()] + childNodes.flatMap(\.stylesheets) + [QuizRuntimePanelStyles.stylesheet()]
+                : [],
             scripts: script ? QuizScript().nodes.scripts : []
         )
     }
 
-    private func json() -> String {
-        let payload = QuizData(
-            set,
-            timerSeconds: timerSeconds
+    public static func stylesheet() -> CSSStyleSheet {
+        CSSStyleSheet(
+            rules: [
+                CSS.rule(
+                    ".wc-quiz",
+                    CSS.decl("width", "min(980px, calc(100% - 48px))"),
+                    CSS.decl("margin", "0 auto"),
+                    CSS.decl("padding", "60px 0 96px"),
+                    CSS.decl("color", "var(--text-color)")
+                )
+            ],
+            media: [
+                CSS.media(
+                    "(max-width: 760px)",
+                    CSS.rule(
+                        ".wc-quiz",
+                        CSS.decl("width", "calc(100% - 32px)"),
+                        CSS.decl("padding", "42px 0 78px")
+                    )
+                )
+            ]
         )
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [
-            .sortedKeys
-        ]
-
-        guard let data = try? encoder.encode(payload) else {
-            return "{}"
-        }
-
-        let raw = String(
-            decoding: data,
-            as: UTF8.self
-        )
-
-        return raw
-            .replacingOccurrences(of: "&", with: "\\u0026")
-            .replacingOccurrences(of: "<", with: "\\u003C")
-            .replacingOccurrences(of: ">", with: "\\u003E")
     }
 }
