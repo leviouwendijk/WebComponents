@@ -56,9 +56,14 @@ extension QuizScript.Source {
 
                 event.preventDefault();
 
-                const nextHidden = !details.hidden;
-                details.hidden = nextHidden;
-                reportToggle.textContent = nextHidden ? 'Toon details' : 'Verberg details';
+                const expanded = details.getAttribute('data-quiz-report-details-state') === 'expanded';
+                const nextState = expanded ? 'collapsed' : 'expanded';
+
+                details.setAttribute('data-quiz-report-details-state', nextState);
+                details.setAttribute('aria-hidden', nextState === 'expanded' ? 'false' : 'true');
+
+                reportToggle.setAttribute('aria-expanded', nextState === 'expanded' ? 'true' : 'false');
+                reportToggle.textContent = nextState === 'expanded' ? 'Verberg details' : 'Toon details';
                 return;
             }
 
@@ -67,12 +72,24 @@ extension QuizScript.Source {
             if (reportPrint) {
                 const root = reportPrint.closest(rootSelector);
                 const details = root?.querySelector?.('[data-quiz-report-details]');
+                const toggle = root?.querySelector?.('[data-quiz-report-toggle]');
                 if (!root) return;
 
                 event.preventDefault();
 
+                const previousState = details?.getAttribute('data-quiz-report-details-state') || 'collapsed';
+                const previousAria = details?.getAttribute('aria-hidden') || 'true';
+                const previousToggleExpanded = toggle?.getAttribute('aria-expanded') || 'false';
+                const previousToggleText = toggle?.textContent || 'Toon details';
+
                 if (details) {
-                    details.hidden = false;
+                    details.setAttribute('data-quiz-report-details-state', 'expanded');
+                    details.setAttribute('aria-hidden', 'false');
+                }
+
+                if (toggle) {
+                    toggle.setAttribute('aria-expanded', 'true');
+                    toggle.textContent = 'Verberg details';
                 }
 
                 document.documentElement.classList.add('wc-quiz-printing-report');
@@ -80,6 +97,16 @@ extension QuizScript.Source {
 
                 window.setTimeout(() => {
                     document.documentElement.classList.remove('wc-quiz-printing-report');
+
+                    if (details) {
+                        details.setAttribute('data-quiz-report-details-state', previousState);
+                        details.setAttribute('aria-hidden', previousAria);
+                    }
+
+                    if (toggle) {
+                        toggle.setAttribute('aria-expanded', previousToggleExpanded);
+                        toggle.textContent = previousToggleText;
+                    }
                 }, 250);
 
                 return;

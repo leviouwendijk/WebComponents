@@ -928,36 +928,81 @@ public struct ConditioningMapTool: ReusableComponent, Sendable {
                 CSS.media(
                     "print",
                     CSS.rule(
+                        "html, body, .hm-docs-app--tool",
+                        CSS.decl("background", "#ffffff !important"),
+                        CSS.decl("color", "#111827 !important")
+                    ),
+                    CSS.rule(
                         ".hm-docs-app--tool header, .hm-docs-app--tool nav, .hm-docs-app--tool .wc-docs-project-context-nav, .hm-docs-app--tool .wc-docs-mobile-navigation-drawer, .\(block)__workbench",
                         CSS.decl("display", "none !important")
                     ),
                     CSS.rule(
                         ".\(block)",
+                        CSS.decl("--tool-surface", "#ffffff"),
+                        CSS.decl("--tool-soft", "#f8fafc"),
+                        CSS.decl("--tool-border", "#cbd5e1"),
+                        CSS.decl("--tool-text", "#111827"),
+                        CSS.decl("--tool-muted", "#475569"),
+                        CSS.decl("color-scheme", "light"),
                         CSS.decl("width", "100%"),
                         CSS.decl("padding", "0"),
                         CSS.decl("margin", "0"),
-                        CSS.decl("color", "#111")
+                        CSS.decl("color", "#111827"),
+                        CSS.decl("background", "#ffffff")
+                    ),
+                    CSS.rule(
+                        ".\(block), .\(block) *",
+                        CSS.decl("-webkit-print-color-adjust", "exact"),
+                        CSS.decl("print-color-adjust", "exact")
                     ),
                     CSS.rule(
                         ".\(block)__hero",
                         CSS.decl("margin", "0 0 18px")
                     ),
                     CSS.rule(
-                        ".\(block)__lead",
-                        CSS.decl("max-width", "100%"),
-                        CSS.decl("color", "#333")
+                        ".\(block)__eyebrow, .\(block)__lead, .\(block)__detail-label, .\(block)__node-label, .\(block)__title-field span",
+                        CSS.decl("color", "#475569")
                     ),
                     CSS.rule(
-                        ".\(block)__surface, .\(block)__drawing, .\(block)__node, .\(block)__detail",
+                        ".\(block)__lead",
+                        CSS.decl("max-width", "100%")
+                    ),
+                    CSS.rule(
+                        ".\(block)__surface",
+                        CSS.decl("background", "#ffffff"),
+                        CSS.decl("border-color", "#cbd5e1"),
                         CSS.decl("box-shadow", "none"),
-                        CSS.decl("border-color", "#999"),
                         CSS.decl("break-inside", "avoid")
                     ),
                     CSS.rule(
-                        ".\(block) input, .\(block) textarea, .\(block) select",
-                        CSS.decl("color", "#111"),
-                        CSS.decl("-webkit-print-color-adjust", "exact"),
-                        CSS.decl("print-color-adjust", "exact")
+                        ".\(block)__drawing",
+                        CSS.decl("background", "#f8fafc"),
+                        CSS.decl("border-color", "#cbd5e1"),
+                        CSS.decl("box-shadow", "none"),
+                        CSS.decl("break-inside", "avoid")
+                    ),
+                    CSS.rule(
+                        ".\(block)__node, .\(block)__detail, .\(block)__arrow span, .\(block)__model-kicker",
+                        CSS.decl("background", "#ffffff"),
+                        CSS.decl("border-color", "#cbd5e1"),
+                        CSS.decl("box-shadow", "none"),
+                        CSS.decl("color", "#111827"),
+                        CSS.decl("break-inside", "avoid")
+                    ),
+                    CSS.rule(
+                        ".\(block)__node textarea, .\(block)__detail input, .\(block)__detail textarea, .\(block)__detail select",
+                        CSS.decl("background", "#ffffff"),
+                        CSS.decl("color", "#111827"),
+                        CSS.decl("border-color", "#cbd5e1")
+                    ),
+                    CSS.rule(
+                        ".\(block)__title-field input",
+                        CSS.decl("color", "#111827"),
+                        CSS.decl("border-bottom-color", "#cbd5e1")
+                    ),
+                    CSS.rule(
+                        ".\(block)__arrow",
+                        CSS.decl("color", "#475569")
                     )
                 )
             ]

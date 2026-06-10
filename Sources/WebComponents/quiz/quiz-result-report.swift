@@ -41,7 +41,8 @@ public struct QuizResultReport: ReusableComponent, Sendable {
                                 [
                                     "type": "button",
                                     "class": "wc-quiz-report__button",
-                                    "data-quiz-report-toggle": ""
+                                    "data-quiz-report-toggle": "",
+                                    "aria-expanded": "false"
                                 ]
                             ) {
                                 HTML.text("Toon details")
@@ -71,7 +72,8 @@ public struct QuizResultReport: ReusableComponent, Sendable {
                         [
                             "class": "wc-quiz-report__details",
                             "data-quiz-report-details": "",
-                            "hidden": ""
+                            "data-quiz-report-details-state": "collapsed",
+                            "aria-hidden": "true"
                         ]
                     ) {
                         HTML.div(["class": "wc-quiz-report__focus"]) {
@@ -235,12 +237,27 @@ public struct QuizResultReport: ReusableComponent, Sendable {
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "minmax(220px, .75fr) minmax(0, 1.25fr)"),
                     CSS.decl("gap", "14px"),
-                    CSS.decl("margin-top", "18px")
+                    CSS.decl("overflow", "hidden"),
+                    CSS.decl("will-change", "max-height, opacity, transform, margin-top"),
+                    CSS.decl("transition", "max-height .28s ease, opacity .2s ease, transform .28s ease, margin-top .28s ease")
                 ),
 
                 CSS.rule(
-                    ".wc-quiz-report__details[hidden]",
-                    CSS.decl("display", "none")
+                    ".wc-quiz-report__details[data-quiz-report-details-state=\"collapsed\"]",
+                    CSS.decl("max-height", "0"),
+                    CSS.decl("margin-top", "0"),
+                    CSS.decl("opacity", "0"),
+                    CSS.decl("transform", "translateY(-6px)"),
+                    CSS.decl("pointer-events", "none")
+                ),
+
+                CSS.rule(
+                    ".wc-quiz-report__details[data-quiz-report-details-state=\"expanded\"]",
+                    CSS.decl("max-height", "1400px"),
+                    CSS.decl("margin-top", "18px"),
+                    CSS.decl("opacity", "1"),
+                    CSS.decl("transform", "translateY(0)"),
+                    CSS.decl("pointer-events", "auto")
                 ),
 
                 CSS.rule(
@@ -327,6 +344,14 @@ public struct QuizResultReport: ReusableComponent, Sendable {
                     CSS.rule(
                         ".wc-quiz-printing-report body *",
                         CSS.decl("visibility", "hidden")
+                    ),
+                    CSS.rule(
+                        ".wc-quiz-printing-report .wc-quiz-report__details",
+                        CSS.decl("max-height", "none"),
+                        CSS.decl("margin-top", "18px"),
+                        CSS.decl("opacity", "1"),
+                        CSS.decl("overflow", "visible"),
+                        CSS.decl("transform", "none")
                     ),
                     CSS.rule(
                         ".wc-quiz-printing-report .wc-quiz-report, .wc-quiz-printing-report .wc-quiz-report *",
