@@ -229,7 +229,7 @@ extension QuizScript.Source {
             if (lead) {
                 lead.textContent = answered === total && total > 0
                     ? `Afgerond: ${right} van ${total} vragen correct.`
-                    : `${answered} van ${total} vragen beantwoord. Het rapport werkt live mee.`;
+                    : `${answered} van ${total} vragen beantwoord.`;
             }
 
             if (scoreNode) scoreNode.textContent = score;
