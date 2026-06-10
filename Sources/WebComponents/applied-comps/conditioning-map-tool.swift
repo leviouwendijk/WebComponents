@@ -259,12 +259,14 @@ public struct ConditioningMapTool: ReusableComponent, Sendable {
                 HTML.text(label)
             }
 
-            HTML.input([
+            HTML.textarea([
                 "id": inputID,
-                "type": "text",
+                "rows": "3",
                 "placeholder": placeholder,
                 "data-conditioning-field": field
-            ])
+            ]) {
+                HTML.text("")
+            }
         }
     }
 
@@ -282,12 +284,14 @@ public struct ConditioningMapTool: ReusableComponent, Sendable {
                 HTML.text(kind.tertiaryLabel)
             }
 
-            HTML.input([
+            HTML.textarea([
                 "id": "\(id)-tertiary",
-                "type": "text",
+                "rows": "3",
                 "placeholder": kind.tertiaryPlaceholder,
                 "data-conditioning-field": "tertiary"
-            ])
+            ]) {
+                HTML.text("")
+            }
         }
     }
 
@@ -623,6 +627,24 @@ public struct ConditioningMapTool: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(block)__node textarea",
+                    CSS.decl("width", "100%"),
+                    CSS.decl("min-height", "96px"),
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("border", "1px dashed color-mix(in srgb, var(--tool-text) 22%, transparent)"),
+                    CSS.decl("border-radius", "16px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--tool-soft) 74%, transparent)"),
+                    CSS.decl("color", "var(--tool-text)"),
+                    CSS.decl("font", "inherit"),
+                    CSS.decl("font-size", "1.08rem"),
+                    CSS.decl("font-weight", "760"),
+                    CSS.decl("line-height", "1.32"),
+                    CSS.decl("padding", "14px"),
+                    CSS.decl("resize", "vertical"),
+                    CSS.decl("overflow-wrap", "anywhere")
+                ),
+
+                CSS.rule(
                     ".\(block)__node-label",
                     CSS.decl("display", "block"),
                     CSS.decl("font-size", ".74rem"),
@@ -685,7 +707,9 @@ public struct ConditioningMapTool: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(block)__detail",
                     CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-rows", "auto 1fr"),
                     CSS.decl("gap", "8px"),
+                    CSS.decl("min-height", "142px"),
                     CSS.decl("border", "1px solid var(--tool-border)"),
                     CSS.decl("border-radius", "18px"),
                     CSS.decl("background", "var(--tool-surface)"),
@@ -696,19 +720,27 @@ public struct ConditioningMapTool: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(block)__detail input, .\(block)__detail textarea, .\(block)__detail select",
                     CSS.decl("width", "100%"),
+                    CSS.decl("height", "100%"),
+                    CSS.decl("min-height", "86px"),
                     CSS.decl("box-sizing", "border-box"),
                     CSS.decl("border", "0"),
                     CSS.decl("border-radius", "12px"),
                     CSS.decl("background", "var(--tool-soft)"),
                     CSS.decl("color", "var(--tool-text)"),
                     CSS.decl("font", "inherit"),
+                    CSS.decl("line-height", "1.42"),
                     CSS.decl("padding", "10px 11px")
                 ),
 
                 CSS.rule(
                     ".\(block)__detail textarea",
-                    CSS.decl("min-height", "92px"),
-                    CSS.decl("resize", "vertical")
+                    CSS.decl("resize", "vertical"),
+                    CSS.decl("overflow-wrap", "anywhere")
+                ),
+
+                CSS.rule(
+                    ".\(block)__detail select",
+                    CSS.decl("align-self", "stretch")
                 ),
 
                 CSS.rule(
