@@ -72,13 +72,15 @@ public struct DocsProjectHubPage: SelectableComponent {
                         }
                     }
 
-                    HTML.section(["class": "docs-project-hub__grid \(Self.block)__grid"]) {
-                        for project in projects {
-                            DocsProjectCard(
-                                project: project,
-                                lexicon: lexicon,
-                                includeStyles: false
-                            ).nodes.body
+                    if !projects.isEmpty {
+                        HTML.section(["class": "docs-project-hub__grid \(Self.block)__grid"]) {
+                            for project in projects {
+                                DocsProjectCard(
+                                    project: project,
+                                    lexicon: lexicon,
+                                    includeStyles: false
+                                ).nodes.body
+                            }
                         }
                     }
 
