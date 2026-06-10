@@ -59,37 +59,72 @@ public struct DocsProjectContextNav: SelectableComponent {
         let category = context.activeCategory(in: site)
 
         return HTML.div(["class": "\(Self.block)__breadcrumbs"]) {
-            HTML.a(
-                site.homeHref,
-                ["class": "\(Self.block)__crumb"]
-            ) {
-                HTML.text(lexicon.allDocs)
-            }
+            breadcrumbCrumb(
+                label: lexicon.allDocs,
+                href: site.homeHref
+            )
 
             if let project {
                 separator()
 
-                HTML.a(
-                    project.href,
-                    ["class": "\(Self.block)__crumb"]
-                ) {
-                    HTML.text(project.label)
-                }
+                breadcrumbCrumb(
+                    label: project.label,
+                    href: project.href,
+                    isCurrent: category == nil && context.extraBreadcrumbs.isEmpty
+                )
             }
 
             if let category {
                 separator()
 
-                HTML.a(
-                    category.href,
-                    [
-                        "class": "\(Self.block)__crumb \(Self.block)__crumb--active",
-                        "aria-current": "page"
-                    ]
-                ) {
-                    HTML.text(category.label)
-                }
+                breadcrumbCrumb(
+                    label: category.label,
+                    href: category.href,
+                    isCurrent: context.extraBreadcrumbs.isEmpty
+                )
             }
+
+            for crumb in context.extraBreadcrumbs {
+                separator()
+
+                breadcrumbCrumb(
+                    label: crumb.label,
+                    href: crumb.href,
+                    isCurrent: crumb.isCurrent
+                )
+            }
+        }
+    }
+
+    private func breadcrumbCrumb(
+        label: String,
+        href: String? = nil,
+        isCurrent: Bool = false
+    ) -> any HTMLNode {
+        let attributes: HTMLAttribute = {
+            if isCurrent {
+                return [
+                    "class": "\(Self.block)__crumb \(Self.block)__crumb--active",
+                    "aria-current": "page"
+                ]
+            }
+
+            return [
+                "class": "\(Self.block)__crumb"
+            ]
+        }()
+
+        if let href, !href.isEmpty {
+            return HTML.a(
+                href,
+                attributes
+            ) {
+                HTML.text(label)
+            }
+        }
+
+        return HTML.span(attributes) {
+            HTML.text(label)
         }
     }
 

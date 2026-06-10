@@ -190,24 +190,28 @@ public struct DocsActionSection: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(block)__header",
-                    CSS.decl("display", "flex"),
-                    CSS.decl("justify-content", "space-between"),
-                    CSS.decl("align-items", "end"),
-                    CSS.decl("gap", "18px"),
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "repeat(3, minmax(0, 1fr))"),
+                    CSS.decl("align-items", "start"),
+                    CSS.decl("column-gap", "14px"),
+                    CSS.decl("row-gap", "8px"),
                     CSS.decl("margin", "0 0 18px")
                 ),
 
                 CSS.rule(
                     ".\(block)__header h2",
+                    CSS.decl("grid-column", "1"),
                     CSS.decl("margin", "0"),
                     CSS.decl("font-size", "1rem"),
+                    CSS.decl("line-height", "1.55"),
                     CSS.decl("letter-spacing", ".08em"),
                     CSS.decl("text-transform", "uppercase")
                 ),
 
                 CSS.rule(
                     ".\(block)__header p",
-                    CSS.decl("max-width", "560px"),
+                    CSS.decl("grid-column", "2 / -1"),
+                    CSS.decl("max-width", "none"),
                     CSS.decl("margin", "0"),
                     CSS.decl("line-height", "1.55"),
                     CSS.decl("color", "var(--project-hub-muted, var(--muted-text-color, rgba(0, 0, 0, .62)))")

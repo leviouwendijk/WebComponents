@@ -164,6 +164,22 @@ public enum DocsSiteContent: Sendable {
     }
 }
 
+public struct DocsNavigationCrumb: Sendable {
+    public let label: String
+    public let href: String?
+    public let isCurrent: Bool
+
+    public init(
+        label: String,
+        href: String? = nil,
+        isCurrent: Bool = false
+    ) {
+        self.label = label
+        self.href = href
+        self.isCurrent = isCurrent
+    }
+}
+
 public enum DocsNavigationSurface: Sendable {
     case siteHub
     case projectHub
@@ -174,20 +190,40 @@ public struct DocsNavigationContext: Sendable {
     public let surface: DocsNavigationSurface
     public let activeProjectID: String?
     public let activeCategoryID: String?
+    public let extraBreadcrumbs: [DocsNavigationCrumb]
 
     public init(
         surface: DocsNavigationSurface,
         activeProjectID: String? = nil,
-        activeCategoryID: String? = nil
+        activeCategoryID: String? = nil,
+        extraBreadcrumbs: [DocsNavigationCrumb] = []
     ) {
         self.surface = surface
         self.activeProjectID = activeProjectID
         self.activeCategoryID = activeCategoryID
+        self.extraBreadcrumbs = extraBreadcrumbs
     }
 
     public static func siteHub() -> Self {
         Self(
             surface: .siteHub
+        )
+    }
+
+    public static func sitePage(
+        label: String,
+        href: String? = nil,
+        parentBreadcrumbs: [DocsNavigationCrumb] = []
+    ) -> Self {
+        Self(
+            surface: .siteHub,
+            extraBreadcrumbs: parentBreadcrumbs + [
+                DocsNavigationCrumb(
+                    label: label,
+                    href: href,
+                    isCurrent: true
+                )
+            ]
         )
     }
 
