@@ -85,5 +85,23 @@ extension QuizScript.Source {
 
             return `Eerder beantwoord: ${label} · ${attempts}`;
         }
+
+        function progressHTML(data, item) {
+            const entry = itemProgress(data, item.id);
+
+            if (!entry) {
+                return `
+                    <div class="wc-quiz-prior" data-quiz-prior hidden>
+                        <span data-quiz-prior-text></span>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="wc-quiz-prior" data-quiz-prior data-quiz-prior-state="${esc(entry.lastResult)}">
+                    <span data-quiz-prior-text>${esc(priorText(entry))}</span>
+                </div>
+            `;
+        }
     """#
 }
