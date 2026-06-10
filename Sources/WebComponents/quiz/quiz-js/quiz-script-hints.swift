@@ -67,6 +67,22 @@ extension QuizScript.Source {
             const next = current + 1;
             panel.setAttribute('data-quiz-hint-index', String(next));
 
+            const previous = itemProgress(data, item.id);
+
+            data.progress.items[item.id] = {
+                attempts: previous?.attempts || 0,
+                lastResult: previous?.lastResult || 'unanswered',
+                status: previous?.status || 'unanswered',
+                selected: previous?.selected || [],
+                history: previous?.history || [],
+                hintsUsed: (previous?.hintsUsed || 0) + 1,
+                totalMs: previous?.totalMs || 0,
+                updatedAt: now()
+            };
+
+            saveProgress(data);
+            renderProgress(root);
+
             if (next >= hints.length) {
                 button.disabled = true;
                 button.textContent = 'Geen hints meer';

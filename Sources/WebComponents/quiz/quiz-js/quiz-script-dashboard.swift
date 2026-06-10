@@ -81,6 +81,164 @@ extension QuizScript.Source {
             if (reset) {
                 reset.disabled = answered === 0;
             }
+
+            renderReport(root);
+        }
+
+        function secondsLabel(ms) {
+            const seconds = Math.max(0, Math.round((Number(ms) || 0) / 1000));
+
+            if (seconds < 60) {
+                return `${seconds}s`;
+            }
+
+            const minutes = Math.floor(seconds / 60);
+            const rest = seconds % 60;
+
+            return `${minutes}:${String(rest).padStart(2, '0')}`;
+        }
+
+        function percentLabel(part, whole) {
+            if (!whole) {
+                return '0%';
+            }
+
+            return `${Math.round((part / whole) * 100)}%`;
+        }
+
+        function reportStats(data) {
+            const rows = data.items.map((item) => {
+                const entry = itemProgress(data, item.id);
+                const result = entry?.lastResult || 'unanswered';
+
+                return {
+                    item,
+                    entry,
+                    result,
+                    answered: Boolean(entry && isResult(result)),
+                    right: result === 'right',
+                    weak: result === 'wrong'
+                        || result === 'timeout'
+                        || (entry?.attempts || 0) > 1
+                        || (entry?.hintsUsed || 0) > 0
+                };
+            });
+
+            const answeredRows = rows.filter((row) => row.answered);
+            const rightRows = rows.filter((row) => row.right);
+            const attempts = answeredRows.reduce((total, row) => total + (row.entry?.attempts || 0), 0);
+            const hints = rows.reduce((total, row) => total + (row.entry?.hintsUsed || 0), 0);
+            const totalMs = rows.reduce((total, row) => total + (row.entry?.totalMs || 0), 0);
+
+            return {
+                rows,
+                answeredRows,
+                rightRows,
+                attempts,
+                hints,
+                totalMs
+            };
+        }
+
+        function renderFocus(stats) {
+            const focus = new Map();
+
+            stats.rows
+                .filter((row) => row.weak)
+                .forEach((row) => {
+                    const key = row.item.group || 'Algemeen';
+                    const current = focus.get(key) || {
+                        group: key,
+                        count: 0,
+                        reasons: new Set()
+                    };
+
+                    current.count += 1;
+
+                    if (row.result === 'wrong') current.reasons.add('incorrect');
+                    if (row.result === 'timeout') current.reasons.add('tijd verstreken');
+                    if ((row.entry?.attempts || 0) > 1) current.reasons.add('meerdere pogingen');
+                    if ((row.entry?.hintsUsed || 0) > 0) current.reasons.add('hints gebruikt');
+
+                    focus.set(key, current);
+                });
+
+            const items = Array.from(focus.values())
+                .sort((left, right) => right.count - left.count);
+
+            if (!items.length) {
+                return '<p class="wc-quiz-report__empty">Geen opvallende focusgebieden. Ga zo door.</p>';
+            }
+
+            return `
+                <ul class="wc-quiz-report__focus-list">
+                    ${items.map((item) => `
+                        <li>
+                            <strong>${esc(item.group)}</strong>
+                            <span>${item.count} aandachtspunt(en): ${esc(Array.from(item.reasons).join(', '))}</span>
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+        }
+
+        function renderRows(stats) {
+            const answered = stats.rows.filter((row) => row.answered);
+
+            if (!answered.length) {
+                return '<p class="wc-quiz-report__empty">Nog geen vragen beantwoord.</p>';
+            }
+
+            return `
+                <ul class="wc-quiz-report__row-list">
+                    ${answered.map((row) => `
+                        <li class="wc-quiz-report__row" data-quiz-report-result="${esc(row.result)}">
+                            <div class="wc-quiz-report__row-head">
+                                <strong>${esc(row.item.title)}</strong>
+                                <span>${esc(labelForResult(row.result))}</span>
+                            </div>
+                            <div class="wc-quiz-report__row-meta">
+                                ${esc(row.item.group)} · ${attemptLabel(row.entry?.attempts || 0)} · ${row.entry?.hintsUsed || 0} hint(s) · ${secondsLabel(row.entry?.totalMs || 0)}
+                            </div>
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+        }
+
+        function renderReport(root) {
+            const report = root.querySelector('[data-quiz-report]');
+            if (!report) return;
+
+            const data = state(root);
+            const stats = reportStats(data);
+            const total = data.items.length;
+            const answered = stats.answeredRows.length;
+            const right = stats.rightRows.length;
+            const score = answered > 0 ? percentLabel(right, answered) : 'Nog geen score';
+
+            const lead = report.querySelector('[data-quiz-report-lead]');
+            const scoreNode = report.querySelector('[data-quiz-report-score]');
+            const answeredNode = report.querySelector('[data-quiz-report-answered]');
+            const timeNode = report.querySelector('[data-quiz-report-time]');
+            const attemptsNode = report.querySelector('[data-quiz-report-attempts]');
+            const hintsNode = report.querySelector('[data-quiz-report-hints]');
+            const focusNode = report.querySelector('[data-quiz-report-focus]');
+            const rowsNode = report.querySelector('[data-quiz-report-rows]');
+
+            if (lead) {
+                lead.textContent = answered === total && total > 0
+                    ? `Afgerond: ${right} van ${total} vragen correct.`
+                    : `${answered} van ${total} vragen beantwoord. Het rapport werkt live mee.`;
+            }
+
+            if (scoreNode) scoreNode.textContent = score;
+            if (answeredNode) answeredNode.textContent = `${answered} van ${total}`;
+            if (timeNode) timeNode.textContent = secondsLabel(stats.totalMs);
+            if (attemptsNode) attemptsNode.textContent = stats.attempts ? `${stats.attempts}` : '0';
+            if (hintsNode) hintsNode.textContent = `${stats.hints} gebruikt`;
+            if (focusNode) focusNode.innerHTML = renderFocus(stats);
+            if (rowsNode) rowsNode.innerHTML = renderRows(stats);
         }
 
         function init(scope = document) {

@@ -122,6 +122,7 @@ extension QuizScript.Source {
 
             stopTimer(root);
             data.active = item;
+            data.activeOpenedAt = now();
             panel.innerHTML = render(data, item);
             shell.hidden = false;
             document.documentElement.classList.add('wc-quiz-is-open');

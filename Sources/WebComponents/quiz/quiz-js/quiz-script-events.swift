@@ -47,6 +47,44 @@ extension QuizScript.Source {
                 return;
             }
 
+            const reportToggle = event.target?.closest?.('[data-quiz-report-toggle]');
+
+            if (reportToggle) {
+                const root = reportToggle.closest(rootSelector);
+                const details = root?.querySelector?.('[data-quiz-report-details]');
+                if (!root || !details) return;
+
+                event.preventDefault();
+
+                const nextHidden = !details.hidden;
+                details.hidden = nextHidden;
+                reportToggle.textContent = nextHidden ? 'Toon details' : 'Verberg details';
+                return;
+            }
+
+            const reportPrint = event.target?.closest?.('[data-quiz-report-print]');
+
+            if (reportPrint) {
+                const root = reportPrint.closest(rootSelector);
+                const details = root?.querySelector?.('[data-quiz-report-details]');
+                if (!root) return;
+
+                event.preventDefault();
+
+                if (details) {
+                    details.hidden = false;
+                }
+
+                document.documentElement.classList.add('wc-quiz-printing-report');
+                window.print();
+
+                window.setTimeout(() => {
+                    document.documentElement.classList.remove('wc-quiz-printing-report');
+                }, 250);
+
+                return;
+            }
+
             const resetAll = event.target?.closest?.('[data-quiz-reset-all]');
 
             if (resetAll) {

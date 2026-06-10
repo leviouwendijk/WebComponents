@@ -130,17 +130,20 @@ public struct DocsActionSection: ReusableComponent, Sendable {
     public static let block = "wc-docs-action-section"
 
     public let title: String
+    public let titleHref: String?
     public let lead: String?
     public let cards: [DocsActionCard]
     public let includeStyles: Bool
 
     public init(
         title: String,
+        titleHref: String? = nil,
         lead: String? = nil,
         cards: [DocsActionCard],
         includeStyles: Bool = true
     ) {
         self.title = title
+        self.titleHref = titleHref
         self.lead = lead
         self.cards = cards
         self.includeStyles = includeStyles
@@ -152,7 +155,13 @@ public struct DocsActionSection: ReusableComponent, Sendable {
                 HTML.section(["class": "docs-action-section \(Self.block)"]) {
                     HTML.div(["class": "\(Self.block)__header"]) {
                         HTML.h2 {
-                            HTML.text(title)
+                            if let titleHref, !titleHref.isEmpty {
+                                HTML.a(titleHref) {
+                                    HTML.text(title)
+                                }
+                            } else {
+                                HTML.text(title)
+                            }
                         }
 
                         if let lead, !lead.isEmpty {
@@ -206,6 +215,18 @@ public struct DocsActionSection: ReusableComponent, Sendable {
                     CSS.decl("line-height", "1.55"),
                     CSS.decl("letter-spacing", ".08em"),
                     CSS.decl("text-transform", "uppercase")
+                ),
+
+                CSS.rule(
+                    ".\(block)__header h2 a",
+                    CSS.decl("color", "inherit"),
+                    CSS.decl("text-decoration", "none")
+                ),
+
+                CSS.rule(
+                    ".\(block)__header h2 a:hover",
+                    CSS.decl("text-decoration", "underline"),
+                    CSS.decl("text-underline-offset", "4px")
                 ),
 
                 CSS.rule(

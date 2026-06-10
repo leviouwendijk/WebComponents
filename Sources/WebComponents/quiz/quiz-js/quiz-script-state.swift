@@ -74,6 +74,8 @@ extension QuizScript.Source {
                             ? entry.selected.map(String)
                             : [],
                         history,
+                        hintsUsed: Math.max(0, Math.floor(Number(entry?.hintsUsed) || 0)),
+                        totalMs: Math.max(0, Math.floor(Number(entry?.totalMs) || 0)),
                         updatedAt: Number(entry?.updatedAt) || now()
                     };
                 });

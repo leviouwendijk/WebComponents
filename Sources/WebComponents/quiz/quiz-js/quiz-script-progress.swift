@@ -43,6 +43,7 @@ extension QuizScript.Source {
             const data = state(root);
             const previous = itemProgress(data, item.id);
             const history = previous?.history ? [...previous.history] : [];
+            const elapsed = Math.max(0, now() - (data.activeOpenedAt || now()));
 
             history.push(result);
 
@@ -52,8 +53,12 @@ extension QuizScript.Source {
                 status: result,
                 selected: item.rule.mode === 'text' ? [] : selected,
                 history: history.slice(-20),
+                hintsUsed: previous?.hintsUsed || 0,
+                totalMs: (previous?.totalMs || 0) + elapsed,
                 updatedAt: now()
             };
+
+            data.activeOpenedAt = now();
 
             saveProgress(data);
             renderProgress(root);

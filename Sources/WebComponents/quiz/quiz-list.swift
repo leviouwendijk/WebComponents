@@ -44,6 +44,10 @@ public struct QuizList: ReusableComponent, Sendable {
             items: set.items
         ).nodes
 
+        let reportNodes = QuizResultReport(
+            itemCount: set.items.count
+        ).nodes
+
         let dataNodes = QuizDataScript(
             set: set,
             timerSeconds: timerSeconds
@@ -55,6 +59,7 @@ public struct QuizList: ReusableComponent, Sendable {
             heroNodes,
             progressNodes,
             cardListNodes,
+            reportNodes,
             dataNodes,
             shellNodes
         ]
@@ -72,6 +77,7 @@ public struct QuizList: ReusableComponent, Sendable {
                     heroNodes.body
                     progressNodes.body
                     cardListNodes.body
+                    reportNodes.body
                     dataNodes.body
                     shellNodes.body
                 }
