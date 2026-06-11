@@ -619,24 +619,26 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(ClassName.predictiveMeter)",
-                    CSS.decl("position", "relative"),
+                    CSS.decl("display", "flex"),
+                    CSS.decl("align-items", "flex-end"),
+                    CSS.decl("justify-content", "stretch"),
+                    CSS.decl("box-sizing", "border-box"),
                     CSS.decl("width", "14px"),
                     CSS.decl("height", "58px"),
+                    CSS.decl("padding", "3px"),
                     CSS.decl("overflow", "hidden"),
                     CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-classical-timing-ink) 18%, transparent)"),
-                    CSS.decl("border-radius", "5px"),
+                    CSS.decl("border-radius", "7px"),
                     CSS.decl("background", "color-mix(in srgb, var(--wc-classical-timing-ink) 7%, transparent)"),
                     CSS.decl("box-shadow", "inset 0 0 0 1px color-mix(in srgb, var(--wc-classical-timing-surface) 70%, transparent)")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.predictiveFill)",
-                    CSS.decl("position", "absolute"),
-                    CSS.decl("left", "0"),
-                    CSS.decl("right", "0"),
-                    CSS.decl("bottom", "0"),
+                    CSS.decl("width", "100%"),
+                    CSS.decl("min-height", "7px"),
                     CSS.decl("height", "var(--predictive-power)"),
-                    CSS.decl("border-radius", "inherit"),
+                    CSS.decl("border-radius", "4px"),
                     CSS.decl("background", "color-mix(in srgb, var(--success, #2E8B57) 58%, transparent)")
                 ),
 
@@ -756,14 +758,14 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                     "(max-width: 680px)",
                     CSS.rule(
                         ".\(ClassName.root)",
-                        CSS.decl("--wc-classical-timing-meta-col", "96px"),
-                        CSS.decl("--wc-classical-timing-lane-col", "68px"),
-                        CSS.decl("--wc-classical-timing-predictive-col", "30px"),
-                        CSS.decl("--wc-classical-timing-gap", "8px")
+                        CSS.decl("--wc-classical-timing-meta-col", "132px"),
+                        CSS.decl("--wc-classical-timing-lane-col", "72px"),
+                        CSS.decl("--wc-classical-timing-predictive-col", "32px"),
+                        CSS.decl("--wc-classical-timing-gap", "12px")
                     ),
                     CSS.rule(
                         ".\(ClassName.viewport) > .\(ClassName.chart), .\(ClassName.viewport) > .\(ClassName.timeline)",
-                        CSS.decl("min-width", "660px")
+                        CSS.decl("min-width", "760px")
                     ),
                     CSS.rule(
                         ".\(ClassName.effectiveness)",
