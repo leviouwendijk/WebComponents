@@ -260,7 +260,7 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                     CSS.decl("--wc-classical-timing-meta-col", "clamp(112px, 19vw, 158px)"),
                     CSS.decl("--wc-classical-timing-lane-col", "clamp(76px, 13vw, 104px)"),
                     CSS.decl("--wc-classical-timing-gap", "12px"),
-                    CSS.decl("--wc-classical-timing-duration", "4.5s"),
+                    CSS.decl("--wc-classical-timing-duration", "3.8s"),
                     CSS.decl("--wc-classical-timing-ink", "var(--text-color, #17202a)"),
                     CSS.decl("--wc-classical-timing-muted", "var(--text-muted, #5f6b76)"),
                     CSS.decl("--wc-classical-timing-border", "var(--border-color, rgba(23, 32, 42, .16))"),
@@ -302,12 +302,13 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                     CSS.decl("width", "32px"),
                     CSS.decl("height", "32px"),
                     CSS.decl("padding", "0"),
-                    CSS.decl("border", "0"),
-                    CSS.decl("background", "transparent"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-classical-timing-muted) 30%, transparent)"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-classical-timing-muted) 6%, transparent)"),
                     CSS.decl("color", "color-mix(in srgb, var(--wc-classical-timing-muted) 82%, var(--wc-classical-timing-ink) 18%)"),
                     CSS.decl("cursor", "pointer"),
                     CSS.decl("opacity", ".78"),
-                    CSS.decl("transition", "opacity .14s ease, color .14s ease, transform .14s ease")
+                    CSS.decl("transition", "opacity .14s ease, color .14s ease, transform .14s ease, border-color .14s ease, background-color .14s ease")
                 ),
 
                 CSS.rule(
