@@ -134,6 +134,11 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
     private enum ClassName {
         static let root = "wc-classical-timing"
         static let stage = "wc-classical-timing__stage"
+        static let controlInput = "wc-classical-timing__control-input"
+        static let control = "wc-classical-timing__control"
+        static let controlIcon = "wc-classical-timing__control-icon"
+        static let playIcon = "wc-classical-timing__control-icon--play"
+        static let stopIcon = "wc-classical-timing__control-icon--stop"
         static let header = "wc-classical-timing__header"
         static let eyebrow = "wc-classical-timing__eyebrow"
         static let title = "wc-classical-timing__title"
@@ -209,10 +214,12 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
             HTML.div(
                 [
                     "class": ClassName.stage,
-                    "role": "img",
+                    "role": "group",
                     "aria-label": "Tijdlijn voor klassieke conditionering: delay en trace zijn het sterkst, simultaneous is zwakker door overschaduwing, backward is het minst effectief."
                 ]
             ) {
+                motionToggleInput(id: id)
+                motionToggleControl(id: id)
                 header()
 
                 HTML.div([ "class": ClassName.chart ]) {
@@ -272,8 +279,95 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.controlInput)",
+                    CSS.decl("position", "absolute"),
+                    CSS.decl("width", "1px"),
+                    CSS.decl("height", "1px"),
+                    CSS.decl("margin", "-1px"),
+                    CSS.decl("padding", "0"),
+                    CSS.decl("overflow", "hidden"),
+                    CSS.decl("clip", "rect(0 0 0 0)"),
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("border", "0")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.control)",
+                    CSS.decl("position", "absolute"),
+                    CSS.decl("top", "clamp(16px, 3vw, 24px)"),
+                    CSS.decl("right", "clamp(16px, 3vw, 24px)"),
+                    CSS.decl("z-index", "4"),
+                    CSS.decl("display", "grid"),
+                    CSS.decl("place-items", "center"),
+                    CSS.decl("width", "32px"),
+                    CSS.decl("height", "32px"),
+                    CSS.decl("padding", "0"),
+                    CSS.decl("border", "0"),
+                    CSS.decl("background", "transparent"),
+                    CSS.decl("color", "color-mix(in srgb, var(--wc-classical-timing-muted) 82%, var(--wc-classical-timing-ink) 18%)"),
+                    CSS.decl("cursor", "pointer"),
+                    CSS.decl("opacity", ".78"),
+                    CSS.decl("transition", "opacity .14s ease, color .14s ease, transform .14s ease")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.control):hover",
+                    CSS.decl("opacity", "1"),
+                    CSS.decl("color", "var(--wc-classical-timing-ink)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.control):active",
+                    CSS.decl("transform", "scale(.94)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.controlInput):focus-visible + .\(ClassName.control)",
+                    CSS.decl("outline", "2px solid color-mix(in srgb, var(--accent, #0081F8) 72%, transparent)"),
+                    CSS.decl("outline-offset", "4px"),
+                    CSS.decl("border-radius", "8px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.controlIcon)",
+                    CSS.decl("display", "block"),
+                    CSS.decl("width", "18px"),
+                    CSS.decl("height", "18px"),
+                    CSS.decl("line-height", "0")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.controlIcon) svg",
+                    CSS.decl("display", "block"),
+                    CSS.decl("width", "100%"),
+                    CSS.decl("height", "100%"),
+                    CSS.decl("fill", "currentColor")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.playIcon)",
+                    CSS.decl("display", "none")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.controlInput):checked + .\(ClassName.control) .\(ClassName.playIcon)",
+                    CSS.decl("display", "block")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.controlInput):checked + .\(ClassName.control) .\(ClassName.stopIcon)",
+                    CSS.decl("display", "none")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.controlInput):checked ~ .\(ClassName.chart) .\(ClassName.marker), .\(ClassName.controlInput):checked ~ .\(ClassName.timeline) .\(ClassName.timelineDot)",
+                    CSS.decl("animation-play-state", "paused")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.header)",
                     CSS.decl("max-width", "720px"),
+                    CSS.decl("padding-right", "44px"),
                     CSS.decl("margin-bottom", "18px")
                 ),
 
@@ -611,6 +705,79 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
 
             HTML.p([ "class": ClassName.lead ]) {
                 HTML.text("De witte lijn laat de tijd lopen. De blokken tonen wanneer Prikkel (CS) en Gevolg (US) aanwezig zijn.")
+            }
+        }
+    }
+
+    private static func motionToggleInput(
+        id: String
+    ) -> any HTMLNode {
+        HTML.input(
+            [
+                "id": "\(id)-motion-toggle",
+                "class": ClassName.controlInput,
+                "type": "checkbox",
+                "aria-label": "Animatie pauzeren of afspelen"
+            ]
+        )
+    }
+
+    private static func motionToggleControl(
+        id: String
+    ) -> any HTMLNode {
+        HTML.label(
+            [
+                "class": ClassName.control,
+                "for": "\(id)-motion-toggle",
+                "title": "Animatie pauzeren of afspelen"
+            ]
+        ) {
+            HTML.span(
+                [
+                    "class": "\(ClassName.controlIcon) \(ClassName.stopIcon) stop",
+                    "aria-hidden": "true"
+                ]
+            ) {
+                HTML.el(
+                    "svg",
+                    [
+                        "viewBox": "0 0 24 24",
+                        "focusable": "false"
+                    ]
+                ) {
+                    HTML.el(
+                        "rect",
+                        [
+                            "x": "7",
+                            "y": "7",
+                            "width": "10",
+                            "height": "10",
+                            "rx": "1.5"
+                        ]
+                    ) {}
+                }
+            }
+
+            HTML.span(
+                [
+                    "class": "\(ClassName.controlIcon) \(ClassName.playIcon) play",
+                    "aria-hidden": "true"
+                ]
+            ) {
+                HTML.el(
+                    "svg",
+                    [
+                        "viewBox": "0 0 24 24",
+                        "focusable": "false"
+                    ]
+                ) {
+                    HTML.el(
+                        "polygon",
+                        [
+                            "points": "8,5 19,12 8,19"
+                        ]
+                    ) {}
+                }
             }
         }
     }
