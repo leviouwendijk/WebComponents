@@ -389,9 +389,10 @@ public struct DocsDisclosureGroup: ReusableComponent, Sendable {
                     CSS.decl("max-width", "760px"),
                     CSS.decl("margin-top", "4px"),
                     CSS.decl("padding", "10px 12px"),
-                    CSS.decl("border-left", "3px solid color-mix(in srgb, var(--link-color) 54%, var(--docs-disclosure-border))"),
+                    CSS.decl("border-left", "3px solid color-mix(in srgb, var(--text-color) 24%, var(--docs-disclosure-border))"),
                     CSS.decl("border-radius", "12px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--link-color) 7%, transparent)")
+                    CSS.decl("background", "color-mix(in srgb, var(--background-color) 86%, var(--text-color) 7%)"),
+                    CSS.decl("box-shadow", "inset 0 0 0 1px color-mix(in srgb, var(--text-color) 7%, transparent)")
                 ),
 
                 CSS.rule(
@@ -400,7 +401,7 @@ public struct DocsDisclosureGroup: ReusableComponent, Sendable {
                     CSS.decl("font-weight", "780"),
                     CSS.decl("letter-spacing", ".12em"),
                     CSS.decl("text-transform", "uppercase"),
-                    CSS.decl("color", "color-mix(in srgb, var(--link-color) 68%, var(--text-color))")
+                    CSS.decl("color", "color-mix(in srgb, var(--text-color) 56%, transparent)")
                 ),
 
                 CSS.rule(
@@ -408,7 +409,7 @@ public struct DocsDisclosureGroup: ReusableComponent, Sendable {
                     CSS.decl("font-size", ".96rem"),
                     CSS.decl("font-weight", "590"),
                     CSS.decl("line-height", "1.48"),
-                    CSS.decl("color", "var(--text-color)")
+                    CSS.decl("color", "color-mix(in srgb, var(--text-color) 86%, transparent)")
                 ),
 
                 CSS.rule(
