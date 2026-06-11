@@ -24,7 +24,10 @@ public struct DocsScrollDocument: SelectableComponent {
         includeScript: Bool = true
     ) {
         self.category = category
-        self.kicker = kicker ?? lexicon.contentKicker
+
+        // self.kicker = kicker ?? lexicon.contentKicker
+        self.kicker = kicker ?? category.subtitle ?? lexicon.contentKicker
+
         self.lexicon = lexicon
         self.includeReferences = includeReferences
         self.includeStyles = includeStyles

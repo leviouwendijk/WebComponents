@@ -234,14 +234,6 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 ]
             ) {}
 
-            route_pill(
-                x: 282,
-                y: 118,
-                width: 126,
-                text: "vermijding",
-                track: .afstoter
-            )
-
             HTML.el(
                 "path",
                 [
@@ -252,14 +244,6 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
                 ]
             ) {}
 
-            route_pill(
-                x: 442,
-                y: 138,
-                width: 132,
-                text: "toenadering",
-                track: .aantrekker
-            )
-
             subject(
                 x: 286,
                 y: 176
@@ -268,6 +252,22 @@ public struct DriveObstacleDiagram: ReusableComponent, Sendable {
             obstacle(
                 x: 372,
                 y: 130
+            )
+
+            route_pill(
+                x: 282,
+                y: 118,
+                width: 126,
+                text: "vermijding",
+                track: .afstoter
+            )
+
+            route_pill(
+                x: 442,
+                y: 138,
+                width: 132,
+                text: "toenadering",
+                track: .aantrekker
             )
         }
     }
