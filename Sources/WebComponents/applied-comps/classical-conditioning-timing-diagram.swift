@@ -54,6 +54,17 @@ public enum ClassicalConditioningTimingArrangement: String, Sendable, CaseIterab
         }
     }
 
+    var predictivePower: ClassicalConditioningPredictivePower {
+        switch self {
+        case .delay, .trace:
+            return .strong
+        case .simultaneous:
+            return .weak
+        case .backward:
+            return .ineffective
+        }
+    }
+
     var note: String {
         switch self {
         case .delay:
@@ -90,6 +101,34 @@ public enum ClassicalConditioningTimingArrangement: String, Sendable, CaseIterab
             return .init(start: 42, end: 62)
         case .backward:
             return .init(start: 42, end: 64)
+        }
+    }
+}
+
+public enum ClassicalConditioningPredictivePower: String, Sendable {
+    case strong
+    case weak
+    case ineffective
+
+    var percentage: Int {
+        switch self {
+        case .strong:
+            return 100
+        case .weak:
+            return 30
+        case .ineffective:
+            return 10
+        }
+    }
+
+    var accessibilityLabel: String {
+        switch self {
+        case .strong:
+            return "sterk voorspellend vermogen"
+        case .weak:
+            return "zwak voorspellend vermogen"
+        case .ineffective:
+            return "nauwelijks voorspellend vermogen"
         }
     }
 }
@@ -143,6 +182,7 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
         static let eyebrow = "wc-classical-timing__eyebrow"
         static let title = "wc-classical-timing__title"
         static let lead = "wc-classical-timing__lead"
+        static let viewport = "wc-classical-timing__viewport"
         static let chart = "wc-classical-timing__chart"
         static let rows = "wc-classical-timing__rows"
         static let arrangement = "wc-classical-timing__arrangement"
@@ -157,6 +197,9 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
         static let rail = "wc-classical-timing__rail"
         static let block = "wc-classical-timing__block"
         static let blockText = "wc-classical-timing__block-text"
+        static let predictive = "wc-classical-timing__predictive"
+        static let predictiveMeter = "wc-classical-timing__predictive-meter"
+        static let predictiveFill = "wc-classical-timing__predictive-fill"
         static let markerLayer = "wc-classical-timing__marker-layer"
         static let marker = "wc-classical-timing__marker"
         static let timeline = "wc-classical-timing__timeline"
@@ -222,19 +265,22 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                 motionToggleControl(id: id)
                 header()
 
-                HTML.div([ "class": ClassName.chart ]) {
-                    HTML.div([ "class": ClassName.rows ]) {
-                        for arrangement in arrangements {
-                            arrangementRow(arrangement)
+                HTML.div([ "class": ClassName.viewport ]) {
+                    HTML.div([ "class": ClassName.chart ]) {
+                        HTML.div([ "class": ClassName.rows ]) {
+                            for arrangement in arrangements {
+                                arrangementRow(arrangement)
+                            }
+                        }
+
+                        HTML.div([ "class": ClassName.markerLayer, "aria-hidden": "true" ]) {
+                            HTML.div([ "class": ClassName.marker ]) {}
                         }
                     }
 
-                    HTML.div([ "class": ClassName.markerLayer, "aria-hidden": "true" ]) {
-                        HTML.div([ "class": ClassName.marker ]) {}
-                    }
+                    timeline()
                 }
 
-                timeline()
                 notes(arrangements)
             }
 
@@ -259,6 +305,7 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                     CSS.decl("margin", "2rem auto"),
                     CSS.decl("--wc-classical-timing-meta-col", "clamp(112px, 19vw, 158px)"),
                     CSS.decl("--wc-classical-timing-lane-col", "clamp(76px, 13vw, 104px)"),
+                    CSS.decl("--wc-classical-timing-predictive-col", "34px"),
                     CSS.decl("--wc-classical-timing-gap", "12px"),
                     CSS.decl("--wc-classical-timing-duration", "3.8s"),
                     CSS.decl("--wc-classical-timing-ink", "var(--text-color, #17202a)"),
@@ -361,7 +408,7 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.controlInput):checked ~ .\(ClassName.chart) .\(ClassName.marker), .\(ClassName.controlInput):checked ~ .\(ClassName.timeline) .\(ClassName.timelineDot)",
+                    ".\(ClassName.controlInput):checked ~ .\(ClassName.viewport) .\(ClassName.marker), .\(ClassName.controlInput):checked ~ .\(ClassName.viewport) .\(ClassName.timelineDot)",
                     CSS.decl("animation-play-state", "paused")
                 ),
 
@@ -399,6 +446,23 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.viewport)",
+                    CSS.decl("position", "relative"),
+                    CSS.decl("width", "100%"),
+                    CSS.decl("max-width", "100%"),
+                    CSS.decl("overflow-x", "auto"),
+                    CSS.decl("overflow-y", "hidden"),
+                    CSS.decl("-webkit-overflow-scrolling", "touch"),
+                    CSS.decl("scrollbar-width", "thin"),
+                    CSS.decl("padding-bottom", "4px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.viewport) > .\(ClassName.chart), .\(ClassName.viewport) > .\(ClassName.timeline)",
+                    CSS.decl("min-width", "660px")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.chart)",
                     CSS.decl("position", "relative")
                 ),
@@ -412,7 +476,7 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.arrangement)",
                     CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-columns", "var(--wc-classical-timing-meta-col) minmax(0, 1fr)"),
+                    CSS.decl("grid-template-columns", "var(--wc-classical-timing-meta-col) minmax(0, 1fr) var(--wc-classical-timing-predictive-col)"),
                     CSS.decl("column-gap", "var(--wc-classical-timing-gap)"),
                     CSS.decl("align-items", "stretch")
                 ),
@@ -545,12 +609,54 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.predictive)",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("justify-content", "center"),
+                    CSS.decl("min-width", "var(--wc-classical-timing-predictive-col)"),
+                    CSS.decl("padding", "10px 0")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.predictiveMeter)",
+                    CSS.decl("position", "relative"),
+                    CSS.decl("width", "14px"),
+                    CSS.decl("height", "58px"),
+                    CSS.decl("overflow", "hidden"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-classical-timing-ink) 18%, transparent)"),
+                    CSS.decl("border-radius", "5px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-classical-timing-ink) 7%, transparent)"),
+                    CSS.decl("box-shadow", "inset 0 0 0 1px color-mix(in srgb, var(--wc-classical-timing-surface) 70%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.predictiveFill)",
+                    CSS.decl("position", "absolute"),
+                    CSS.decl("left", "0"),
+                    CSS.decl("right", "0"),
+                    CSS.decl("bottom", "0"),
+                    CSS.decl("height", "var(--predictive-power)"),
+                    CSS.decl("border-radius", "inherit"),
+                    CSS.decl("background", "color-mix(in srgb, var(--success, #2E8B57) 58%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.predictive)--weak .\(ClassName.predictiveFill)",
+                    CSS.decl("background", "color-mix(in srgb, var(--warning, #E7A94E) 72%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.predictive)--ineffective .\(ClassName.predictiveFill)",
+                    CSS.decl("background", "color-mix(in srgb, var(--danger, #D64545) 72%, transparent)")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.markerLayer)",
                     CSS.decl("position", "absolute"),
                     CSS.decl("top", "0"),
                     CSS.decl("bottom", "0"),
                     CSS.decl("left", "calc(var(--wc-classical-timing-meta-col) + var(--wc-classical-timing-gap) + var(--wc-classical-timing-lane-col) + var(--wc-classical-timing-gap))"),
-                    CSS.decl("right", "0"),
+                    CSS.decl("right", "calc(var(--wc-classical-timing-predictive-col) + var(--wc-classical-timing-gap))"),
                     CSS.decl("pointer-events", "none")
                 ),
 
@@ -570,7 +676,7 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.timeline)",
                     CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-columns", "var(--wc-classical-timing-meta-col) var(--wc-classical-timing-lane-col) minmax(0, 1fr)"),
+                    CSS.decl("grid-template-columns", "var(--wc-classical-timing-meta-col) var(--wc-classical-timing-lane-col) minmax(0, 1fr) var(--wc-classical-timing-predictive-col)"),
                     CSS.decl("column-gap", "var(--wc-classical-timing-gap)"),
                     CSS.decl("align-items", "center"),
                     CSS.decl("margin-top", "18px")
@@ -652,7 +758,12 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                         ".\(ClassName.root)",
                         CSS.decl("--wc-classical-timing-meta-col", "96px"),
                         CSS.decl("--wc-classical-timing-lane-col", "68px"),
+                        CSS.decl("--wc-classical-timing-predictive-col", "30px"),
                         CSS.decl("--wc-classical-timing-gap", "8px")
+                    ),
+                    CSS.rule(
+                        ".\(ClassName.viewport) > .\(ClassName.chart), .\(ClassName.viewport) > .\(ClassName.timeline)",
+                        CSS.decl("min-width", "660px")
                     ),
                     CSS.rule(
                         ".\(ClassName.effectiveness)",
@@ -701,11 +812,11 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
             }
 
             HTML.el("h3", [ "class": ClassName.title ]) {
-                HTML.text("Effectiviteit per volgorde van prikkel en gevolg")
+                HTML.text("Effectiviteit van koppelings-patroon")
             }
 
             HTML.p([ "class": ClassName.lead ]) {
-                HTML.text("De witte lijn laat de tijd lopen. De blokken tonen wanneer Prikkel (CS) en Gevolg (US) aanwezig zijn.")
+                HTML.text("Hier zie je de effectiviteit van binding tussen Prikkel (CS) en Gevolg (US) aan de hand van het volgorde-patroon waarin deze verschijnen.")
             }
         }
     }
@@ -815,6 +926,25 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                     kind: .consequence,
                     interval: arrangement.consequenceInterval
                 )
+            }
+
+            predictivePowerNode(arrangement.predictivePower)
+        }
+    }
+
+    private static func predictivePowerNode(
+        _ power: ClassicalConditioningPredictivePower
+    ) -> any HTMLNode {
+        HTML.div(
+            [
+                "class": "\(ClassName.predictive) \(ClassName.predictive)--\(power.rawValue)",
+                "style": "--predictive-power: \(power.percentage)%;",
+                "role": "img",
+                "aria-label": "Voorspellend vermogen: \(power.accessibilityLabel)"
+            ]
+        ) {
+            HTML.div([ "class": ClassName.predictiveMeter, "aria-hidden": "true" ]) {
+                HTML.div([ "class": ClassName.predictiveFill ]) {}
             }
         }
     }
