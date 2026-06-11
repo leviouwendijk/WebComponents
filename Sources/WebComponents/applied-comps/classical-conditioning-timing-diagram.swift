@@ -46,9 +46,9 @@ public enum ClassicalConditioningTimingArrangement: String, Sendable, CaseIterab
         case .delay:
             return "sterk"
         case .trace:
-            return "sterk, gevoeliger"
+            return "sterk"
         case .simultaneous:
-            return "zwakker"
+            return "zwak"
         case .backward:
             return "minst effectief"
         }
@@ -61,9 +61,9 @@ public enum ClassicalConditioningTimingArrangement: String, Sendable, CaseIterab
         case .trace:
             return "Prikkel eindigt kort voordat het gevolg begint."
         case .simultaneous:
-            return "Prikkel en gevolg vallen samen; overschaduwing wordt waarschijnlijker."
+            return "Prikkel en gevolg vallen samen; overschaduwing (overstemming) wordt waarschijnlijk."
         case .backward:
-            return "Gevolg komt vóór de prikkel; de prikkel voorspelt dus slecht."
+            return "Gevolg komt vóór de prikkel; de prikkel verliest diens voorspellende rol (informatief vermogen)."
         }
     }
 
@@ -253,7 +253,7 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                     CSS.decl("--wc-classical-timing-meta-col", "clamp(112px, 19vw, 158px)"),
                     CSS.decl("--wc-classical-timing-lane-col", "clamp(76px, 13vw, 104px)"),
                     CSS.decl("--wc-classical-timing-gap", "12px"),
-                    CSS.decl("--wc-classical-timing-duration", "5.8s"),
+                    CSS.decl("--wc-classical-timing-duration", "4.5s"),
                     CSS.decl("--wc-classical-timing-ink", "var(--text-color, #17202a)"),
                     CSS.decl("--wc-classical-timing-muted", "var(--text-muted, #5f6b76)"),
                     CSS.decl("--wc-classical-timing-border", "var(--border-color, rgba(23, 32, 42, .16))"),
@@ -433,9 +433,14 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                     CSS.decl("inset", "0"),
                     CSS.decl("display", "grid"),
                     CSS.decl("place-items", "center"),
-                    CSS.decl("font-size", ".62rem"),
+                    CSS.decl("padding", "0 4px"),
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("overflow", "hidden"),
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("text-overflow", "ellipsis"),
+                    CSS.decl("font-size", ".58rem"),
                     CSS.decl("font-weight", "800"),
-                    CSS.decl("letter-spacing", ".04em"),
+                    CSS.decl("letter-spacing", ".02em"),
                     CSS.decl("color", "rgba(255,255,255,.88)")
                 ),
 
@@ -667,7 +672,7 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                     ]
                 ) {
                     HTML.span([ "class": ClassName.blockText ]) {
-                        HTML.text(kind.sourceLabel)
+                        HTML.text(kind.laneLabel)
                     }
                 }
             }
