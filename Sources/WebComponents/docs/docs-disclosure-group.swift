@@ -1,6 +1,89 @@
 import Constructors
 import CSS
 import HTML
+import JS
+
+public struct DocsDisclosurePurposeCard: Sendable {
+    public enum Tone: String, Sendable {
+        case positive
+        case neutral
+        case caution
+    }
+
+    public let title: String
+    public let text: String?
+    public let tone: Tone
+    public let marker: String
+
+    public init(
+        _ title: String,
+        text: String? = nil,
+        tone: Tone = .positive,
+        marker: String = "+"
+    ) {
+        self.title = title
+        self.text = text
+        self.tone = tone
+        self.marker = marker
+    }
+
+    func node(
+        block: String
+    ) -> any HTMLNode {
+        HTML.div(["class": "\(block)__purpose-card \(block)__purpose-card--\(tone.rawValue)"]) {
+            HTML.span(["class": "\(block)__purpose-marker", "aria-hidden": "true"]) {
+                HTML.text(marker)
+            }
+
+            HTML.div(["class": "\(block)__purpose-copy"]) {
+                HTML.el("h4", ["class": "\(block)__purpose-title"]) {
+                    HTML.text(title)
+                }
+
+                if let text, !text.isEmpty {
+                    HTML.p(["class": "\(block)__purpose-text"]) {
+                        HTML.text(text)
+                    }
+                }
+            }
+        }
+    }
+}
+
+public struct DocsDisclosurePurposeGrid: ReusableComponent, Sendable {
+    private static let block = "wc-docs-disclosure-group"
+
+    public let label: String?
+    public let cards: [DocsDisclosurePurposeCard]
+
+    public init(
+        label: String? = "Doel",
+        cards: [DocsDisclosurePurposeCard]
+    ) {
+        self.label = label
+        self.cards = cards
+    }
+
+    public var nodes: ReusableComponentNodes {
+        .body([node()])
+    }
+
+    public func node() -> any HTMLNode {
+        HTML.div(["class": "\(Self.block)__purpose"]) {
+            if let label, !label.isEmpty {
+                HTML.p(["class": "\(Self.block)__purpose-label"]) {
+                    HTML.text(label)
+                }
+            }
+
+            HTML.div(["class": "\(Self.block)__purpose-grid"]) {
+                for card in cards {
+                    card.node(block: Self.block)
+                }
+            }
+        }
+    }
+}
 
 public struct DocsDisclosureSection: Sendable {
     public let id: String
@@ -54,8 +137,14 @@ public struct DocsDisclosureSection: Sendable {
                         HTML.text(title)
                     }
 
-                    HTML.span(["class": "\(block)__summary-text"]) {
-                        HTML.text(summary)
+                    HTML.span(["class": "\(block)__definition"]) {
+                        HTML.span(["class": "\(block)__definition-label"]) {
+                            HTML.text("Definitie")
+                        }
+
+                        HTML.span(["class": "\(block)__definition-text"]) {
+                            HTML.text(summary)
+                        }
                     }
                 }
 
@@ -64,8 +153,10 @@ public struct DocsDisclosureSection: Sendable {
                 }
             }
 
-            HTML.div(["class": "\(block)__content"]) {
-                body()
+            HTML.div(["class": "\(block)__content-clip", "data-docs-disclosure-content": ""]) {
+                HTML.div(["class": "\(block)__content"]) {
+                    body()
+                }
             }
         }
     }
@@ -289,6 +380,131 @@ public struct DocsDisclosureGroup: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(block)__content > :last-child",
                     CSS.decl("margin-bottom", "0")
+                ),
+
+                CSS.rule(
+                    ".\(block)__definition",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "5px"),
+                    CSS.decl("max-width", "760px"),
+                    CSS.decl("margin-top", "4px"),
+                    CSS.decl("padding", "10px 12px"),
+                    CSS.decl("border-left", "3px solid color-mix(in srgb, var(--link-color) 54%, var(--docs-disclosure-border))"),
+                    CSS.decl("border-radius", "12px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--link-color) 7%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__definition-label",
+                    CSS.decl("font-size", ".66rem"),
+                    CSS.decl("font-weight", "780"),
+                    CSS.decl("letter-spacing", ".12em"),
+                    CSS.decl("text-transform", "uppercase"),
+                    CSS.decl("color", "color-mix(in srgb, var(--link-color) 68%, var(--text-color))")
+                ),
+
+                CSS.rule(
+                    ".\(block)__definition-text",
+                    CSS.decl("font-size", ".96rem"),
+                    CSS.decl("font-weight", "590"),
+                    CSS.decl("line-height", "1.48"),
+                    CSS.decl("color", "var(--text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__content",
+                    CSS.decl("border-top", "0")
+                ),
+
+                CSS.rule(
+                    ".\(block)__content-clip",
+                    CSS.decl("max-height", "0"),
+                    CSS.decl("opacity", "0"),
+                    CSS.decl("overflow", "hidden"),
+                    CSS.decl("border-top", "1px solid var(--docs-disclosure-border)"),
+                    CSS.decl("transition", "max-height .34s cubic-bezier(.22, 1, .36, 1), opacity .22s ease")
+                ),
+
+                CSS.rule(
+                    ".\(block)__section[open] .\(block)__content-clip",
+                    CSS.decl("max-height", "2400px"),
+                    CSS.decl("opacity", "1")
+                ),
+
+                CSS.rule(
+                    ".\(block)__purpose",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "10px"),
+                    CSS.decl("margin", "18px 0")
+                ),
+
+                CSS.rule(
+                    ".\(block)__purpose-label",
+                    CSS.decl("margin", "0"),
+                    CSS.decl("font-size", ".68rem"),
+                    CSS.decl("font-weight", "780"),
+                    CSS.decl("letter-spacing", ".12em"),
+                    CSS.decl("text-transform", "uppercase"),
+                    CSS.decl("color", "var(--docs-disclosure-muted)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__purpose-grid",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "repeat(auto-fit, minmax(220px, 1fr))"),
+                    CSS.decl("gap", "10px")
+                ),
+
+                CSS.rule(
+                    ".\(block)__purpose-card",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "28px minmax(0, 1fr)"),
+                    CSS.decl("gap", "10px"),
+                    CSS.decl("align-items", "start"),
+                    CSS.decl("padding", "13px"),
+                    CSS.decl("border", "1px solid var(--docs-disclosure-border)"),
+                    CSS.decl("border-radius", "14px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--background-color) 88%, var(--text-color) 6%)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__purpose-card--positive",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--success, #2E8B57) 42%, var(--docs-disclosure-border))"),
+                    CSS.decl("background", "color-mix(in srgb, var(--success, #2E8B57) 8%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__purpose-card--caution",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--warning, #E7A94E) 45%, var(--docs-disclosure-border))"),
+                    CSS.decl("background", "color-mix(in srgb, var(--warning, #E7A94E) 9%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__purpose-marker",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("place-items", "center"),
+                    CSS.decl("width", "26px"),
+                    CSS.decl("height", "26px"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("font-weight", "820"),
+                    CSS.decl("background", "color-mix(in srgb, var(--success, #2E8B57) 15%, transparent)"),
+                    CSS.decl("color", "color-mix(in srgb, var(--success, #2E8B57) 78%, var(--text-color))")
+                ),
+
+                CSS.rule(
+                    ".\(block)__purpose-title",
+                    CSS.decl("margin", "0"),
+                    CSS.decl("font-size", ".93rem"),
+                    CSS.decl("line-height", "1.25"),
+                    CSS.decl("font-weight", "760")
+                ),
+
+                CSS.rule(
+                    ".\(block)__purpose-text",
+                    CSS.decl("margin", "5px 0 0"),
+                    CSS.decl("font-size", ".86rem"),
+                    CSS.decl("line-height", "1.45"),
+                    CSS.decl("color", "var(--docs-disclosure-muted)")
                 )
             ],
             media: [
@@ -310,4 +526,119 @@ public struct DocsDisclosureGroup: ReusableComponent, Sendable {
             ]
         )
     }
+}
+
+public struct DocsDisclosureGroupScript: ReusableComponent {
+    public init() {}
+
+    public var nodes: ReusableComponentNodes {
+        .init(
+            scripts: [
+                JSSource(Self.source).as_inline_script()
+            ]
+        )
+    }
+
+    private static let source = #"""
+    (() => {
+        if (window.wcDocsDisclosureGroup?.initialized) return;
+
+        const sectionSelector = '[data-docs-disclosure-section]';
+        const contentSelector = '[data-docs-disclosure-content]';
+
+        function contentFor(section) {
+            return section.querySelector(contentSelector);
+        }
+
+        function setHeight(section) {
+            const content = contentFor(section);
+            if (!content) return;
+
+            content.style.maxHeight = section.open
+                ? `${content.scrollHeight}px`
+                : '0px';
+        }
+
+        function openSection(section) {
+            const content = contentFor(section);
+            if (!content) return;
+
+            section.open = true;
+            content.style.maxHeight = '0px';
+            content.style.opacity = '0';
+
+            requestAnimationFrame(() => {
+                content.style.maxHeight = `${content.scrollHeight}px`;
+                content.style.opacity = '1';
+            });
+        }
+
+        function closeSection(section) {
+            const content = contentFor(section);
+            if (!content) return;
+
+            content.style.maxHeight = `${content.scrollHeight}px`;
+            content.style.opacity = '1';
+
+            requestAnimationFrame(() => {
+                content.style.maxHeight = '0px';
+                content.style.opacity = '0';
+            });
+
+            const finish = event => {
+                if (event.propertyName !== 'max-height') return;
+
+                content.removeEventListener('transitionend', finish);
+                section.open = false;
+            };
+
+            content.addEventListener('transitionend', finish);
+        }
+
+        function toggle(section) {
+            if (section.open) {
+                closeSection(section);
+            } else {
+                openSection(section);
+            }
+        }
+
+        function init(scope = document) {
+            const sections = scope.matches?.(sectionSelector)
+                ? [scope]
+                : Array.from(scope.querySelectorAll?.(sectionSelector) || []);
+
+            sections.forEach(section => {
+                section.setAttribute('data-docs-disclosure-animated', '');
+                setHeight(section);
+            });
+        }
+
+        document.addEventListener('click', event => {
+            const summary = event.target?.closest?.('summary');
+            if (!summary) return;
+
+            const section = summary.closest(sectionSelector);
+            if (!section) return;
+
+            event.preventDefault();
+            toggle(section);
+        });
+
+        window.addEventListener('resize', () => {
+            document.querySelectorAll(sectionSelector).forEach(setHeight);
+        });
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => init());
+        } else {
+            init();
+        }
+
+        window.wcDocsDisclosureGroup = {
+            initialized: true,
+            init
+        };
+    })();
+    """#
 }
