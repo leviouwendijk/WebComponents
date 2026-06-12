@@ -315,6 +315,53 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".dark-mode .\(ClassName.root)",
+                    CSS.decl("--wc-classical-timing-ink", "var(--text-color, #f4f4f5)"),
+                    CSS.decl("--wc-classical-timing-muted", "var(--muted-text-color, rgba(244, 244, 245, .68))"),
+                    CSS.decl("--wc-classical-timing-border", "var(--border-color, rgba(255, 255, 255, .13))"),
+                    CSS.decl("--wc-classical-timing-surface", "var(--surface-color, #1b1c1f)")
+                ),
+
+                CSS.rule(
+                    ".dark-mode .\(ClassName.stage)",
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, #1b1c1f) 96%, var(--text-color, #f4f4f5) 4%)"),
+                    CSS.decl("box-shadow", "0 18px 40px rgba(0, 0, 0, .28)")
+                ),
+
+                CSS.rule(
+                    ".dark-mode .\(ClassName.rail)::before",
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-classical-timing-ink) 18%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".dark-mode .\(ClassName.timelineTrack)::before",
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-classical-timing-ink) 13%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".dark-mode .\(ClassName.block)",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--wc-classical-timing-ink) 22%, transparent)"),
+                    CSS.decl("box-shadow", "0 4px 14px rgba(0, 0, 0, .18)")
+                ),
+
+                CSS.rule(
+                    ".dark-mode .\(ClassName.block)--stimulus",
+                    CSS.decl("background", "repeating-linear-gradient(135deg, color-mix(in srgb, var(--wc-classical-timing-ink) 16%, transparent), color-mix(in srgb, var(--wc-classical-timing-ink) 16%, transparent) 2px, color-mix(in srgb, var(--surface-color, #1b1c1f) 90%, var(--wc-classical-timing-ink) 10%) 2px, color-mix(in srgb, var(--surface-color, #1b1c1f) 90%, var(--wc-classical-timing-ink) 10%) 6px)")
+                ),
+
+                CSS.rule(
+                    ".dark-mode .\(ClassName.block)--consequence",
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, #1b1c1f) 72%, var(--wc-classical-timing-ink) 28%)")
+                ),
+
+                CSS.rule(
+                    ".dark-mode .\(ClassName.predictiveMeter)",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--wc-classical-timing-ink) 18%, transparent)"),
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, #1b1c1f) 86%, var(--wc-classical-timing-ink) 8%)"),
+                    CSS.decl("box-shadow", "inset 0 0 0 1px rgba(255, 255, 255, .04)")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.stage)",
                     CSS.decl("position", "relative"),
                     CSS.decl("overflow", "hidden"),
