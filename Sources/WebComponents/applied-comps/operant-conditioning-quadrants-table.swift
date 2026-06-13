@@ -48,9 +48,12 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
     public let caption: String?
     public let includeStyles: Bool
 
+    public static let defaultCaption =
+        "Positief en negatief betekenen aanwezigheid en afwezigheid (toevoeging of opheffing), van een aantrekker (appetetief) of een afstoter (aversief). Door deze te combineren ontstaan er vier mogelijke opties (ook wel 'kwadranten' genoemd): +R, -R, +P, -P. Daarin verwijst 'R' naar 'reinforcement', ofwel versterking/bekrachtiging en verwijst 'P' naar 'punishment', ofwel ontkrachting/verzwakking. Elk van de vier kwadranten is een specifiek effect dat een uitkomst (feedback-prikkel) heeft op een gemaakte keuze/reactie/gedragsuiting."
+
     public init(
         id: String = "operant-conditioning-quadrants",
-        caption: String? = "Positief en negatief betekenen aanwezigheid en afwezigheid (toevoeging of opheffing), van een aantrekker (appetetief) of een afstoter (aversief). Door deze te combineren ontstaan er vier mogelijke opties (ook wel 'kwadranten' genoemd): +R, -R, +P, -P. Daarin verwijst 'R' naar 'reinforcement', ofwel versterking/bekrachtiging en verwijst 'P' naar 'punishment', ofwel ontkrachting/verzwakking. Elk van de vier kwadranten is een specifiek effect dat een uitkomst (feedback-prikkel) heeft op een gemaakte keuze/reactie/gedragsuiting.",
+        caption: String? = Self.defaultCaption,
         includeStyles: Bool = true
     ) {
         self.id = id
@@ -76,7 +79,7 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
 
     public static func figure_node(
         id: String = "operant-conditioning-quadrants",
-        caption: String? = nil
+        caption: String? = Self.defaultCaption
     ) -> any HTMLNode {
         HTML.figure(
             [
