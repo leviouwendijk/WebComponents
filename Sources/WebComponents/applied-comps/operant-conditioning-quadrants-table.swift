@@ -319,18 +319,18 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
 
             axis(
                 title: "Versterkt keuze",
-                note: "gedrag neemt toe"
+                note: "gedrag neemt toe in frequentie"
             )
 
             axis(
                 title: "Verzwakt keuze",
-                note: "gedrag neemt af"
+                note: "gedrag neemt af in frequentie"
             )
 
             rowHead(
                 sign: "+",
-                title: "Toevoegen",
-                note: "er komt iets bij"
+                title: "Activatie",
+                note: "toevoeging"
             )
 
             quadrantCell(.positive_reinforcement)
@@ -338,8 +338,8 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
 
             rowHead(
                 sign: "-",
-                title: "Wegnemen",
-                note: "er valt iets weg"
+                title: "Deactivatie",
+                note: "opheffing"
             )
 
             quadrantCell(.negative_reinforcement)
