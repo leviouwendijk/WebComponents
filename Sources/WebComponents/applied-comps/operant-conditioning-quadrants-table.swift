@@ -435,13 +435,13 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
     ) -> String {
         switch quadrant {
         case .positive_reinforcement:
-            return "Toegang tot een motivator wordt toegevoegd."
+            return "Toegang tot een motivator wordt verkregen als gevolg van de keuze."
         case .negative_reinforcement:
-            return "Een demotivator, druk of ongemak wordt weggenomen."
+            return "Een demotivator, druk of ongemak wordt weggenomen (ontsnapping) als gevolg van de keuze."
         case .positive_punishment:
-            return "Een demotivator, druk of ongemak wordt toegevoegd."
+            return "Een demotivator, druk of ongemak wordt geactiveerd (vermijdbaar, niet-ontsnapbaar) als gevolg van de keuze."
         case .negative_punishment:
-            return "Toegang tot een motivator wordt weggenomen."
+            return "Toegang tot een motivator wordt verloren als gevolg van de keuze."
         }
     }
 
@@ -450,9 +450,9 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
     ) -> String {
         switch quadrant {
         case .positive_reinforcement, .negative_reinforcement:
-            return "De keuze wordt waarschijnlijker."
+            return "De keuze wordt na deze ervaring waarschijnlijker."
         case .positive_punishment, .negative_punishment:
-            return "De keuze wordt minder waarschijnlijk."
+            return "De keuze wordt na deze ervaring minder waarschijnlijk."
         }
     }
 }
