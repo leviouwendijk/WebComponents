@@ -16,22 +16,13 @@ public struct DocsCategoryNavScript: ReusableComponent {
     (() => {
         if (window.wcDocsCategoryNav?.initialized) return;
 
-        const rootSelector = '.wc-docs-category-nav, .docs-category-nav';
-        const scrollerSelector = '.wc-docs-category-nav__inner, .docs-category-nav__inner';
-        const trackSelector = '.wc-docs-category-nav__track, .docs-category-nav__track';
-        const activeSelector = '.wc-docs-category-nav__link[aria-current="page"], .docs-category-nav__link[aria-current="page"]';
-        const linkSelector = '.wc-docs-category-nav__link, .docs-category-nav__link';
+        const rootSelector = '.docs-category-nav, .wc-docs-category-nav';
+        const scrollerSelector = '.docs-category-nav__inner, .wc-docs-category-nav__inner';
+        const activeSelector = '.docs-category-nav__link[aria-current="page"], .wc-docs-category-nav__link[aria-current="page"]';
+        const linkSelector = '.docs-category-nav__link, .wc-docs-category-nav__link';
 
         function clamp(value, min, max) {
             return Math.max(min, Math.min(max, value));
-        }
-
-        function scrollerFor(root) {
-            return root?.querySelector?.(scrollerSelector) || null;
-        }
-
-        function activeFor(root) {
-            return root?.querySelector?.(activeSelector) || null;
         }
 
         function maxScrollLeft(scroller) {
@@ -52,24 +43,14 @@ public struct DocsCategoryNavScript: ReusableComponent {
             );
         }
 
-        function centerError(scroller, item) {
-            const scrollerRect = scroller.getBoundingClientRect();
-            const itemRect = item.getBoundingClientRect();
+        function centerItem(item, behavior = 'auto') {
+            if (!item) return false;
 
-            const scrollerCenter = scrollerRect.left + (scrollerRect.width / 2);
-            const itemCenter = itemRect.left + (itemRect.width / 2);
+            const root = item.closest(rootSelector);
+            const scroller = root?.querySelector?.(scrollerSelector);
 
-            return itemCenter - scrollerCenter;
-        }
-
-        function centerItem(root, item, behavior = 'auto') {
-            if (!root || !item) return false;
-
-            const scroller = scrollerFor(root);
-            if (!scroller) return false;
-
-            const max = maxScrollLeft(scroller);
-            if (max <= 0) return false;
+            if (!root || !scroller) return false;
+            if (maxScrollLeft(scroller) <= 0) return false;
 
             scroller.scrollTo({
                 left: targetScrollLeft(scroller, item),
@@ -79,142 +60,88 @@ public struct DocsCategoryNavScript: ReusableComponent {
             return true;
         }
 
-        function centerActive(root, behavior = 'auto') {
-            const active = activeFor(root);
-            return centerItem(root, active, behavior);
-        }
-
-        function centerAll(behavior = 'auto') {
+        function centerActive(behavior = 'auto') {
             document.querySelectorAll(rootSelector).forEach((root) => {
-                centerActive(root, behavior);
+                centerItem(root.querySelector(activeSelector), behavior);
             });
         }
 
-        function settleRoot(root, attempts = 10) {
+        function settleActive() {
             let count = 0;
 
             const tick = () => {
-                const scroller = scrollerFor(root);
-                const active = activeFor(root);
-
-                if (!scroller || !active) return;
-
-                centerItem(root, active, 'auto');
-
+                centerActive('auto');
                 count += 1;
 
-                const max = maxScrollLeft(scroller);
-                const atStart = scroller.scrollLeft <= 1;
-                const atEnd = scroller.scrollLeft >= max - 1;
-                const cannotCenter = atStart || atEnd;
-                const stillOff = Math.abs(centerError(scroller, active)) > 8;
-
-                if (count < attempts && stillOff && !cannotCenter) {
-                    window.requestAnimationFrame(tick);
+                if (count < 14) {
+                    window.setTimeout(() => {
+                        window.requestAnimationFrame(tick);
+                    }, count < 4 ? 32 : 90);
                 }
             };
 
             window.requestAnimationFrame(tick);
         }
 
-        function settleAll() {
-            document.querySelectorAll(rootSelector).forEach((root) => {
-                settleRoot(root);
-            });
+        function bindClicks() {
+            document.addEventListener(
+                'click',
+                (event) => {
+                    const link = event.target?.closest?.(linkSelector);
+                    if (!link) return;
+
+                    centerItem(link, 'smooth');
+                },
+                true
+            );
         }
 
-        function schedule(delay = 0) {
-            const run = () => {
-                window.requestAnimationFrame(settleAll);
-            };
-
-            if (delay > 0) {
-                window.setTimeout(run, delay);
-            } else {
-                run();
-            }
-        }
-
-        function bindFocusCentering() {
+        function bindFocus() {
             document.addEventListener(
                 'focusin',
                 (event) => {
                     const link = event.target?.closest?.(linkSelector);
                     if (!link) return;
 
-                    const root = link.closest(rootSelector);
-                    centerItem(root, link, 'smooth');
+                    centerItem(link, 'smooth');
                 },
                 true
             );
         }
 
-        function bindResizeCentering() {
-            let resizeTimer = 0;
+        function bindViewportChanges() {
+            let timer = 0;
 
-            const recenter = () => {
-                window.clearTimeout(resizeTimer);
-                resizeTimer = window.setTimeout(() => {
-                    schedule();
-                }, 80);
+            const schedule = () => {
+                window.clearTimeout(timer);
+                timer = window.setTimeout(settleActive, 80);
             };
 
-            window.addEventListener('resize', recenter, { passive: true });
-            window.visualViewport?.addEventListener?.('resize', recenter, { passive: true });
-            window.visualViewport?.addEventListener?.('scroll', recenter, { passive: true });
-        }
-
-        function bindLayoutObservers() {
-            if (!('ResizeObserver' in window)) return;
-
-            const observer = new ResizeObserver(() => {
-                schedule();
-            });
-
-            document.querySelectorAll(rootSelector).forEach((root) => {
-                const scroller = scrollerFor(root);
-                const track = root.querySelector(trackSelector);
-
-                if (scroller) observer.observe(scroller);
-                if (track) observer.observe(track);
-            });
+            window.addEventListener('resize', schedule, { passive: true });
+            window.visualViewport?.addEventListener?.('resize', schedule, { passive: true });
+            window.visualViewport?.addEventListener?.('scroll', schedule, { passive: true });
         }
 
         function init() {
-            bindFocusCentering();
-            bindResizeCentering();
-            bindLayoutObservers();
+            bindClicks();
+            bindFocus();
+            bindViewportChanges();
 
-            schedule();
-            schedule(80);
-            schedule(180);
-            schedule(360);
-            schedule(700);
+            settleActive();
 
-            if (document.readyState !== 'complete') {
-                window.addEventListener(
-                    'load',
-                    () => schedule(),
-                    { once: true }
-                );
-            }
-
-            window.addEventListener('pageshow', () => {
-                schedule();
-                schedule(120);
-                schedule(420);
-            });
+            window.addEventListener('load', settleActive, { once: true });
+            window.addEventListener('pageshow', settleActive);
 
             document.fonts?.ready
-                ?.then(() => schedule())
+                ?.then(settleActive)
                 ?.catch(() => {});
         }
 
         window.wcDocsCategoryNav = {
             initialized: true,
             init,
-            center: centerAll,
-            settle: settleAll
+            center: centerActive,
+            settle: settleActive
         };
 
         if (document.readyState === 'loading') {
