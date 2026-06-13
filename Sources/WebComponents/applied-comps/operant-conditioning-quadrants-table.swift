@@ -50,7 +50,7 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
 
     public init(
         id: String = "operant-conditioning-quadrants",
-        caption: String? = "Positief en negatief gaan over toevoegen of wegnemen van een aantrekker of een afstoter; versterking en ontkrachting gaan over het effect de uitkomst heeft op de keuze/reactie.",
+        caption: String? = "Positief en negatief betekenen aanwezigheid en afwezigheid (toevoeging of opheffing), van een aantrekker (appetetief) of een afstoter (aversief). Door deze te combineren ontstaan er vier mogelijke opties (ook wel 'kwadranten' genoemd): +R, -R, +P, -P. Daarin verwijst 'R' naar 'reinforcement', ofwel versterking/bekrachtiging en verwijst 'P' naar 'punishment', ofwel ontkrachting/verzwakking. Elk van de vier kwadranten is een specifiek effect dat een uitkomst (feedback-prikkel) heeft op een gemaakte keuze/reactie/gedragsuiting.",
         includeStyles: Bool = true
     ) {
         self.id = id
@@ -489,13 +489,13 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
     ) -> String {
         switch quadrant {
         case .positive_reinforcement:
-            return "Beloning"
+            return "Beloning/Zelfloning"
         case .negative_reinforcement:
-            return "Verlichting"
+            return "Verlichting/Opluchting"
         case .positive_punishment:
-            return "Correctie"
+            return "Correctie/Bestraffing"
         case .negative_punishment:
-            return "Verlies"
+            return "Verlies/Frustratie"
         }
     }
 
@@ -506,9 +506,9 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
         case .positive_reinforcement:
             return "Toegang tot een motivator wordt verkregen als gevolg van de keuze."
         case .negative_reinforcement:
-            return "Een demotivator, druk of ongemak wordt weggenomen (ontsnapping) als gevolg van de keuze."
+            return "Een demotivator, druk of ongemak wordt weggenomen (ontsnapt) als gevolg van de keuze."
         case .positive_punishment:
-            return "Een demotivator, druk of ongemak wordt geactiveerd (vermijdbaar, niet-ontsnapbaar) als gevolg van de keuze."
+            return "Een demotivator, druk of ongemak wordt geactiveerd (vermijdbaar, maar niet-ontsnapbaar) als gevolg van de keuze."
         case .negative_punishment:
             return "Toegang tot een motivator wordt verloren als gevolg van de keuze."
         }

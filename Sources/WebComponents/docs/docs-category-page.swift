@@ -140,6 +140,7 @@ public struct DocsCategoryPage: ReusableComponent {
         out += DocsThemeScript().nodes.scripts
         out += DocsMobileTOCMenuScript().nodes.scripts
         out += DocsScrollSpyScript().nodes.scripts
+        out += DocsCategoryNavScript().nodes.scripts
         out += content.scripts
         return out
     }
