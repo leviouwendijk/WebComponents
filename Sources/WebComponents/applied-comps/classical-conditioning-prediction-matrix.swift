@@ -650,37 +650,37 @@ public struct ClassicalConditioningPredictionMatrix: ReusableComponent, Sendable
         HTML.div([ "class": ClassName.status ]) {
             HTML.div([ "class": ClassName.statusHeader ]) {
                 HTML.div([ "class": ClassName.statusTitle ]) {
-                    HTML.text("Leerstatus: verwachting in beweging")
+                    HTML.text("Staten van Koppeling")
                 }
 
                 HTML.div([ "class": ClassName.statusText ]) {
-                    HTML.text("Acquisitie, asymptoot en extinctie beschrijven niet het soort verwachting, maar de fase waarin die verwachting wordt opgebouwd, stabiel wordt of weer daalt.")
+                    HTML.text("Acquisitie, asymptoot en extinctie beschrijven de verwachting tegenover het gevolg. Ofwel: in hoeverre is wat de hond verwacht dat er gebeuren gaat (na de prikkel) in overeenkomst met het werkelijke gevolg?")
                 }
             }
 
             HTML.div([ "class": ClassName.statusGrid ]) {
                 statusCard(
                     kicker: "prediction error",
-                    title: "Verwachting klopt nog niet",
+                    title: "Verwachting klopt niet",
                     text: "Er is verschil tussen wat de hond verwacht en wat er gebeurt."
                 )
 
                 statusCard(
                     kicker: "acquisitie",
-                    title: "Verwachting wordt geleerd",
-                    text: "De prikkel krijgt steeds meer voorspellende betekenis."
+                    title: "Meer verwachting ontstaat",
+                    text: "De prikkel krijgt meer voorspellende betekenis door het gevolg (toename in saillantie)."
                 )
 
                 statusCard(
                     kicker: "asymptoot",
                     title: "Verwachting past bij patroon",
-                    text: "De voorspelling is stabiel omdat de uitkomst betrouwbaar volgt."
+                    text: "De verwacthing komt overeen met het gevolg (stabiele prikkel-gevolg-relatie)."
                 )
 
                 statusCard(
                     kicker: "extinctie",
                     title: "CS+ zonder US",
-                    text: "Een eerder geleerde verwachting daalt wanneer het gevolg uitblijft."
+                    text: "De prikkel krijgt minder voorspellende betekenis door het gevolg (afname van saillantie)."
                 )
             }
         }

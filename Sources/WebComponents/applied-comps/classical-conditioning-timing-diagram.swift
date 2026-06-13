@@ -208,6 +208,8 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
         static let timelineDot = "wc-classical-timing__timeline-dot"
         static let notes = "wc-classical-timing__notes"
         static let note = "wc-classical-timing__note"
+        static let noteLabel = "wc-classical-timing__note-label"
+        static let noteBody = "wc-classical-timing__note-body"
         static let caption = "wc-classical-timing__caption"
     }
 
@@ -776,20 +778,32 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.notes)",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "6px"),
+                    CSS.decl("gap", "8px"),
                     CSS.decl("margin-top", "16px")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.note)",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "clamp(112px, 16vw, 170px) minmax(0, 1fr)"),
+                    CSS.decl("column-gap", "10px"),
+                    CSS.decl("align-items", "start"),
                     CSS.decl("font-size", ".84rem"),
                     CSS.decl("line-height", "1.42"),
                     CSS.decl("color", "var(--wc-classical-timing-muted)")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.note) strong",
-                    CSS.decl("color", "var(--wc-classical-timing-ink)")
+                    ".\(ClassName.noteLabel)",
+                    CSS.decl("display", "block"),
+                    CSS.decl("font-weight", "700"),
+                    CSS.decl("color", "var(--wc-classical-timing-ink)"),
+                    CSS.decl("white-space", "nowrap")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.noteBody)",
+                    CSS.decl("min-width", "0")
                 ),
 
                 CSS.rule(
@@ -1044,11 +1058,13 @@ public struct ClassicalConditioningTimingDiagram: ReusableComponent, Sendable {
         HTML.div([ "class": ClassName.notes ]) {
             for arrangement in arrangements {
                 HTML.div([ "class": ClassName.note ]) {
-                    HTML.el("strong") {
-                        HTML.text("\(arrangement.title): ")
+                    HTML.strong([ "class": ClassName.noteLabel ]) {
+                        HTML.text("\(arrangement.title):")
                     }
 
-                    HTML.text(arrangement.note)
+                    HTML.span([ "class": ClassName.noteBody ]) {
+                        HTML.text(arrangement.note)
+                    }
                 }
             }
         }
