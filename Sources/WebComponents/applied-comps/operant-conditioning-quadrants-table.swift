@@ -3,6 +3,20 @@ import CSS
 import HTML
 
 public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
+    private enum OutcomeDomain: String, Sendable {
+        case appetitive
+        case aversive
+
+        var title: String {
+            switch self {
+            case .appetitive:
+                return "Appetitief"
+            case .aversive:
+                return "Aversief"
+            }
+        }
+    }
+
     private enum ClassName {
         static let root = "wc-operant-quadrants"
         static let stage = "wc-operant-quadrants__stage"
@@ -21,7 +35,9 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
         static let rowTitle = "wc-operant-quadrants__row-title"
         static let rowNote = "wc-operant-quadrants__row-note"
         static let cell = "wc-operant-quadrants__cell"
+        static let badges = "wc-operant-quadrants__badges"
         static let code = "wc-operant-quadrants__code"
+        static let badge = "wc-operant-quadrants__badge"
         static let cellTitle = "wc-operant-quadrants__cell-title"
         static let cellText = "wc-operant-quadrants__cell-text"
         static let cellMeta = "wc-operant-quadrants__cell-meta"
@@ -107,7 +123,9 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
                     CSS.decl("--wc-operant-quadrants-surface", "var(--surface-color, #fff)"),
                     CSS.decl("--wc-operant-quadrants-soft", "var(--surface-soft-color, #f1f5f9)"),
                     CSS.decl("--wc-operant-quadrants-good", "var(--success, #2E8B57)"),
-                    CSS.decl("--wc-operant-quadrants-bad", "var(--danger, #D64545)")
+                    CSS.decl("--wc-operant-quadrants-bad", "var(--danger, #D64545)"),
+                    CSS.decl("--wc-operant-quadrants-appetitive", "var(--success, #2E8B57)"),
+                    CSS.decl("--wc-operant-quadrants-aversive", "var(--danger, #D64545)")
                 ),
 
                 CSS.rule(
@@ -248,15 +266,42 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.code)",
+                    ".\(ClassName.badges)",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("flex-wrap", "wrap"),
+                    CSS.decl("gap", "6px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.code), .\(ClassName.badge)",
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("align-items", "center"),
                     CSS.decl("width", "fit-content"),
                     CSS.decl("padding", "4px 8px"),
                     CSS.decl("border-radius", "999px"),
-                    CSS.decl("font-family", "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"),
-                    CSS.decl("font-size", ".8rem"),
-                    CSS.decl("font-weight", "800"),
+                    CSS.decl("font-size", ".74rem"),
+                    CSS.decl("font-weight", "820"),
+                    CSS.decl("letter-spacing", ".02em"),
                     CSS.decl("color", "var(--wc-operant-quadrants-ink)"),
                     CSS.decl("background", "color-mix(in srgb, var(--wc-operant-quadrants-ink) 8%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.code)",
+                    CSS.decl("font-family", "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"),
+                    CSS.decl("font-size", ".8rem")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.badge)--appetitive",
+                    CSS.decl("color", "var(--wc-operant-quadrants-appetitive)"),
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-operant-quadrants-appetitive) 12%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.badge)--aversive",
+                    CSS.decl("color", "var(--wc-operant-quadrants-aversive)"),
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-operant-quadrants-aversive) 10%, transparent)")
                 ),
 
                 CSS.rule(
@@ -303,7 +348,7 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
             }
 
             HTML.p([ "class": ClassName.lead ]) {
-                HTML.text("De termen positief en negatief betekenen hier: iets wordt toegevoegd of weggenomen. Bekrachtiging maakt een keuze waarschijnlijker; bestraffing maakt een keuze minder waarschijnlijk.")
+                HTML.text("Positief en negatief zeggen of een uitkomst wordt geactiveerd of opgeheven. Versterking en ontkrachting zeggen of de keuze daarna toe- of afneemt. Appetitief en aversief zeggen of die uitkomst om een aantrekker of afstoter draait.")
             }
         }
     }
@@ -385,9 +430,22 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
     private static func quadrantCell(
         _ quadrant: OperantQuadrant
     ) -> any HTMLNode {
-        HTML.div([ "class": "\(ClassName.cell) \(ClassName.cell)--\(familyClass(quadrant))" ]) {
-            HTML.span([ "class": ClassName.code ]) {
-                HTML.text(quadrant.code)
+        let domain = outcomeDomain(quadrant)
+
+        return HTML.div(
+            [
+                "class": "\(ClassName.cell) \(ClassName.cell)--\(familyClass(quadrant)) \(ClassName.cell)--\(domain.rawValue)",
+                "aria-label": "\(quadrant.code), \(domain.title): \(title(quadrant))"
+            ]
+        ) {
+            HTML.div([ "class": ClassName.badges ]) {
+                HTML.span([ "class": ClassName.code ]) {
+                    HTML.text(quadrant.code)
+                }
+
+                HTML.span([ "class": "\(ClassName.badge) \(ClassName.badge)--\(domain.rawValue)" ]) {
+                    HTML.text(domain.title)
+                }
             }
 
             HTML.div([ "class": ClassName.cellTitle ]) {
@@ -401,6 +459,17 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
             HTML.div([ "class": ClassName.cellMeta ]) {
                 HTML.text(effect(quadrant))
             }
+        }
+    }
+
+    private static func outcomeDomain(
+        _ quadrant: OperantQuadrant
+    ) -> OutcomeDomain {
+        switch quadrant {
+        case .positive_reinforcement, .negative_punishment:
+            return .appetitive
+        case .positive_punishment, .negative_reinforcement:
+            return .aversive
         }
     }
 

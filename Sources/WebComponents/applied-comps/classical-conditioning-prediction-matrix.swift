@@ -514,15 +514,15 @@ public struct ClassicalConditioningPredictionMatrix: ReusableComponent, Sendable
     private static func header() -> any HTMLNode {
         HTML.div([ "class": ClassName.header ]) {
             HTML.p([ "class": ClassName.eyebrow ]) {
-                HTML.text("Klassieke conditionering · voorspelling")
+                HTML.text("Klassieke conditionering · verwachting")
             }
 
             HTML.el("h3", [ "class": ClassName.title ]) {
-                HTML.text("CS+ en CS−: welke verwachting krijgt de prikkel?")
+                HTML.text("Verwachting van gevolg tegenover realiteit")
             }
 
             HTML.p([ "class": ClassName.lead ]) {
-                HTML.text("Excitatoir en inhibitoir zeggen of een prikkel de verwachting van een gevolg verhoogt of verlaagt. Appetitief en aversief zeggen welk soort gevolg wordt verwacht.")
+                HTML.text("Excitatoir (aansporend) en inhibitoir (remmend) zeggen of een prikkel de verwachting van een gevolg verhoogt of verlaagt. Appetitief en aversief zeggen welk soort gevolg wordt verwacht.")
             }
         }
     }
