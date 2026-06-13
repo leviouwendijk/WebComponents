@@ -2,6 +2,9 @@ import Constructors
 import CSS
 import HTML
 
+// maybe add a note about:
+// vermijding can take place in fight, flight, avoidance
+
 public enum DriveObstacleTarget: String, Sendable, CaseIterable {
     case afstoter
     case aantrekker

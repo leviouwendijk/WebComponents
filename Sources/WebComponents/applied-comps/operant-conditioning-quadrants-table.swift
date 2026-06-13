@@ -34,7 +34,7 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
 
     public init(
         id: String = "operant-conditioning-quadrants",
-        caption: String? = "De vier operante kwadranten combineren twee vragen: komt er iets bij of valt er iets weg, en wordt de keuze daarna waarschijnlijker of minder waarschijnlijk?",
+        caption: String? = "Positief en negatief gaan over toevoegen of wegnemen van een aantrekker of een afstoter; versterking en ontkrachting gaan over het effect de uitkomst heeft op de keuze/reactie.",
         includeStyles: Bool = true
     ) {
         self.id = id
@@ -170,7 +170,7 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.corner), .\(ClassName.axis), .\(ClassName.rowHead), .\(ClassName.cell)",
+                    ".\(ClassName.axis), .\(ClassName.rowHead), .\(ClassName.cell)",
                     CSS.decl("border", "1px solid var(--wc-operant-quadrants-border)"),
                     CSS.decl("border-radius", "16px"),
                     CSS.decl("background", "color-mix(in srgb, var(--wc-operant-quadrants-surface) 92%, transparent)")
@@ -178,15 +178,7 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(ClassName.corner)",
-                    CSS.decl("display", "grid"),
-                    CSS.decl("place-items", "center"),
-                    CSS.decl("min-height", "86px"),
-                    CSS.decl("padding", "12px"),
-                    CSS.decl("font-size", ".78rem"),
-                    CSS.decl("font-weight", "800"),
-                    CSS.decl("letter-spacing", ".08em"),
-                    CSS.decl("text-transform", "uppercase"),
-                    CSS.decl("color", "var(--wc-operant-quadrants-muted)")
+                    CSS.decl("min-height", "0")
                 ),
 
                 CSS.rule(
@@ -320,12 +312,10 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
         HTML.div(
             [
                 "class": ClassName.matrix,
-                "aria-label": "Operante kwadranten"
+                "aria-label": "Operante kwadranten",
             ]
         ) {
-            HTML.div([ "class": ClassName.corner ]) {
-                HTML.text("uitkomst")
-            }
+            HTML.div(["class": ClassName.corner, "aria-hidden": "true"]) {}
 
             axis(
                 title: "Versterkt keuze",
