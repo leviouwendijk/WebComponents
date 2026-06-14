@@ -49,7 +49,10 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
     public let includeStyles: Bool
 
     public static let defaultCaption =
-        "Positief en negatief betekenen aanwezigheid en afwezigheid (toevoeging of opheffing), van een aantrekker (appetetief) of een afstoter (aversief). Door deze te combineren ontstaan er vier mogelijke opties (ook wel 'kwadranten' genoemd): +R, -R, +P, -P. Daarin verwijst 'R' naar 'reinforcement', ofwel versterking/bekrachtiging en verwijst 'P' naar 'punishment', ofwel ontkrachting/verzwakking. Elk van de vier kwadranten is een specifiek effect dat een uitkomst (feedback-prikkel) heeft op een gemaakte keuze/reactie/gedragsuiting."
+        "De vier operante kwadranten ordenen uitkomsten naar richting en effect: +R en -R versterken gedrag; +P en -P verzwakken gedrag."
+
+    // public static let defaultCaption =
+    //     "Positief en negatief betekenen aanwezigheid en afwezigheid (toevoeging of opheffing), van een aantrekker (appetetief) of een afstoter (aversief). Door deze te combineren ontstaan er vier mogelijke opties (ook wel 'kwadranten' genoemd): +R, -R, +P, -P. Daarin verwijst 'R' naar 'reinforcement', ofwel versterking/bekrachtiging en verwijst 'P' naar 'punishment', ofwel ontkrachting/verzwakking. Elk van de vier kwadranten is een specifiek effect dat een uitkomst (feedback-prikkel) heeft op een gemaakte keuze/reactie/gedragsuiting."
 
     public init(
         id: String = "operant-conditioning-quadrants",
@@ -350,8 +353,12 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
                 HTML.text("Vier manieren waarop uitkomsten gedrag vormen")
             }
 
-            HTML.p([ "class": ClassName.lead ]) {
-                HTML.text("Positief en negatief zeggen of een uitkomst wordt geactiveerd of opgeheven. Versterking en ontkrachting zeggen of de keuze daarna toe- of afneemt. Appetitief en aversief zeggen of die uitkomst om een aantrekker of afstoter draait.")
+            HTML.p(["class": ClassName.lead]) {
+                // HTML.text("Positief en negatief zeggen of een uitkomst wordt geactiveerd of opgeheven. Versterking en ontkrachting zeggen of de keuze daarna toe- of afneemt. Appetitief en aversief zeggen of die uitkomst om een aantrekker of afstoter draait.")
+
+                HTML.text(
+                    "Positief en negatief betekenen aanwezigheid en afwezigheid (toevoeging of opheffing), van een aantrekker (appetetief) of een afstoter (aversief). Door deze te combineren ontstaan er vier mogelijke opties (ook wel 'kwadranten' genoemd): +R, -R, +P, -P. Daarin verwijst 'R' naar 'reinforcement', ofwel versterking/bekrachtiging en verwijst 'P' naar 'punishment', ofwel ontkrachting/verzwakking. Elk van de vier kwadranten is een specifiek effect dat een uitkomst (feedback-prikkel) heeft op een gemaakte keuze/reactie/gedragsuiting."
+                )
             }
         }
     }
