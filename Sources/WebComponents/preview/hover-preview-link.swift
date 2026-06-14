@@ -387,8 +387,21 @@ public struct HoverPreviewLink: SelectableComponent {
                     ),
                     CSS.rule(
                         card,
-                        CSS.decl("width", "min(360px, calc(100vw - 32px))"),
-                        CSS.decl("min-width", "0")
+                        CSS.decl("position", "fixed"),
+                        CSS.decl("left", "max(14px, env(safe-area-inset-left))"),
+                        CSS.decl("right", "max(14px, env(safe-area-inset-right))"),
+                        CSS.decl("bottom", "calc(88px + env(safe-area-inset-bottom))"),
+                        CSS.decl("width", "auto"),
+                        CSS.decl("min-width", "0"),
+                        CSS.decl("max-width", "none"),
+                        CSS.decl("max-height", "min(52vh, 420px)"),
+                        CSS.decl("overflow", "auto"),
+                        CSS.decl("transform", "translateY(8px) scale(.985)"),
+                        CSS.decl("transform-origin", "center bottom")
+                    ),
+                    CSS.rule(
+                        "\(root):hover \(card), \(root):focus-within \(card)",
+                        CSS.decl("transform", "translateY(0) scale(1)")
                     ),
                     CSS.rule(
                         "\(card)::after",
