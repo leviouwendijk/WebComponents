@@ -132,6 +132,7 @@ public struct HoverPreviewLink: SelectableComponent {
                 CSS.rule(
                     root,
                     CSS.decl("position", "relative"),
+                    CSS.decl("z-index", "0"),
                     CSS.decl("display", "inline-flex"),
                     CSS.decl("align-items", "baseline"),
                     CSS.decl("isolation", "isolate"),
@@ -142,6 +143,11 @@ public struct HoverPreviewLink: SelectableComponent {
                     CSS.decl("--wc-hover-preview-ink", "var(--text-color, #202124)"),
                     CSS.decl("--wc-hover-preview-muted", "var(--muted-text-color, rgba(32, 33, 36, .66))"),
                     CSS.decl("--wc-hover-preview-accent", "var(--link-color, #2563eb)")
+                ),
+
+                CSS.rule(
+                    "\(root):hover, \(root):focus-within",
+                    CSS.decl("z-index", "var(--wc-hover-preview-z)")
                 ),
 
                 CSS.rule(

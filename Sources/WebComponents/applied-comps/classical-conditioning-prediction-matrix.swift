@@ -564,7 +564,7 @@ public struct ClassicalConditioningPredictionMatrix: ReusableComponent, Sendable
                 domain: .appetitive,
                 title: "Beloning of toegang blijft uit",
                 text: "De prikkel remt de verwachting dat voer, spel, aandacht, vrijheid of toegang beschikbaar wordt.",
-                meta: "Typische richting: no-access, frustratie of afname van benadering."
+                meta: "Typische richting: onthouding, frustratie of afname van benadering."
             )
 
             cell(
