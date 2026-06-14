@@ -383,10 +383,11 @@ public struct HoverPreviewLink: SelectableComponent {
                     "(max-width: 640px)",
                     CSS.rule(
                         root,
-                        CSS.decl("position", "static")
+                        CSS.decl("position", "relative")
                     ),
                     CSS.rule(
                         card,
+                        CSS.decl("position", "fixed"),
                         CSS.decl("left", "16px"),
                         CSS.decl("right", "16px"),
                         CSS.decl("bottom", "auto"),
