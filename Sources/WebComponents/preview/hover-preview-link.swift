@@ -47,7 +47,14 @@ public struct HoverPreviewLink: SelectableComponent {
                                 }
                             }
 
-                            HTML.span(["class": "\(Self.block)__title"]) {
+                            HTML.a(
+                                href,
+                                [
+                                    "class": "\(Self.block)__title",
+                                    "target": "_blank",
+                                    "rel": "noopener noreferrer"
+                                ]
+                            ) {
                                 HTML.text(preview.title)
                             }
 
@@ -297,11 +304,23 @@ public struct HoverPreviewLink: SelectableComponent {
 
                 CSS.rule(
                     title,
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("width", "fit-content"),
                     CSS.decl("font-size", ".98rem"),
                     CSS.decl("font-weight", "820"),
                     CSS.decl("letter-spacing", "-.01em"),
                     CSS.decl("line-height", "1.15"),
-                    CSS.decl("color", "var(--wc-hover-preview-ink)")
+                    CSS.decl("color", "var(--wc-hover-preview-ink)"),
+                    CSS.decl("text-decoration", "none"),
+                    CSS.decl("cursor", "pointer")
+                ),
+
+                CSS.rule(
+                    "\(title):hover, \(title):focus-visible",
+                    CSS.decl("color", "var(--wc-hover-preview-accent)"),
+                    CSS.decl("text-decoration", "underline"),
+                    CSS.decl("text-decoration-thickness", ".08em"),
+                    CSS.decl("text-underline-offset", ".18em")
                 ),
 
                 CSS.rule(
