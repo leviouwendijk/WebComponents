@@ -650,7 +650,7 @@ public struct ClassicalConditioningPredictionMatrix: ReusableComponent, Sendable
         HTML.div([ "class": ClassName.status ]) {
             HTML.div([ "class": ClassName.statusHeader ]) {
                 HTML.div([ "class": ClassName.statusTitle ]) {
-                    HTML.text("Staten van Koppeling")
+                    HTML.text("Staten van koppeling")
                 }
 
                 HTML.div([ "class": ClassName.statusText ]) {
