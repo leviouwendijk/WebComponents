@@ -26,6 +26,7 @@ public struct DocsLexicon: Sendable {
     public let entryPluralLabel: String
     public let definitionSingularLabel: String
     public let definitionPluralLabel: String
+    public let definitionRelatedLinksLabel: String
 
     public init(
         docs: String,
@@ -49,7 +50,8 @@ public struct DocsLexicon: Sendable {
         entrySingularLabel: String,
         entryPluralLabel: String,
         definitionSingularLabel: String,
-        definitionPluralLabel: String
+        definitionPluralLabel: String,
+        definitionRelatedLinksLabel: String
     ) {
         self.docs = docs
         self.allDocs = allDocs
@@ -73,6 +75,7 @@ public struct DocsLexicon: Sendable {
         self.entryPluralLabel = entryPluralLabel
         self.definitionSingularLabel = definitionSingularLabel
         self.definitionPluralLabel = definitionPluralLabel
+        self.definitionRelatedLinksLabel = definitionRelatedLinksLabel
     }
 
     public func categoryCountLabel(
@@ -125,7 +128,8 @@ public struct DocsLexicon: Sendable {
         entrySingularLabel: "entry",
         entryPluralLabel: "entries",
         definitionSingularLabel: "Definition",
-        definitionPluralLabel: "Definitions"
+        definitionPluralLabel: "Definitions",
+        definitionRelatedLinksLabel: "See also"
     )
 
     public static let dutch = DocsLexicon(
@@ -150,6 +154,7 @@ public struct DocsLexicon: Sendable {
         entrySingularLabel: "onderdeel",
         entryPluralLabel: "onderdelen",
         definitionSingularLabel: "Definitie",
-        definitionPluralLabel: "Definities"
+        definitionPluralLabel: "Definities",
+        definitionRelatedLinksLabel: "Raadpleeg ook"
     )
 }
