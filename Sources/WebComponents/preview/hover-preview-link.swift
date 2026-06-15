@@ -140,8 +140,8 @@ public struct HoverPreviewLink: SelectableComponent {
                     root,
                     CSS.decl("position", "relative"),
                     CSS.decl("z-index", "0"),
-                    CSS.decl("display", "inline-flex"),
-                    CSS.decl("align-items", "baseline"),
+                    CSS.decl("display", "inline"),
+                    CSS.decl("vertical-align", "baseline"),
                     CSS.decl("isolation", "isolate"),
                     CSS.decl("--wc-hover-preview-z", "\(zIndex)"),
                     CSS.decl("--wc-hover-preview-surface", "var(--surface-color, #fff)"),
@@ -151,6 +151,21 @@ public struct HoverPreviewLink: SelectableComponent {
                     CSS.decl("--wc-hover-preview-muted", "var(--muted-text-color, rgba(32, 33, 36, .66))"),
                     CSS.decl("--wc-hover-preview-accent", "var(--link-color, #2563eb)")
                 ),
+                // CSS.rule(
+                //     root,
+                //     CSS.decl("position", "relative"),
+                //     CSS.decl("z-index", "0"),
+                //     CSS.decl("display", "inline-flex"),
+                //     CSS.decl("align-items", "baseline"),
+                //     CSS.decl("isolation", "isolate"),
+                //     CSS.decl("--wc-hover-preview-z", "\(zIndex)"),
+                //     CSS.decl("--wc-hover-preview-surface", "var(--surface-color, #fff)"),
+                //     CSS.decl("--wc-hover-preview-soft", "var(--surface-soft-color, #f1f5f9)"),
+                //     CSS.decl("--wc-hover-preview-border", "var(--border-color, rgba(15, 23, 42, .12))"),
+                //     CSS.decl("--wc-hover-preview-ink", "var(--text-color, #202124)"),
+                //     CSS.decl("--wc-hover-preview-muted", "var(--muted-text-color, rgba(32, 33, 36, .66))"),
+                //     CSS.decl("--wc-hover-preview-accent", "var(--link-color, #2563eb)")
+                // ),
 
                 CSS.rule(
                     "\(root):hover, \(root):focus-within",
