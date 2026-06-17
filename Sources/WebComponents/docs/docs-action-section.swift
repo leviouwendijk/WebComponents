@@ -3,6 +3,12 @@ import CSS
 import HTML
 
 public struct DocsActionCard: ReusableComponent, Sendable {
+    public enum Icon: String, Sendable, Hashable {
+        case document
+        case quiz
+        case resource
+    }
+
     public static let block = "wc-docs-action-card"
 
     public let href: String
@@ -10,6 +16,7 @@ public struct DocsActionCard: ReusableComponent, Sendable {
     public let title: String
     public let summary: String
     public let meta: String?
+    public let icon: Icon?
     public let searchText: String
     public let includeStyles: Bool
 
@@ -19,6 +26,7 @@ public struct DocsActionCard: ReusableComponent, Sendable {
         title: String,
         summary: String,
         meta: String? = nil,
+        icon: Icon? = nil,
         searchText: String? = nil,
         includeStyles: Bool = true
     ) {
@@ -27,6 +35,7 @@ public struct DocsActionCard: ReusableComponent, Sendable {
         self.title = title
         self.summary = summary
         self.meta = meta
+        self.icon = icon
         self.searchText = searchText ?? "\(eyebrow) \(title) \(summary) \(meta ?? "")"
         self.includeStyles = includeStyles
     }
@@ -46,8 +55,14 @@ public struct DocsActionCard: ReusableComponent, Sendable {
                         HTML.text(eyebrow)
                     }
 
-                    HTML.h3 {
-                        HTML.text(title)
+                    HTML.div(["class": "\(Self.block)__title-row"]) {
+                        if let icon {
+                            icon_node(icon)
+                        }
+
+                        HTML.h3 {
+                            HTML.text(title)
+                        }
                     }
 
                     HTML.p {
@@ -63,6 +78,119 @@ public struct DocsActionCard: ReusableComponent, Sendable {
             ],
             stylesheets: includeStyles ? [Self.stylesheet()] : []
         )
+    }
+
+    private func icon_node(
+        _ icon: Icon
+    ) -> any HTMLNode {
+        HTML.span(
+            [
+                "class": "\(Self.block)__icon \(Self.block)__icon--\(icon.rawValue)",
+                "aria-hidden": "true"
+            ]
+        ) {
+            HTML.el(
+                "svg",
+                [
+                    "viewBox": "0 0 24 24",
+                    "focusable": "false"
+                ]
+            ) {
+                icon_shape(icon)
+            }
+        }
+    }
+
+    private func icon_shape(
+        _ icon: Icon
+    ) -> HTMLFragment {
+        switch icon {
+        case .document:
+            return [
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M7 3.75h7.25L18 7.5v12.75H7z"
+                    ]
+                ) {},
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M14.25 3.75V7.5H18"
+                    ]
+                ) {},
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M9.25 11.25h5.5M9.25 14.25h5.5M9.25 17.25h3.75"
+                    ]
+                ) {}
+            ]
+
+        case .quiz:
+            return [
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M6.5 4.25h11A1.75 1.75 0 0 1 19.25 6v12A1.75 1.75 0 0 1 17.5 19.75h-11A1.75 1.75 0 0 1 4.75 18V6A1.75 1.75 0 0 1 6.5 4.25z"
+                    ]
+                ) {},
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M9 8.25h6M9 12h3.75M9 15.75h2.25"
+                    ]
+                ) {},
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M15.1 14.4c0-.85.65-1.15 1.15-1.55.45-.35.75-.75.75-1.35 0-1-.75-1.75-1.95-1.75-1.05 0-1.8.55-2.1 1.4"
+                    ]
+                ) {},
+                HTML.el(
+                    "circle",
+                    [
+                        "cx": "15.1",
+                        "cy": "17",
+                        "r": ".45"
+                    ]
+                ) {}
+            ]
+
+        case .resource:
+            return [
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M5 7h14M5 12h14M5 17h14"
+                    ]
+                ) {},
+                HTML.el(
+                    "circle",
+                    [
+                        "cx": "9",
+                        "cy": "7",
+                        "r": "1.45"
+                    ]
+                ) {},
+                HTML.el(
+                    "circle",
+                    [
+                        "cx": "15",
+                        "cy": "12",
+                        "r": "1.45"
+                    ]
+                ) {},
+                HTML.el(
+                    "circle",
+                    [
+                        "cx": "11",
+                        "cy": "17",
+                        "r": "1.45"
+                    ]
+                ) {}
+            ]
+        }
     }
 
     public static func stylesheet() -> CSSStyleSheet {
@@ -96,6 +224,40 @@ public struct DocsActionCard: ReusableComponent, Sendable {
                     CSS.decl("letter-spacing", ".1em"),
                     CSS.decl("text-transform", "uppercase"),
                     CSS.decl("color", "var(--project-hub-muted, var(--muted-text-color, rgba(0, 0, 0, .62)))")
+                ),
+
+                CSS.rule(
+                    ".\(block)__title-row",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("gap", "10px"),
+                    CSS.decl("min-width", "0")
+                ),
+
+                CSS.rule(
+                    ".\(block)__icon",
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("justify-content", "center"),
+                    CSS.decl("width", "34px"),
+                    CSS.decl("height", "34px"),
+                    CSS.decl("flex", "0 0 34px"),
+                    CSS.decl("border-radius", "12px"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--link-color, currentColor) 28%, transparent)"),
+                    CSS.decl("background", "color-mix(in srgb, var(--link-color, currentColor) 10%, transparent)"),
+                    CSS.decl("color", "var(--link-color, currentColor)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__icon svg",
+                    CSS.decl("display", "block"),
+                    CSS.decl("width", "19px"),
+                    CSS.decl("height", "19px"),
+                    CSS.decl("fill", "none"),
+                    CSS.decl("stroke", "currentColor"),
+                    CSS.decl("stroke-width", "1.65"),
+                    CSS.decl("stroke-linecap", "round"),
+                    CSS.decl("stroke-linejoin", "round")
                 ),
 
                 CSS.rule(
