@@ -41,6 +41,15 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
         static let cellTitle = "wc-operant-quadrants__cell-title"
         static let cellText = "wc-operant-quadrants__cell-text"
         static let cellMeta = "wc-operant-quadrants__cell-meta"
+
+        static let rowStack = "wc-operant-quadrants__row-stack"
+        static let outcomeGroup = "wc-operant-quadrants__outcome-group"
+        static let outcomeGroupReinforcement = "wc-operant-quadrants__outcome-group--reinforcement"
+        static let outcomeGroupPunishment = "wc-operant-quadrants__outcome-group--punishment"
+        static let outcomeFooter = "wc-operant-quadrants__outcome-footer"
+        static let outcomeFooterTitle = "wc-operant-quadrants__outcome-footer-title"
+        static let outcomeFooterNote = "wc-operant-quadrants__outcome-footer-note"
+
         static let caption = "wc-operant-quadrants__caption"
     }
 
@@ -189,6 +198,7 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
                     ".\(ClassName.matrix)",
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "150px repeat(2, minmax(240px, 1fr))"),
+                    CSS.decl("grid-template-rows", "auto auto"),
                     CSS.decl("gap", "10px"),
                     CSS.decl("min-width", "720px")
                 ),
@@ -225,11 +235,56 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.rowHead)",
+                    ".\(ClassName.rowStack)",
                     CSS.decl("display", "grid"),
-                    CSS.decl("align-content", "center"),
-                    CSS.decl("gap", "5px"),
-                    CSS.decl("padding", "14px 16px")
+                    CSS.decl("grid-template-rows", "1fr 1fr"),
+                    CSS.decl("gap", "10px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.outcomeGroup)",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-rows", "1fr 1fr auto"),
+                    CSS.decl("gap", "10px"),
+                    CSS.decl("padding", "10px"),
+                    CSS.decl("border", "1px solid var(--wc-operant-quadrants-border)"),
+                    CSS.decl("border-radius", "20px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-operant-quadrants-surface) 72%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.outcomeGroupReinforcement)",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--wc-operant-quadrants-good) 34%, var(--wc-operant-quadrants-border))"),
+                    CSS.decl("box-shadow", "0 16px 34px color-mix(in srgb, var(--wc-operant-quadrants-good) 8%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.outcomeGroupPunishment)",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--wc-operant-quadrants-bad) 30%, var(--wc-operant-quadrants-border))"),
+                    CSS.decl("box-shadow", "0 16px 34px color-mix(in srgb, var(--wc-operant-quadrants-bad) 7%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.outcomeFooter)",
+                    CSS.decl("padding", "12px 14px"),
+                    CSS.decl("border-radius", "14px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-operant-quadrants-soft) 72%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.outcomeFooterTitle)",
+                    CSS.decl("font-size", ".9rem"),
+                    CSS.decl("font-weight", "850"),
+                    CSS.decl("line-height", "1.15"),
+                    CSS.decl("color", "var(--wc-operant-quadrants-ink)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.outcomeFooterNote)",
+                    CSS.decl("margin-top", "4px"),
+                    CSS.decl("font-size", ".78rem"),
+                    CSS.decl("line-height", "1.35"),
+                    CSS.decl("color", "var(--wc-operant-quadrants-muted)")
                 ),
 
                 CSS.rule(
@@ -335,8 +390,8 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
                     ),
                     CSS.rule(
                         ".\(ClassName.matrix)",
-                        CSS.decl("grid-template-columns", "132px repeat(2, 246px)"),
-                        CSS.decl("min-width", "650px")
+                        CSS.decl("grid-template-columns", "132px repeat(2, 266px)"),
+                        CSS.decl("min-width", "684px")
                     )
                 )
             ]
@@ -382,23 +437,35 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
                 note: "gedrag neemt af in frequentie"
             )
 
-            rowHead(
-                sign: "+",
-                title: "Activatie",
-                note: "toevoeging"
+            HTML.div([ "class": ClassName.rowStack ]) {
+                rowHead(
+                    sign: "+",
+                    title: "Activatie",
+                    note: "toevoeging"
+                )
+
+                rowHead(
+                    sign: "-",
+                    title: "Deactivatie",
+                    note: "opheffing"
+                )
+            }
+
+            outcomeGroup(
+                className: ClassName.outcomeGroupReinforcement,
+                title: "Voordeel",
+                note: "uitkomst maakt deze keuze waarschijnlijker",
+                top: .positive_reinforcement,
+                bottom: .negative_reinforcement
             )
 
-            quadrantCell(.positive_reinforcement)
-            quadrantCell(.positive_punishment)
-
-            rowHead(
-                sign: "-",
-                title: "Deactivatie",
-                note: "opheffing"
+            outcomeGroup(
+                className: ClassName.outcomeGroupPunishment,
+                title: "Nadeel",
+                note: "uitkomst maakt deze keuze minder waarschijnlijk",
+                top: .positive_punishment,
+                bottom: .negative_punishment
             )
-
-            quadrantCell(.negative_reinforcement)
-            quadrantCell(.negative_punishment)
         }
     }
 
@@ -433,6 +500,31 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
 
             HTML.div([ "class": ClassName.rowNote ]) {
                 HTML.text(note)
+            }
+        }
+    }
+
+    private static func outcomeGroup(
+        className: String,
+        title: String,
+        note: String,
+        top: OperantQuadrant,
+        bottom: OperantQuadrant
+    ) -> any HTMLNode {
+        HTML.div([
+            "class": "\(ClassName.outcomeGroup) \(className)"
+        ]) {
+            quadrantCell(top)
+            quadrantCell(bottom)
+
+            HTML.div([ "class": ClassName.outcomeFooter ]) {
+                HTML.div([ "class": ClassName.outcomeFooterTitle ]) {
+                    HTML.text(title)
+                }
+
+                HTML.div([ "class": ClassName.outcomeFooterNote ]) {
+                    HTML.text(note)
+                }
             }
         }
     }
