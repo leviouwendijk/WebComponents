@@ -1,6 +1,7 @@
 import Constructors
 import CSS
 import HTML
+import JS
 
 public struct HoverPreviewLink: SelectableComponent {
     public enum DestinationScope: String, Sendable {
@@ -492,4 +493,98 @@ public struct HoverPreviewLink: SelectableComponent {
             ]
         )
     }
+}
+
+public struct HoverPreviewLinkScript: ReusableComponent {
+    public init() {}
+
+    public var nodes: ReusableComponentNodes {
+        .init(
+            scripts: [
+                JSSource(Self.source).as_inline_script()
+            ]
+        )
+    }
+
+    private static let source = #"""
+    (() => {
+        if (window.wcHoverPreviewLinkScope?.initialized) return;
+
+        const rootSelector = '[data-hover-preview]';
+        const linkSelector = '.wc-hover-preview__link';
+
+        function normalizedPath(path) {
+            const next = String(path || '/').replace(/\/+$/, '');
+            return next || '/';
+        }
+
+        function scopeFor(rawHref) {
+            const raw = String(rawHref || '').trim();
+
+            if (!raw || raw.startsWith('#') || raw.startsWith('?')) {
+                return 'same-page';
+            }
+
+            let url;
+
+            try {
+                url = new URL(raw, window.location.href);
+            } catch {
+                return 'same-site';
+            }
+
+            const protocol = url.protocol.toLowerCase();
+
+            if (
+                protocol === 'mailto:' ||
+                protocol === 'tel:' ||
+                (protocol !== 'http:' && protocol !== 'https:')
+            ) {
+                return 'external';
+            }
+
+            if (url.origin !== window.location.origin) {
+                return 'external';
+            }
+
+            return normalizedPath(url.pathname) === normalizedPath(window.location.pathname)
+                ? 'same-page'
+                : 'same-site';
+        }
+
+        function sync(root) {
+            if (!root) return;
+
+            const link = root.querySelector(linkSelector);
+
+            if (!link) return;
+
+            root.setAttribute(
+                'data-hover-preview-scope',
+                scopeFor(link.getAttribute('href'))
+            );
+        }
+
+        function init(scope = document) {
+            const roots = scope.matches?.(rootSelector)
+                ? [scope]
+                : Array.from(scope.querySelectorAll?.(rootSelector) || []);
+
+            roots.forEach(sync);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => init());
+        } else {
+            init();
+        }
+
+        window.addEventListener('popstate', () => init());
+
+        window.wcHoverPreviewLinkScope = {
+            initialized: true,
+            init
+        };
+    })();
+    """#
 }
