@@ -297,9 +297,9 @@ public struct DocsActionCard: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(block)__icon--bibliography",
                     CSS.decl("border-radius", "9px"),
-                    CSS.decl("color", "color-mix(in srgb, var(--warning, #E7A94E) 74%, var(--link-color, currentColor) 26%)"),
-                    CSS.decl("background", "color-mix(in srgb, var(--warning, #E7A94E) 17%, transparent)"),
-                    CSS.decl("border-color", "color-mix(in srgb, var(--warning, #E7A94E) 34%, transparent)")
+                    CSS.decl("color", "color-mix(in srgb, var(--text-color, currentColor) 54%, var(--link-color, currentColor) 46%)"),
+                    CSS.decl("background", "color-mix(in srgb, var(--link-color, currentColor) 7%, transparent)"),
+                    CSS.decl("border-color", "color-mix(in srgb, var(--text-color, currentColor) 12%, var(--link-color, currentColor) 18%)")
                 ),
 
                 CSS.rule(
