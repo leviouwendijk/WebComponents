@@ -43,6 +43,8 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
         static let cellMeta = "wc-operant-quadrants__cell-meta"
 
         static let rowStack = "wc-operant-quadrants__row-stack"
+        static let rowStackSpacer = "wc-operant-quadrants__row-stack-spacer"
+
         static let outcomeGroup = "wc-operant-quadrants__outcome-group"
         static let outcomeGroupReinforcement = "wc-operant-quadrants__outcome-group--reinforcement"
         static let outcomeGroupPunishment = "wc-operant-quadrants__outcome-group--punishment"
@@ -237,8 +239,15 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.rowStack)",
                     CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-rows", "1fr 1fr"),
+                    CSS.decl("grid-template-rows", "1fr 1fr auto"),
                     CSS.decl("gap", "10px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.rowStackSpacer)",
+                    CSS.decl("min-height", "68px"),
+                    CSS.decl("visibility", "hidden"),
+                    CSS.decl("pointer-events", "none")
                 ),
 
                 CSS.rule(
@@ -247,21 +256,21 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
                     CSS.decl("grid-template-rows", "1fr 1fr auto"),
                     CSS.decl("gap", "10px"),
                     CSS.decl("padding", "10px"),
-                    CSS.decl("border", "1px solid var(--wc-operant-quadrants-border)"),
+                    CSS.decl("border", "1.5px solid var(--wc-operant-quadrants-border)"),
                     CSS.decl("border-radius", "20px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--wc-operant-quadrants-surface) 72%, transparent)")
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-operant-quadrants-surface) 18%, transparent)")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.outcomeGroupReinforcement)",
-                    CSS.decl("border-color", "color-mix(in srgb, var(--wc-operant-quadrants-good) 34%, var(--wc-operant-quadrants-border))"),
-                    CSS.decl("box-shadow", "0 16px 34px color-mix(in srgb, var(--wc-operant-quadrants-good) 8%, transparent)")
+                    CSS.decl("border-color", "color-mix(in srgb, var(--wc-operant-quadrants-good) 58%, var(--wc-operant-quadrants-border))"),
+                    CSS.decl("box-shadow", "0 16px 34px color-mix(in srgb, var(--wc-operant-quadrants-good) 6%, transparent)")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.outcomeGroupPunishment)",
-                    CSS.decl("border-color", "color-mix(in srgb, var(--wc-operant-quadrants-bad) 30%, var(--wc-operant-quadrants-border))"),
-                    CSS.decl("box-shadow", "0 16px 34px color-mix(in srgb, var(--wc-operant-quadrants-bad) 7%, transparent)")
+                    CSS.decl("border-color", "color-mix(in srgb, var(--wc-operant-quadrants-bad) 52%, var(--wc-operant-quadrants-border))"),
+                    CSS.decl("box-shadow", "0 16px 34px color-mix(in srgb, var(--wc-operant-quadrants-bad) 6%, transparent)")
                 ),
 
                 CSS.rule(
@@ -449,6 +458,11 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
                     title: "Deactivatie",
                     note: "opheffing"
                 )
+
+                HTML.div([
+                    "class": ClassName.rowStackSpacer,
+                    "aria-hidden": "true"
+                ]) {}
             }
 
             outcomeGroup(
