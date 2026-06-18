@@ -237,6 +237,17 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.rowHead)",
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("display", "grid"),
+                    CSS.decl("align-content", "center"),
+                    CSS.decl("justify-items", "start"),
+                    CSS.decl("gap", "5px"),
+                    CSS.decl("padding", "14px 16px"),
+                    CSS.decl("overflow", "hidden")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.rowStack)",
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-rows", "1fr 1fr auto"),
