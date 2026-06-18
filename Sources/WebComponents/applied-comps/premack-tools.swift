@@ -25,7 +25,7 @@ public struct PremackTool: ReusableComponent, Sendable {
         var lead: String {
             switch self {
             case .hierarchy:
-                return "Brainstorm welke reacties in een concrete situatie het meest waarschijnlijk zijn."
+                return "Brainstorm welke reacties in een specifieke situatie het meest waarschijnlijk zijn."
             case .contingency:
                 return "Koppel een lage-kans en hoge-kans respons. Gebruik de hoge-kans respons als bekrachtiger, of poort de hoge-kans respons via een lage-kans respons."
             }
