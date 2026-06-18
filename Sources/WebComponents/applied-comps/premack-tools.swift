@@ -139,7 +139,7 @@ public struct PremackTool: ReusableComponent, Sendable {
                     HTML.h2 { HTML.text("Hiërarchie") }
 
                     HTML.p(["class": "\(Self.block)__hint"]) {
-                        HTML.text("Hoogste waarschijnlijkheid bovenaan. Gebruik dit om te bepalen wat als bekrachtiger kan werken.")
+                        HTML.text("Hoogste waarschijnlijkheid bovenaan. Gebruik dit om te bepalen wat als bekrachtiger kan werken, of om te analyseren wat jouw doelgedrag momenteel aan het verhinderen kan zijn.")
                     }
 
                     HTML.ol([
