@@ -7,6 +7,7 @@ public struct DocsActionCard: ReusableComponent, Sendable {
         case document
         case quiz
         case resource
+        case bibliography
     }
 
     public static let block = "wc-docs-action-card"
@@ -184,6 +185,40 @@ public struct DocsActionCard: ReusableComponent, Sendable {
                     ]
                 ) {}
             ]
+
+        case .bibliography:
+            return [
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M5.25 19.25h13.5"
+                    ]
+                ) {},
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M6.25 5.25h3.15v14H6.25z"
+                    ]
+                ) {},
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M10.45 4.75h3.15v14.5h-3.15z"
+                    ]
+                ) {},
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M15.15 6.05l2.55-.42 2.08 12.95-2.55.42z"
+                    ]
+                ) {},
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M7.15 8.25h1.35M7.15 15.9h1.35M11.35 8.25h1.35M11.35 15.9h1.35M16.15 9.1l1.15-.2M17.15 15.35l1.15-.2"
+                    ]
+                ) {}
+            ]
         }
     }
 
@@ -260,6 +295,14 @@ public struct DocsActionCard: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(block)__icon--bibliography",
+                    CSS.decl("border-radius", "9px"),
+                    CSS.decl("color", "color-mix(in srgb, var(--warning, #E7A94E) 74%, var(--link-color, currentColor) 26%)"),
+                    CSS.decl("background", "color-mix(in srgb, var(--warning, #E7A94E) 17%, transparent)"),
+                    CSS.decl("border-color", "color-mix(in srgb, var(--warning, #E7A94E) 34%, transparent)")
+                ),
+
+                CSS.rule(
                     ".\(block)__icon svg",
                     CSS.decl("display", "block"),
                     CSS.decl("width", "19px"),
@@ -276,6 +319,13 @@ public struct DocsActionCard: ReusableComponent, Sendable {
                     CSS.decl("width", "21px"),
                     CSS.decl("height", "21px"),
                     CSS.decl("stroke-width", "1.8")
+                ),
+
+                CSS.rule(
+                    ".\(block)__icon--bibliography svg",
+                    CSS.decl("width", "21px"),
+                    CSS.decl("height", "21px"),
+                    CSS.decl("stroke-width", "1.55")
                 ),
 
                 CSS.rule(
