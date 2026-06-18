@@ -148,12 +148,6 @@ public struct DocsActionCard: ReusableComponent, Sendable {
                     [
                         "d": "M12.62 16.8h.01"
                     ]
-                ) {},
-                HTML.el(
-                    "path",
-                    [
-                        "d": "M7.9 16.35l1.32 1.32 2.18-2.18"
-                    ]
                 ) {}
             ]
 
