@@ -9,10 +9,10 @@ public enum NegativeReinforcementPressurePattern: String, Sendable, CaseIterable
     public var title: String {
         switch self {
         case .steadyRelease:
-            return "Constante druk → release"
+            return "mild-constante druk → release"
 
         case .pulsedEscape:
-            return "Piekjes → escape"
+            return "milde pieken → escape"
         }
     }
 
