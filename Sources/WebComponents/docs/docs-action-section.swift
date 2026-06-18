@@ -130,29 +130,29 @@ public struct DocsActionCard: ReusableComponent, Sendable {
         case .quiz:
             return [
                 HTML.el(
-                    "path",
-                    [
-                        "d": "M6.5 4.25h11A1.75 1.75 0 0 1 19.25 6v12A1.75 1.75 0 0 1 17.5 19.75h-11A1.75 1.75 0 0 1 4.75 18V6A1.75 1.75 0 0 1 6.5 4.25z"
-                    ]
-                ) {},
-                HTML.el(
-                    "path",
-                    [
-                        "d": "M9 8.25h6M9 12h3.75M9 15.75h2.25"
-                    ]
-                ) {},
-                HTML.el(
-                    "path",
-                    [
-                        "d": "M15.1 14.4c0-.85.65-1.15 1.15-1.55.45-.35.75-.75.75-1.35 0-1-.75-1.75-1.95-1.75-1.05 0-1.8.55-2.1 1.4"
-                    ]
-                ) {},
-                HTML.el(
                     "circle",
                     [
-                        "cx": "15.1",
-                        "cy": "17",
-                        "r": ".45"
+                        "cx": "12",
+                        "cy": "12",
+                        "r": "7.35"
+                    ]
+                ) {},
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M9.75 9.8c.28-1.28 1.34-2.05 2.72-2.05 1.58 0 2.8.98 2.8 2.44 0 1.02-.56 1.63-1.42 2.2-.82.54-1.23.95-1.23 1.86"
+                    ]
+                ) {},
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M12.62 16.8h.01"
+                    ]
+                ) {},
+                HTML.el(
+                    "path",
+                    [
+                        "d": "M7.9 16.35l1.32 1.32 2.18-2.18"
                     ]
                 ) {}
             ]
@@ -249,6 +249,23 @@ public struct DocsActionCard: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(block)__icon--document",
+                    CSS.decl("border-radius", "12px")
+                ),
+
+                CSS.rule(
+                    ".\(block)__icon--quiz",
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--link-color, currentColor) 16%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__icon--resource",
+                    CSS.decl("border-radius", "10px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--link-color, currentColor) 8%, transparent)")
+                ),
+
+                CSS.rule(
                     ".\(block)__icon svg",
                     CSS.decl("display", "block"),
                     CSS.decl("width", "19px"),
@@ -258,6 +275,13 @@ public struct DocsActionCard: ReusableComponent, Sendable {
                     CSS.decl("stroke-width", "1.65"),
                     CSS.decl("stroke-linecap", "round"),
                     CSS.decl("stroke-linejoin", "round")
+                ),
+
+                CSS.rule(
+                    ".\(block)__icon--quiz svg",
+                    CSS.decl("width", "21px"),
+                    CSS.decl("height", "21px"),
+                    CSS.decl("stroke-width", "1.8")
                 ),
 
                 CSS.rule(
