@@ -39,6 +39,7 @@ public struct PressureArousalCurveDiagram: ReusableComponent, Sendable {
     public let caption: String?
     public let initial: PressureArousalMode
     public let operantConditioningHref: String
+    public let operantConditioningPreview: HoverPreview?
     public let includeStyles: Bool
 
     public init(
@@ -46,12 +47,14 @@ public struct PressureArousalCurveDiagram: ReusableComponent, Sendable {
         caption: String? = "Druk en arousal lopen niet altijd netjes gelijk. Bij hogere arousal kan gedrag sneller, grover en minder gevoelig voor subtiele feedback worden.",
         initial: PressureArousalMode = .negativeReinforcement,
         operantConditioningHref: String = "/hondengedrag/operante-conditionering/",
+        operantConditioningPreview: HoverPreview? = nil,
         includeStyles: Bool = true
     ) {
         self.id = id
         self.caption = caption
         self.initial = initial
         self.operantConditioningHref = operantConditioningHref
+        self.operantConditioningPreview = operantConditioningPreview
         self.includeStyles = includeStyles
     }
 
@@ -101,7 +104,8 @@ public struct PressureArousalCurveDiagram: ReusableComponent, Sendable {
                             for mode in PressureArousalMode.allCases {
                                 Self.detail(
                                     mode,
-                                    href: operantConditioningHref
+                                    href: operantConditioningHref,
+                                    preview: operantConditioningPreview
                                 )
                             }
                         }
@@ -128,7 +132,12 @@ public struct PressureArousalCurveDiagram: ReusableComponent, Sendable {
                     }
                 }
             ],
-            stylesheets: includeStyles ? [Self.stylesheet()] : []
+            stylesheets: includeStyles
+                ? [
+                    HoverPreviewLink.stylesheet(),
+                    Self.stylesheet()
+                ]
+                : []
         )
     }
 
@@ -368,7 +377,8 @@ public struct PressureArousalCurveDiagram: ReusableComponent, Sendable {
 
     private static func detail(
         _ mode: PressureArousalMode,
-        href: String
+        href: String,
+        preview: HoverPreview?
     ) -> any HTMLNode {
         HTML.article(
             [
@@ -376,15 +386,11 @@ public struct PressureArousalCurveDiagram: ReusableComponent, Sendable {
                 "data-pressure-track": mode.rawValue
             ]
         ) {
-            HTML.a(
-                href,
-                [
-                    "class": ClassName.detailCode,
-                    "aria-label": "\(mode.code), operante conditionering"
-                ]
-            ) {
-                HTML.text(mode.code)
-            }
+            Self.operantCodeLink(
+                mode,
+                href: href,
+                preview: preview
+            )
 
             HTML.div {
                 HTML.h3([ "class": ClassName.detailTitle ]) {
@@ -396,6 +402,37 @@ public struct PressureArousalCurveDiagram: ReusableComponent, Sendable {
                 }
             }
         }
+    }
+
+    private static func operantCodeLink(
+        _ mode: PressureArousalMode,
+        href: String,
+        preview: HoverPreview?
+    ) -> any HTMLNode {
+        let label: HTMLFragment = [
+            HTML.span([ "class": ClassName.detailCode ]) {
+                HTML.text(mode.code)
+            }
+        ]
+
+        guard let preview else {
+            return HTML.a(
+                href,
+                [
+                    "class": ClassName.detailCode,
+                    "aria-label": "\(mode.code), operante conditionering"
+                ]
+            ) {
+                HTML.text(mode.code)
+            }
+        }
+
+        return HoverPreviewLink(
+            href: href,
+            label: label,
+            preview: preview,
+            destinationScope: .sameSite
+        ).nodes.body[0]
     }
 
     private static func detailBody(
@@ -651,6 +688,24 @@ public struct PressureArousalCurveDiagram: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.detail) .wc-hover-preview",
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("width", "fit-content")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.detail) .wc-hover-preview__link",
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("text-decoration", "none"),
+                    CSS.decl("color", "inherit")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.detail) .wc-hover-preview__link::after",
+                    CSS.decl("display", "none")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.detailCode)",
                     CSS.decl("display", "inline-flex"),
                     CSS.decl("align-items", "center"),
@@ -663,9 +718,9 @@ public struct PressureArousalCurveDiagram: ReusableComponent, Sendable {
                     CSS.decl("font-weight", "780"),
                     CSS.decl("line-height", "1"),
                     CSS.decl("text-decoration", "none"),
-                    CSS.decl("color", "var(--link-color, #2563eb)"),
-                    CSS.decl("background", "color-mix(in srgb, var(--link-color, #2563eb) 10%, transparent)"),
-                    CSS.decl("box-shadow", "inset 0 0 0 1px color-mix(in srgb, var(--link-color, #2563eb) 22%, transparent)")
+                    CSS.decl("color", "var(--wc-hover-preview-accent, var(--link-color, #2563eb))"),
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-hover-preview-accent, var(--link-color, #2563eb)) 10%, transparent)"),
+                    CSS.decl("box-shadow", "inset 0 0 0 1px color-mix(in srgb, var(--wc-hover-preview-accent, var(--link-color, #2563eb)) 22%, transparent)")
                 ),
 
                 CSS.rule(

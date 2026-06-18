@@ -3,6 +3,12 @@ import CSS
 import HTML
 
 public struct HoverPreviewLink: SelectableComponent {
+    public enum DestinationScope: String, Sendable {
+        case samePage = "same-page"
+        case sameSite = "same-site"
+        case external
+    }
+    
     public enum Namespace {}
     public typealias SelectorNamespace = Namespace
 
@@ -11,17 +17,22 @@ public struct HoverPreviewLink: SelectableComponent {
     public let href: String
     public let label: HTMLFragment
     public let preview: HoverPreview
+    public let destinationScope: DestinationScope
     public let zIndex: Int
 
     public init(
         href: String,
         label: HTMLFragment,
         preview: HoverPreview,
+        destinationScope: DestinationScope? = nil,
         zIndex: Int = 1000
     ) {
         self.href = href
         self.label = label
         self.preview = preview
+        self.destinationScope = destinationScope ?? Self.inferredDestinationScope(
+            for: href
+        )
         self.zIndex = zIndex
     }
 
@@ -31,7 +42,8 @@ public struct HoverPreviewLink: SelectableComponent {
                 HTML.span([
                     "class": Self.block,
                     "data-hover-preview": "",
-                    "data-hover-preview-variant": preview.variant.rawValue
+                    "data-hover-preview-variant": preview.variant.rawValue,
+                    "data-hover-preview-scope": destinationScope.rawValue
                 ]) {
                     HTML.a(href, ["class": "\(Self.block)__link"]) {
                         label
@@ -113,6 +125,39 @@ public struct HoverPreviewLink: SelectableComponent {
         nodes.body[0]
     }
 
+    private static func inferredDestinationScope(
+        for href: String
+    ) -> DestinationScope {
+        let trimmed = href.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
+        guard !trimmed.isEmpty else {
+            return .samePage
+        }
+
+        if trimmed.hasPrefix("#") || trimmed.hasPrefix("?") {
+            return .samePage
+        }
+
+        if trimmed.hasPrefix("/") && !trimmed.hasPrefix("//") {
+            return .sameSite
+        }
+
+        let lowercased = trimmed.lowercased()
+
+        if lowercased.hasPrefix("//")
+            || lowercased.hasPrefix("http://")
+            || lowercased.hasPrefix("https://")
+            || lowercased.hasPrefix("mailto:")
+            || lowercased.hasPrefix("tel:")
+            || lowercased.contains("://") {
+            return .external
+        }
+
+        return .sameSite
+    }
+
     public static func css() -> CSSStyleSheet {
         stylesheet()
     }
@@ -148,8 +193,13 @@ public struct HoverPreviewLink: SelectableComponent {
                     CSS.decl("--wc-hover-preview-soft", "var(--surface-soft-color, #f1f5f9)"),
                     CSS.decl("--wc-hover-preview-border", "var(--border-color, rgba(15, 23, 42, .12))"),
                     CSS.decl("--wc-hover-preview-ink", "var(--text-color, #202124)"),
+                    // CSS.decl("--wc-hover-preview-muted", "var(--muted-text-color, rgba(32, 33, 36, .66))"),
+                    // CSS.decl("--wc-hover-preview-accent", "var(--link-color, #2563eb)")
                     CSS.decl("--wc-hover-preview-muted", "var(--muted-text-color, rgba(32, 33, 36, .66))"),
-                    CSS.decl("--wc-hover-preview-accent", "var(--link-color, #2563eb)")
+                    CSS.decl("--wc-hover-preview-accent-same-page", "var(--success, #2E8B57)"),
+                    CSS.decl("--wc-hover-preview-accent-same-site", "var(--link-color, #2563eb)"),
+                    CSS.decl("--wc-hover-preview-accent-external", "var(--external-link-color, var(--link-color, #2563eb))"),
+                    CSS.decl("--wc-hover-preview-accent", "var(--wc-hover-preview-accent-same-site)")
                 ),
                 // CSS.rule(
                 //     root,
@@ -391,6 +441,22 @@ public struct HoverPreviewLink: SelectableComponent {
                 CSS.rule(
                     "\(root)[data-hover-preview-variant=\"definition\"]",
                     CSS.decl("--wc-hover-preview-accent", "var(--link-color, #2563eb)")
+                ),
+
+                // additions
+                CSS.rule(
+                    "\(root)[data-hover-preview-scope=\"same-page\"]",
+                    CSS.decl("--wc-hover-preview-accent", "var(--wc-hover-preview-accent-same-page)")
+                ),
+
+                CSS.rule(
+                    "\(root)[data-hover-preview-scope=\"same-site\"]",
+                    CSS.decl("--wc-hover-preview-accent", "var(--wc-hover-preview-accent-same-site)")
+                ),
+
+                CSS.rule(
+                    "\(root)[data-hover-preview-scope=\"external\"]",
+                    CSS.decl("--wc-hover-preview-accent", "var(--wc-hover-preview-accent-external)")
                 )
             ],
             media: [
