@@ -118,11 +118,34 @@ public struct DocsCopyrightBanner: ReusableComponent, Sendable {
                     ".\(block)",
                     CSS.decl("box-sizing", "border-box"),
                     CSS.decl("width", "min(1120px, calc(100% - 32px))"),
-                    CSS.decl("margin", "clamp(44px, 7vw, 72px) auto 0"),
+                    CSS.decl("margin", "0 auto"),
                     CSS.decl("padding", "18px 0 26px"),
                     CSS.decl("border-top", "1px solid var(--border-color, rgba(15, 23, 42, .12))"),
                     CSS.decl("color", "var(--muted-text-color, rgba(32, 33, 36, .66))")
                 ),
+
+                CSS.rule(
+                    ".hm-docs-app--with-footer",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("flex-direction", "column"),
+                    CSS.decl("min-height", "100vh"),
+                    CSS.decl("min-height", "100svh")
+                ),
+
+                CSS.rule(
+                    ".hm-docs-app--with-footer > .\(block)",
+                    CSS.decl("margin-top", "auto")
+                ),
+
+                // CSS.rule(
+                //     ".\(block)",
+                //     CSS.decl("box-sizing", "border-box"),
+                //     CSS.decl("width", "min(1120px, calc(100% - 32px))"),
+                //     CSS.decl("margin", "clamp(44px, 7vw, 72px) auto 0"),
+                //     CSS.decl("padding", "18px 0 26px"),
+                //     CSS.decl("border-top", "1px solid var(--border-color, rgba(15, 23, 42, .12))"),
+                //     CSS.decl("color", "var(--muted-text-color, rgba(32, 33, 36, .66))")
+                // ),
 
                 CSS.rule(
                     ".\(block), .\(block) *",
@@ -190,10 +213,15 @@ public struct DocsCopyrightBanner: ReusableComponent, Sendable {
             media: [
                 CSS.media(
                     "(max-width: 720px)",
+                    // CSS.rule(
+                    //     ".\(block)",
+                    //     CSS.decl("width", "calc(100% - 28px)"),
+                    //     CSS.decl("margin-top", "40px"),
+                    //     CSS.decl("padding-bottom", "22px")
+                    // ),
                     CSS.rule(
                         ".\(block)",
                         CSS.decl("width", "calc(100% - 28px)"),
-                        CSS.decl("margin-top", "40px"),
                         CSS.decl("padding-bottom", "22px")
                     ),
 
