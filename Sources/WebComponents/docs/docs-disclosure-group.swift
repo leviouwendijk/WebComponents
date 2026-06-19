@@ -555,9 +555,24 @@ public struct DocsDisclosureGroupScript: ReusableComponent {
             const content = contentFor(section);
             if (!content) return;
 
-            content.style.maxHeight = section.open
-                ? `${content.scrollHeight}px`
-                : '0px';
+            if (section.open) {
+                content.style.maxHeight = 'none';
+                content.style.opacity = '1';
+            } else {
+                content.style.maxHeight = '0px';
+                content.style.opacity = '0';
+            }
+        }
+
+        function afterMaxHeightTransition(content, callback) {
+            const finish = event => {
+                if (event.propertyName !== 'max-height') return;
+
+                content.removeEventListener('transitionend', finish);
+                callback();
+            };
+
+            content.addEventListener('transitionend', finish);
         }
 
         function openSection(section) {
@@ -571,6 +586,12 @@ public struct DocsDisclosureGroupScript: ReusableComponent {
             requestAnimationFrame(() => {
                 content.style.maxHeight = `${content.scrollHeight}px`;
                 content.style.opacity = '1';
+
+                afterMaxHeightTransition(content, () => {
+                    if (section.open) {
+                        content.style.maxHeight = 'none';
+                    }
+                });
             });
         }
 
@@ -586,14 +607,11 @@ public struct DocsDisclosureGroupScript: ReusableComponent {
                 content.style.opacity = '0';
             });
 
-            const finish = event => {
-                if (event.propertyName !== 'max-height') return;
+            afterMaxHeightTransition(content, () => {
+                if (!section.open) return;
 
-                content.removeEventListener('transitionend', finish);
                 section.open = false;
-            };
-
-            content.addEventListener('transitionend', finish);
+            });
         }
 
         function toggle(section) {
@@ -629,6 +647,12 @@ public struct DocsDisclosureGroupScript: ReusableComponent {
         window.addEventListener('resize', () => {
             document.querySelectorAll(sectionSelector).forEach(setHeight);
         });
+
+        if (document.fonts?.ready) {
+            document.fonts.ready.then(() => {
+                document.querySelectorAll(sectionSelector).forEach(setHeight);
+            });
+        }
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => init());
