@@ -16,26 +16,6 @@ public enum DrijfverenResponseMapPole: String, Sendable, CaseIterable {
             return "Nadelen"
         }
     }
-
-    var directionLabel: String {
-        switch self {
-        case .voordeel:
-            return "naar toe"
-
-        case .nadeel:
-            return "weg van"
-        }
-    }
-
-    var summaryLabel: String {
-        switch self {
-        case .voordeel:
-            return "Totaal voordeel"
-
-        case .nadeel:
-            return "Totaal nadeel"
-        }
-    }
 }
 
 public enum DrijfverenResponseMapKind: String, Sendable, CaseIterable {
@@ -72,22 +52,6 @@ public enum DrijfverenResponseMapKind: String, Sendable, CaseIterable {
         }
     }
 
-    var shortTitle: String {
-        switch self {
-        case .appetitiveGain:
-            return "+ aantrekker"
-
-        case .aversiveRelief:
-            return "- afstoter"
-
-        case .appetitiveLoss:
-            return "- aantrekker"
-
-        case .aversiveActivation:
-            return "+ afstoter"
-        }
-    }
-
     var eyebrow: String {
         switch self {
         case .appetitiveGain:
@@ -107,7 +71,7 @@ public enum DrijfverenResponseMapKind: String, Sendable, CaseIterable {
     var placeholder: String {
         switch self {
         case .appetitiveGain:
-            return "Bijvoorbeeld: hond weg, ruimte, controle, opluchting als succeservaring"
+            return "Bijvoorbeeld: ruimte, controle, aandacht, succeservaring"
 
         case .aversiveRelief:
             return "Bijvoorbeeld: dreiging stopt, afstand neemt toe, spanning zakt"
@@ -174,7 +138,7 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
             }
 
             HTML.p(["class": "\(Self.block)__lead"]) {
-                HTML.text("Breng in kaart welke reacties latent beschikbaar zijn, en waarom één reactie in deze situatie naar voren komt: weg van nadelen, of juist naar voordelen toe.")
+                HTML.text("Breng één concrete reactie in kaart: wat trekt de hond naar deze reactie toe, en welke nadelen of kosten hangen eraan vast?")
             }
         }
     }
@@ -183,9 +147,10 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
         HTML.section(["class": "\(Self.block)__surface"]) {
             contextFields()
 
-            HTML.div(["class": "\(Self.block)__workspace"]) {
-                responsePanel()
-                graphPanel()
+            HTML.div(["class": "\(Self.block)__map"]) {
+                focusCard()
+                motivationGrid()
+                summary()
             }
         }
     }
@@ -240,171 +205,100 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
         }
     }
 
-    private func responsePanel() -> any HTMLNode {
-        HTML.aside(["class": "\(Self.block)__responses"]) {
-            HTML.div(["class": "\(Self.block)__panel-head"]) {
-                HTML.p(["class": "\(Self.block)__panel-eyebrow"]) {
-                    HTML.text("latent")
+    private func focusCard() -> any HTMLNode {
+        HTML.section(["class": "\(Self.block)__focus-card"]) {
+            HTML.div(["class": "\(Self.block)__focus-copy"]) {
+                HTML.p(["class": "\(Self.block)__eyebrow"]) {
+                    HTML.text("gekozen respons")
                 }
 
                 HTML.h2 {
-                    HTML.text("Mogelijke reacties")
+                    HTML.text("Welke reactie komt naar voren?")
                 }
 
                 HTML.p {
-                    HTML.text("Meerdere reacties kunnen beschikbaar zijn. Selecteer de reactie waarvoor je de voordelen en nadelen wilt tekenen.")
+                    HTML.text("Vul één concrete reactie in. Gebruik daarna de voordelen en nadelen om te verklaren waarom deze respons in deze situatie prominent kan worden.")
                 }
             }
 
-            HTML.div(["class": "\(Self.block)__response-list", "data-response-list": ""]) {
-                responseRow(
-                    id: "response-1",
-                    label: "Uitvallen / blaffen",
-                    active: true
-                )
-
-                responseRow(
-                    id: "response-2",
-                    label: "Wegkijken / afstand nemen",
-                    active: false
-                )
-
-                responseRow(
-                    id: "response-3",
-                    label: "Inchecken bij begeleider",
-                    active: false
-                )
-            }
-
-            HTML.button(
+            HTML.label(
                 [
-                    "type": "button",
-                    "class": "\(Self.block)__button \(Self.block)__button--secondary",
-                    "data-response-add": ""
+                    "class": "\(Self.block)__response-field",
+                    "for": "\(id)-active-response"
                 ]
             ) {
-                HTML.text("Reactie toevoegen")
-            }
-        }
-    }
-
-    private func responseRow(
-        id: String,
-        label: String,
-        active: Bool
-    ) -> any HTMLNode {
-        var className = "\(Self.block)__response-row"
-
-        if active {
-            className += " \(Self.block)__response-row--active"
-        }
-
-        return HTML.div(
-            [
-                "class": className,
-                "data-response-row": id
-            ]
-        ) {
-            HTML.button(
-                [
-                    "type": "button",
-                    "class": "\(Self.block)__response-select",
-                    "data-response-select": id,
-                    "aria-label": "Selecteer reactie"
-                ]
-            ) {
-                HTML.text("Kies")
-            }
-
-            HTML.input([
-                "type": "text",
-                "value": label,
-                "data-response-label": id,
-                "aria-label": "Respons"
-            ])
-
-            HTML.label(["class": "\(Self.block)__response-salience"]) {
                 HTML.span {
-                    HTML.text("salientie")
+                    HTML.text("Respons")
                 }
 
                 HTML.input([
-                    "type": "range",
-                    "min": "0",
-                    "max": "5",
-                    "value": active ? "4" : "2",
-                    "data-response-salience": id
+                    "id": "\(id)-active-response",
+                    "type": "text",
+                    "value": "Uitvallen / blaffen",
+                    "data-response-label": "response-1",
+                    "aria-label": "Gekozen respons"
                 ])
             }
         }
     }
 
-    private func graphPanel() -> any HTMLNode {
-        HTML.section(["class": "\(Self.block)__graph-panel"]) {
-            HTML.div(["class": "\(Self.block)__graph-head"]) {
-                HTML.div {
-                    HTML.p(["class": "\(Self.block)__panel-eyebrow"]) {
-                        HTML.text("gekozen respons")
-                    }
+    private func motivationGrid() -> any HTMLNode {
+        HTML.div(["class": "\(Self.block)__motivation-grid"]) {
+            motivationLane(
+                pole: .voordeel,
+                tone: "voordelen",
+                eyebrow: "trekkend",
+                subtitle: "Wat levert deze reactie op, of wat stopt ermee?",
+                kinds: [
+                    .aversiveRelief,
+                    .appetitiveGain
+                ]
+            )
 
-                    HTML.h2 {
-                        HTML.span(["data-active-response-label": ""]) {
-                            HTML.text("Uitvallen / blaffen")
-                        }
-                    }
-                }
-
-                HTML.div(["class": "\(Self.block)__score-strip"]) {
-                    scorePill(.voordeel)
-                    scorePill(.nadeel)
-                }
-            }
-
-            HTML.div(["class": "\(Self.block)__graph"]) {
-                poleColumn(.nadeel)
-                centerNode()
-                poleColumn(.voordeel)
-            }
-
-            summary()
+            motivationLane(
+                pole: .nadeel,
+                tone: "nadelen",
+                eyebrow: "remmend",
+                subtitle: "Wat kost deze reactie, of wat wordt er juist actief?",
+                kinds: [
+                    .appetitiveLoss,
+                    .aversiveActivation
+                ]
+            )
         }
     }
 
-    private func scorePill(
-        _ pole: DrijfverenResponseMapPole
+    private func motivationLane(
+        pole: DrijfverenResponseMapPole,
+        tone: String,
+        eyebrow: String,
+        subtitle: String,
+        kinds: [DrijfverenResponseMapKind]
     ) -> any HTMLNode {
-        HTML.div(["class": "\(Self.block)__score \(Self.block)__score--\(pole.rawValue)"]) {
-            HTML.span {
-                HTML.text(pole.summaryLabel)
-            }
-
-            HTML.strong(["data-pole-total": pole.rawValue]) {
-                HTML.text("0")
-            }
-        }
-    }
-
-    private func poleColumn(
-        _ pole: DrijfverenResponseMapPole
-    ) -> any HTMLNode {
-        HTML.div(
+        HTML.section(
             [
-                "class": "\(Self.block)__pole \(Self.block)__pole--\(pole.rawValue)",
+                "class": "\(Self.block)__motivation-lane \(Self.block)__motivation-lane--\(tone)",
                 "data-pole": pole.rawValue
             ]
         ) {
-            HTML.div(["class": "\(Self.block)__pole-head"]) {
+            HTML.div(["class": "\(Self.block)__motivation-lane-head"]) {
                 HTML.p {
-                    HTML.text(pole.directionLabel)
+                    HTML.text(eyebrow)
                 }
 
                 HTML.h3 {
                     HTML.text(pole.title)
                 }
+
+                HTML.span {
+                    HTML.text(subtitle)
+                }
             }
 
-            for kind in DrijfverenResponseMapKind.allCases where kind.pole == pole {
-                bucket(kind)
+            HTML.div(["class": "\(Self.block)__bucket-stack"]) {
+                for kind in kinds {
+                    bucket(kind)
+                }
             }
         }
     }
@@ -433,7 +327,8 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
                     [
                         "type": "button",
                         "class": "\(Self.block)__small-button",
-                        "data-kind-add": kind.rawValue
+                        "data-kind-add": kind.rawValue,
+                        "aria-label": "Item toevoegen"
                     ]
                 ) {
                     HTML.text("+")
@@ -490,43 +385,9 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
         }
     }
 
-    private func centerNode() -> any HTMLNode {
-        HTML.div(["class": "\(Self.block)__center"]) {
-            HTML.div(["class": "\(Self.block)__arrow \(Self.block)__arrow--away"]) {
-                HTML.span {
-                    HTML.text("weg van")
-                }
-            }
-
-            HTML.div(["class": "\(Self.block)__dog-node"]) {
-                HTML.p {
-                    HTML.text("hond")
-                }
-
-                HTML.strong(["data-center-response-label": ""]) {
-                    HTML.text("Uitvallen / blaffen")
-                }
-
-                HTML.span(["data-center-context-label": ""]) {
-                    HTML.text("in deze omstandigheid")
-                }
-            }
-
-            HTML.div(["class": "\(Self.block)__arrow \(Self.block)__arrow--toward"]) {
-                HTML.span {
-                    HTML.text("naar toe")
-                }
-            }
-        }
-    }
-
     private func summary() -> any HTMLNode {
-        HTML.div(["class": "\(Self.block)__summary"]) {
-            HTML.div(["class": "\(Self.block)__balance"]) {
-                HTML.div(["class": "\(Self.block)__balance-fill"]) {}
-            }
-
-            HTML.div {
+        HTML.section(["class": "\(Self.block)__summary"]) {
+            HTML.div(["class": "\(Self.block)__summary-head"]) {
                 HTML.p(["class": "\(Self.block)__summary-eyebrow"]) {
                     HTML.text("interpretatie")
                 }
@@ -536,8 +397,35 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
                 }
 
                 HTML.p(["data-summary-text": ""]) {
-                    HTML.text("De gekozen reactie wordt begrijpelijker wanneer zichtbaar wordt wat deze oplevert, voorkomt, verliest of activeert.")
+                    HTML.text("De kaart wordt duidelijk zodra je per respons ziet wat deze oplevert, wat ermee stopt, en welke kosten eraan hangen.")
                 }
+            }
+
+            HTML.div(["class": "\(Self.block)__totals"]) {
+                totalPill(
+                    pole: .voordeel,
+                    label: "Voordeel"
+                )
+
+                totalPill(
+                    pole: .nadeel,
+                    label: "Nadeel"
+                )
+            }
+        }
+    }
+
+    private func totalPill(
+        pole: DrijfverenResponseMapPole,
+        label: String
+    ) -> any HTMLNode {
+        HTML.div(["class": "\(Self.block)__total \(Self.block)__total--\(pole.rawValue)"]) {
+            HTML.span {
+                HTML.text(label)
+            }
+
+            HTML.strong(["data-pole-total": pole.rawValue]) {
+                HTML.text("0")
             }
         }
     }
@@ -580,8 +468,7 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
                     CSS.decl("--tool-muted", "var(--muted-text-color, rgba(23, 32, 42, .65))"),
                     CSS.decl("--tool-voordeel", "var(--success, #2E8B57)"),
                     CSS.decl("--tool-nadeel", "var(--danger, #D64545)"),
-                    CSS.decl("--tool-balance", "50%"),
-                    CSS.decl("width", "min(1180px, calc(100% - 48px))"),
+                    CSS.decl("width", "min(1120px, calc(100% - 48px))"),
                     CSS.decl("margin", "0 auto"),
                     CSS.decl("padding", "58px 0 92px"),
                     CSS.decl("color", "var(--tool-text)")
@@ -594,12 +481,12 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(block)__hero",
-                    CSS.decl("max-width", "920px"),
+                    CSS.decl("max-width", "860px"),
                     CSS.decl("margin", "0 0 32px")
                 ),
 
                 CSS.rule(
-                    ".\(block)__eyebrow, .\(block)__panel-eyebrow",
+                    ".\(block)__eyebrow, .\(block)__summary-eyebrow",
                     CSS.decl("margin", "0 0 8px"),
                     CSS.decl("font-size", ".76rem"),
                     CSS.decl("font-weight", "780"),
@@ -618,7 +505,7 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(block)__lead",
-                    CSS.decl("max-width", "820px"),
+                    CSS.decl("max-width", "800px"),
                     CSS.decl("margin", "18px 0 0"),
                     CSS.decl("font-size", "1.08rem"),
                     CSS.decl("line-height", "1.55"),
@@ -654,7 +541,7 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(block)__field span",
+                    ".\(block)__field span, .\(block)__response-field span",
                     CSS.decl("font-size", ".72rem"),
                     CSS.decl("font-weight", "780"),
                     CSS.decl("letter-spacing", ".09em"),
@@ -675,171 +562,93 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(block)__workspace",
+                    ".\(block)__map",
                     CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-columns", "minmax(260px, .34fr) minmax(0, .66fr)"),
-                    CSS.decl("gap", "16px"),
-                    CSS.decl("align-items", "start")
+                    CSS.decl("gap", "16px")
                 ),
 
                 CSS.rule(
-                    ".\(block)__responses, .\(block)__graph-panel, .\(block)__actions",
+                    ".\(block)__focus-card",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "minmax(0, .58fr) minmax(280px, .42fr)"),
+                    CSS.decl("gap", "16px"),
+                    CSS.decl("align-items", "stretch"),
+                    CSS.decl("padding", "18px"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--link-color) 38%, var(--tool-border))"),
+                    CSS.decl("border-radius", "22px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--link-color) 8%, var(--tool-surface))")
+                ),
+
+                CSS.rule(
+                    ".\(block)__focus-copy h2",
+                    CSS.decl("margin", "0"),
+                    CSS.decl("font-size", "1.35rem"),
+                    CSS.decl("line-height", "1.15")
+                ),
+
+                CSS.rule(
+                    ".\(block)__focus-copy p:not(.\(block)__eyebrow)",
+                    CSS.decl("margin", "8px 0 0"),
+                    CSS.decl("font-size", ".94rem"),
+                    CSS.decl("line-height", "1.45"),
+                    CSS.decl("color", "var(--tool-muted)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__response-field",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "8px"),
+                    CSS.decl("align-content", "center"),
+                    CSS.decl("padding", "14px"),
+                    CSS.decl("border", "1px solid var(--tool-border)"),
+                    CSS.decl("border-radius", "18px"),
+                    CSS.decl("background", "var(--tool-surface)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__response-field input",
+                    CSS.decl("font-weight", "760")
+                ),
+
+                CSS.rule(
+                    ".\(block)__motivation-grid",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "repeat(2, minmax(0, 1fr))"),
+                    CSS.decl("gap", "16px")
+                ),
+
+                CSS.rule(
+                    ".\(block)__motivation-lane",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "12px"),
+                    CSS.decl("align-content", "start"),
+                    CSS.decl("padding", "16px"),
                     CSS.decl("border", "1px solid var(--tool-border)"),
                     CSS.decl("border-radius", "22px"),
                     CSS.decl("background", "var(--tool-surface)")
                 ),
 
                 CSS.rule(
-                    ".\(block)__responses, .\(block)__graph-panel",
-                    CSS.decl("padding", "18px")
+                    ".\(block)__motivation-lane--voordelen",
+                    CSS.decl("box-shadow", "inset 6px 0 0 color-mix(in srgb, var(--tool-voordeel) 72%, transparent)")
                 ),
 
                 CSS.rule(
-                    ".\(block)__panel-head h2, .\(block)__graph-head h2",
+                    ".\(block)__motivation-lane--nadelen",
+                    CSS.decl("box-shadow", "inset 6px 0 0 color-mix(in srgb, var(--tool-nadeel) 72%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__motivation-lane-head",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "4px"),
+                    CSS.decl("padding", "0 0 12px"),
+                    CSS.decl("border-bottom", "1px solid var(--tool-border)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__motivation-lane-head p",
                     CSS.decl("margin", "0"),
-                    CSS.decl("font-size", "1.25rem"),
-                    CSS.decl("line-height", "1.15")
-                ),
-
-                CSS.rule(
-                    ".\(block)__panel-head p:not(.\(block)__panel-eyebrow)",
-                    CSS.decl("margin", "8px 0 0"),
-                    CSS.decl("font-size", ".92rem"),
-                    CSS.decl("line-height", "1.45"),
-                    CSS.decl("color", "var(--tool-muted)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__response-list",
-                    CSS.decl("display", "grid"),
-                    CSS.decl("gap", "10px"),
-                    CSS.decl("margin", "16px 0")
-                ),
-
-                CSS.rule(
-                    ".\(block)__response-row",
-                    CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-columns", "auto minmax(0, 1fr)"),
-                    CSS.decl("gap", "8px"),
-                    CSS.decl("padding", "10px"),
-                    CSS.decl("border", "1px solid var(--tool-border)"),
-                    CSS.decl("border-radius", "16px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--tool-soft) 65%, transparent)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__response-row--active",
-                    CSS.decl("border-color", "color-mix(in srgb, var(--link-color) 48%, var(--tool-border))"),
-                    CSS.decl("background", "color-mix(in srgb, var(--link-color) 10%, var(--tool-surface))")
-                ),
-
-                CSS.rule(
-                    ".\(block)__response-select",
-                    CSS.decl("grid-row", "span 2"),
-                    CSS.decl("align-self", "stretch"),
-                    CSS.decl("border", "1px solid var(--tool-border)"),
-                    CSS.decl("border-radius", "12px"),
-                    CSS.decl("background", "var(--tool-surface)"),
-                    CSS.decl("color", "var(--tool-text)"),
-                    CSS.decl("font", "inherit"),
-                    CSS.decl("font-weight", "760"),
-                    CSS.decl("cursor", "pointer")
-                ),
-
-                CSS.rule(
-                    ".\(block)__response-salience",
-                    CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-columns", "auto minmax(0, 1fr)"),
-                    CSS.decl("gap", "8px"),
-                    CSS.decl("align-items", "center")
-                ),
-
-                CSS.rule(
-                    ".\(block)__response-salience span",
-                    CSS.decl("font-size", ".72rem"),
-                    CSS.decl("font-weight", "760"),
-                    CSS.decl("color", "var(--tool-muted)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__graph-head",
-                    CSS.decl("display", "flex"),
-                    CSS.decl("justify-content", "space-between"),
-                    CSS.decl("gap", "16px"),
-                    CSS.decl("align-items", "flex-start"),
-                    CSS.decl("margin-bottom", "16px")
-                ),
-
-                CSS.rule(
-                    ".\(block)__score-strip",
-                    CSS.decl("display", "flex"),
-                    CSS.decl("gap", "8px"),
-                    CSS.decl("flex-wrap", "wrap"),
-                    CSS.decl("justify-content", "flex-end")
-                ),
-
-                CSS.rule(
-                    ".\(block)__score",
-                    CSS.decl("display", "grid"),
-                    CSS.decl("gap", "2px"),
-                    CSS.decl("min-width", "94px"),
-                    CSS.decl("padding", "8px 10px"),
-                    CSS.decl("border-radius", "16px"),
-                    CSS.decl("background", "var(--tool-soft)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__score span",
-                    CSS.decl("font-size", ".68rem"),
-                    CSS.decl("font-weight", "760"),
-                    CSS.decl("letter-spacing", ".06em"),
-                    CSS.decl("text-transform", "uppercase"),
-                    CSS.decl("color", "var(--tool-muted)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__score strong",
-                    CSS.decl("font-family", "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"),
-                    CSS.decl("font-size", "1rem")
-                ),
-
-                CSS.rule(
-                    ".\(block)__score--voordeel strong",
-                    CSS.decl("color", "var(--tool-voordeel)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__score--nadeel strong",
-                    CSS.decl("color", "var(--tool-nadeel)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__graph",
-                    CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-columns", "minmax(0, 1fr) minmax(180px, 220px) minmax(0, 1fr)"),
-                    CSS.decl("gap", "14px"),
-                    CSS.decl("align-items", "stretch")
-                ),
-
-                CSS.rule(
-                    ".\(block)__pole",
-                    CSS.decl("display", "grid"),
-                    CSS.decl("align-content", "start"),
-                    CSS.decl("gap", "10px"),
-                    CSS.decl("min-width", "0")
-                ),
-
-                CSS.rule(
-                    ".\(block)__pole-head",
-                    CSS.decl("padding", "14px"),
-                    CSS.decl("border", "1px solid var(--tool-border)"),
-                    CSS.decl("border-radius", "18px"),
-                    CSS.decl("background", "var(--tool-soft)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__pole-head p",
-                    CSS.decl("margin", "0 0 4px"),
                     CSS.decl("font-size", ".72rem"),
                     CSS.decl("font-weight", "780"),
                     CSS.decl("letter-spacing", ".09em"),
@@ -848,19 +657,23 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(block)__pole-head h3",
+                    ".\(block)__motivation-lane-head h3",
                     CSS.decl("margin", "0"),
-                    CSS.decl("font-size", "1.05rem")
+                    CSS.decl("font-size", "1.2rem"),
+                    CSS.decl("line-height", "1.12")
                 ),
 
                 CSS.rule(
-                    ".\(block)__pole--voordeel .\(block)__pole-head",
-                    CSS.decl("box-shadow", "inset 5px 0 0 color-mix(in srgb, var(--tool-voordeel) 72%, transparent)")
+                    ".\(block)__motivation-lane-head span",
+                    CSS.decl("font-size", ".9rem"),
+                    CSS.decl("line-height", "1.4"),
+                    CSS.decl("color", "var(--tool-muted)")
                 ),
 
                 CSS.rule(
-                    ".\(block)__pole--nadeel .\(block)__pole-head",
-                    CSS.decl("box-shadow", "inset 5px 0 0 color-mix(in srgb, var(--tool-nadeel) 72%, transparent)")
+                    ".\(block)__bucket-stack",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "12px")
                 ),
 
                 CSS.rule(
@@ -870,12 +683,13 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
                     CSS.decl("padding", "12px"),
                     CSS.decl("border", "1px solid var(--tool-border)"),
                     CSS.decl("border-radius", "18px"),
-                    CSS.decl("background", "var(--tool-surface)")
+                    CSS.decl("background", "color-mix(in srgb, var(--tool-soft) 62%, var(--tool-surface))")
                 ),
 
                 CSS.rule(
                     ".\(block)__bucket-head",
                     CSS.decl("display", "flex"),
+                    CSS.decl("align-items", "flex-start"),
                     CSS.decl("justify-content", "space-between"),
                     CSS.decl("gap", "10px")
                 ),
@@ -893,7 +707,7 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(block)__bucket-head h4",
                     CSS.decl("margin", "0"),
-                    CSS.decl("font-size", ".92rem"),
+                    CSS.decl("font-size", ".96rem"),
                     CSS.decl("line-height", "1.2")
                 ),
 
@@ -906,7 +720,7 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(block)__item-row",
                     CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-columns", "minmax(0, 1fr) minmax(92px, 124px) 32px"),
+                    CSS.decl("grid-template-columns", "minmax(0, 1fr) minmax(94px, 126px) 32px"),
                     CSS.decl("gap", "7px"),
                     CSS.decl("align-items", "center")
                 ),
@@ -927,146 +741,15 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(block)__center",
-                    CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-rows", "1fr auto 1fr"),
-                    CSS.decl("align-items", "center"),
-                    CSS.decl("justify-items", "center"),
-                    CSS.decl("gap", "12px"),
-                    CSS.decl("min-height", "420px")
-                ),
-
-                CSS.rule(
-                    ".\(block)__dog-node",
-                    CSS.decl("display", "grid"),
-                    CSS.decl("place-items", "center"),
-                    CSS.decl("gap", "5px"),
-                    CSS.decl("width", "100%"),
-                    CSS.decl("min-height", "166px"),
-                    CSS.decl("padding", "18px"),
-                    CSS.decl("border", "1px solid color-mix(in srgb, var(--link-color) 40%, var(--tool-border))"),
-                    CSS.decl("border-radius", "28px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--link-color) 10%, var(--tool-surface))"),
-                    CSS.decl("text-align", "center")
-                ),
-
-                CSS.rule(
-                    ".\(block)__dog-node p",
-                    CSS.decl("margin", "0"),
-                    CSS.decl("font-size", ".72rem"),
-                    CSS.decl("font-weight", "780"),
-                    CSS.decl("letter-spacing", ".1em"),
-                    CSS.decl("text-transform", "uppercase"),
-                    CSS.decl("color", "var(--tool-muted)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__dog-node strong",
-                    CSS.decl("font-size", "1.08rem"),
-                    CSS.decl("line-height", "1.16")
-                ),
-
-                CSS.rule(
-                    ".\(block)__dog-node span",
-                    CSS.decl("font-size", ".82rem"),
-                    CSS.decl("line-height", "1.35"),
-                    CSS.decl("color", "var(--tool-muted)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__arrow",
-                    CSS.decl("position", "relative"),
-                    CSS.decl("width", "100%"),
-                    CSS.decl("min-height", "74px"),
-                    CSS.decl("display", "grid"),
-                    CSS.decl("place-items", "center")
-                ),
-
-                CSS.rule(
-                    ".\(block)__arrow::before",
-                    CSS.decl("content", "''"),
-                    CSS.decl("position", "absolute"),
-                    CSS.decl("left", "16px"),
-                    CSS.decl("right", "16px"),
-                    CSS.decl("top", "50%"),
-                    CSS.decl("height", "2px"),
-                    CSS.decl("background", "var(--tool-border)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__arrow::after",
-                    CSS.decl("content", "''"),
-                    CSS.decl("position", "absolute"),
-                    CSS.decl("top", "calc(50% - 5px)"),
-                    CSS.decl("width", "10px"),
-                    CSS.decl("height", "10px"),
-                    CSS.decl("border-top", "2px solid var(--tool-border)"),
-                    CSS.decl("border-right", "2px solid var(--tool-border)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__arrow--toward::after",
-                    CSS.decl("right", "14px"),
-                    CSS.decl("transform", "rotate(45deg)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__arrow--away::after",
-                    CSS.decl("left", "14px"),
-                    CSS.decl("transform", "rotate(225deg)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__arrow span",
-                    CSS.decl("position", "relative"),
-                    CSS.decl("z-index", "1"),
-                    CSS.decl("padding", "4px 8px"),
-                    CSS.decl("border", "1px solid var(--tool-border)"),
-                    CSS.decl("border-radius", "999px"),
-                    CSS.decl("background", "var(--tool-surface)"),
-                    CSS.decl("font-size", ".72rem"),
-                    CSS.decl("font-weight", "780"),
-                    CSS.decl("letter-spacing", ".08em"),
-                    CSS.decl("text-transform", "uppercase"),
-                    CSS.decl("color", "var(--tool-muted)")
-                ),
-
-                CSS.rule(
                     ".\(block)__summary",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "12px"),
-                    CSS.decl("margin-top", "16px"),
+                    CSS.decl("grid-template-columns", "minmax(0, 1fr) auto"),
+                    CSS.decl("gap", "16px"),
+                    CSS.decl("align-items", "center"),
                     CSS.decl("padding", "16px"),
                     CSS.decl("border", "1px solid var(--tool-border)"),
                     CSS.decl("border-radius", "18px"),
                     CSS.decl("background", "var(--tool-soft)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__balance",
-                    CSS.decl("height", "16px"),
-                    CSS.decl("border-radius", "999px"),
-                    CSS.decl("overflow", "hidden"),
-                    CSS.decl("background", "color-mix(in srgb, var(--tool-nadeel) 70%, transparent)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__balance-fill",
-                    CSS.decl("width", "var(--tool-balance)"),
-                    CSS.decl("height", "100%"),
-                    CSS.decl("border-radius", "inherit"),
-                    CSS.decl("background", "color-mix(in srgb, var(--tool-voordeel) 72%, transparent)"),
-                    CSS.decl("transition", "width .16s ease")
-                ),
-
-                CSS.rule(
-                    ".\(block)__summary-eyebrow",
-                    CSS.decl("margin", "0 0 4px"),
-                    CSS.decl("font-size", ".72rem"),
-                    CSS.decl("font-weight", "780"),
-                    CSS.decl("letter-spacing", ".09em"),
-                    CSS.decl("text-transform", "uppercase"),
-                    CSS.decl("color", "var(--tool-muted)")
                 ),
 
                 CSS.rule(
@@ -1084,12 +767,58 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(block)__totals",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("gap", "8px"),
+                    CSS.decl("flex-wrap", "wrap"),
+                    CSS.decl("justify-content", "flex-end")
+                ),
+
+                CSS.rule(
+                    ".\(block)__total",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "2px"),
+                    CSS.decl("min-width", "86px"),
+                    CSS.decl("padding", "8px 10px"),
+                    CSS.decl("border-radius", "16px"),
+                    CSS.decl("background", "var(--tool-surface)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__total span",
+                    CSS.decl("font-size", ".68rem"),
+                    CSS.decl("font-weight", "760"),
+                    CSS.decl("letter-spacing", ".06em"),
+                    CSS.decl("text-transform", "uppercase"),
+                    CSS.decl("color", "var(--tool-muted)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__total strong",
+                    CSS.decl("font-family", "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"),
+                    CSS.decl("font-size", "1rem")
+                ),
+
+                CSS.rule(
+                    ".\(block)__total--voordeel strong",
+                    CSS.decl("color", "var(--tool-voordeel)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__total--nadeel strong",
+                    CSS.decl("color", "var(--tool-nadeel)")
+                ),
+
+                CSS.rule(
                     ".\(block)__actions",
                     CSS.decl("display", "flex"),
                     CSS.decl("flex-wrap", "wrap"),
                     CSS.decl("gap", "10px"),
                     CSS.decl("margin-top", "18px"),
-                    CSS.decl("padding", "18px")
+                    CSS.decl("padding", "18px"),
+                    CSS.decl("border", "1px solid var(--tool-border)"),
+                    CSS.decl("border-radius", "22px"),
+                    CSS.decl("background", "var(--tool-surface)")
                 ),
 
                 CSS.rule(
@@ -1148,14 +877,17 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
                         CSS.decl("padding", "44px 0 78px")
                     ),
                     CSS.rule(
-                        ".\(block)__context-grid, .\(block)__workspace, .\(block)__graph",
+                        ".\(block)__context-grid, .\(block)__focus-card, .\(block)__motivation-grid, .\(block)__summary",
                         CSS.decl("grid-template-columns", "1fr")
                     ),
                     CSS.rule(
-                        ".\(block)__center",
-                        CSS.decl("grid-template-rows", "auto auto auto"),
-                        CSS.decl("min-height", "0")
-                    ),
+                        ".\(block)__totals",
+                        CSS.decl("justify-content", "flex-start")
+                    )
+                ),
+
+                CSS.media(
+                    "(max-width: 640px)",
                     CSS.rule(
                         ".\(block)__item-row",
                         CSS.decl("grid-template-columns", "1fr")
@@ -1195,7 +927,7 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
                         CSS.decl("print-color-adjust", "exact")
                     ),
                     CSS.rule(
-                        ".\(block)__surface, .\(block)__responses, .\(block)__graph-panel, .\(block)__field, .\(block)__bucket, .\(block)__dog-node, .\(block)__summary",
+                        ".\(block)__surface, .\(block)__focus-card, .\(block)__motivation-lane, .\(block)__bucket, .\(block)__summary",
                         CSS.decl("box-shadow", "none"),
                         CSS.decl("break-inside", "avoid")
                     )
@@ -1221,6 +953,7 @@ public struct DrijfverenResponseMapToolScript: ReusableComponent {
         if (window.wcDrijfverenResponseMapTool?.initialized) return;
 
         const rootSelector = '[data-drijfveren-response-map-tool]';
+
         const kinds = {
             'appetitive-gain': 'voordeel',
             'aversive-relief': 'voordeel',
@@ -1235,22 +968,6 @@ public struct DrijfverenResponseMapToolScript: ReusableComponent {
         function numeric(value, fallback = 0) {
             const next = Number(value);
             return Number.isFinite(next) ? next : fallback;
-        }
-
-        function activeID(root) {
-            return root.getAttribute('data-active-response') || 'response-1';
-        }
-
-        function activeLabel(root) {
-            const id = activeID(root);
-            const input = root.querySelector(`[data-response-label="${id}"]`);
-
-            return text(input?.value) || 'Geselecteerde reactie';
-        }
-
-        function circumstanceLabel(root) {
-            const input = root.querySelector('[data-drijfveren-field="circumstance"]');
-            return text(input?.value) || 'in deze omstandigheid';
         }
 
         function rowScore(row) {
@@ -1288,64 +1005,35 @@ public struct DrijfverenResponseMapToolScript: ReusableComponent {
             if (total.voordeel === 0 && total.nadeel === 0) {
                 return {
                     title: 'Vul de concrete voordelen en nadelen in',
-                    text: 'De gekozen reactie wordt begrijpelijker wanneer zichtbaar wordt wat deze oplevert, voorkomt, verliest of activeert.'
+                    text: 'De kaart wordt duidelijk zodra je per respons ziet wat deze oplevert, wat ermee stopt, en welke kosten eraan hangen.'
                 };
             }
 
             if (total.voordeel > total.nadeel) {
                 return {
-                    title: 'Deze reactie wordt naar voren getrokken door voordeel',
-                    text: 'De ingevulde voordelen zijn sterker dan de nadelen. De respons beweegt vooral naar toegang, controle, opluchting of een ander belangrijk gevolg toe.'
+                    title: 'De voordelen maken deze reactie logisch',
+                    text: 'De respons wordt begrijpelijk omdat hij iets oplevert of iets onaangenaams laat stoppen. Denk bij reactiviteit bijvoorbeeld aan afstand, opluchting, controle of ontlading.'
                 };
             }
 
             if (total.nadeel > total.voordeel) {
                 return {
-                    title: 'Deze reactie wordt geremd door nadeel',
-                    text: 'De ingevulde nadelen zijn sterker dan de voordelen. De respons kan verdwijnen, afzwakken of plaatsmaken voor een andere latente reactie.'
+                    title: 'De nadelen kunnen deze reactie remmen',
+                    text: 'De respons heeft wel functie, maar brengt ook kosten mee. Daardoor kan alternatief gedrag kansrijker worden wanneer dat dezelfde voordelen geeft met minder nadeel.'
                 };
             }
 
             return {
-                title: 'Voordelen en nadelen houden elkaar in balans',
-                text: 'Kleine verschillen in context, afstand, behoefte, eerdere ervaring of alternatief gedrag kunnen bepalen welke reactie uiteindelijk prominent wordt.'
+                title: 'Voordelen en nadelen zijn ongeveer even sterk',
+                text: 'Dan kunnen kleine contextfactoren bepalen wat de hond uiteindelijk doet: afstand, spanning, eerdere herhaling, begeleidergedrag of beschikbaar alternatief gedrag.'
             };
-        }
-
-        function updateResponseRows(root) {
-            const id = activeID(root);
-
-            root.querySelectorAll('[data-response-row]').forEach((row) => {
-                row.classList.toggle(
-                    'wc-drijfveren-response-map-tool__response-row--active',
-                    row.getAttribute('data-response-row') === id
-                );
-            });
         }
 
         function update(root) {
             if (!root) return;
 
-            updateResponseRows(root);
-
-            const label = activeLabel(root);
-            const context = circumstanceLabel(root);
             const total = totals(root);
-            const all = total.voordeel + total.nadeel;
-            const share = all > 0
-                ? Math.round((total.voordeel / all) * 100)
-                : 50;
             const summary = summaryFor(total);
-
-            root.style.setProperty('--tool-balance', `${share}%`);
-
-            root.querySelectorAll('[data-active-response-label], [data-center-response-label]').forEach((node) => {
-                node.textContent = label;
-            });
-
-            root.querySelectorAll('[data-center-context-label]').forEach((node) => {
-                node.textContent = context;
-            });
 
             Object.entries(total).forEach(([pole, value]) => {
                 const node = root.querySelector(`[data-pole-total="${pole}"]`);
@@ -1406,46 +1094,6 @@ public struct DrijfverenResponseMapToolScript: ReusableComponent {
             return row;
         }
 
-        function makeResponseRow(root) {
-            const count = root.querySelectorAll('[data-response-row]').length + 1;
-            const id = `response-${Date.now()}-${count}`;
-
-            const row = document.createElement('div');
-            row.className = 'wc-drijfveren-response-map-tool__response-row';
-            row.setAttribute('data-response-row', id);
-
-            const select = document.createElement('button');
-            select.type = 'button';
-            select.className = 'wc-drijfveren-response-map-tool__response-select';
-            select.setAttribute('data-response-select', id);
-            select.setAttribute('aria-label', 'Selecteer reactie');
-            select.textContent = 'Kies';
-
-            const label = document.createElement('input');
-            label.type = 'text';
-            label.value = `Reactie ${count}`;
-            label.setAttribute('data-response-label', id);
-            label.setAttribute('aria-label', 'Respons');
-
-            const salience = document.createElement('label');
-            salience.className = 'wc-drijfveren-response-map-tool__response-salience';
-
-            const salienceText = document.createElement('span');
-            salienceText.textContent = 'salientie';
-
-            const salienceInput = document.createElement('input');
-            salienceInput.type = 'range';
-            salienceInput.min = '0';
-            salienceInput.max = '5';
-            salienceInput.value = '2';
-            salienceInput.setAttribute('data-response-salience', id);
-
-            salience.append(salienceText, salienceInput);
-            row.append(select, label, salience);
-
-            return row;
-        }
-
         function clearMap(root) {
             root.querySelectorAll('[data-drijfveren-field], [data-kind-input]').forEach((input) => {
                 input.value = '';
@@ -1470,26 +1118,8 @@ public struct DrijfverenResponseMapToolScript: ReusableComponent {
             root.addEventListener('change', () => update(root));
 
             root.addEventListener('click', (event) => {
-                const select = event.target.closest('[data-response-select]');
-                if (select) {
-                    root.setAttribute('data-active-response', select.getAttribute('data-response-select'));
-                    update(root);
-                    return;
-                }
-
-                const addResponse = event.target.closest('[data-response-add]');
-                if (addResponse) {
-                    const list = root.querySelector('[data-response-list]');
-                    const row = makeResponseRow(root);
-
-                    list?.appendChild(row);
-                    root.setAttribute('data-active-response', row.getAttribute('data-response-row'));
-                    row.querySelector('[data-response-label]')?.focus();
-                    update(root);
-                    return;
-                }
-
                 const addKind = event.target.closest('[data-kind-add]');
+
                 if (addKind) {
                     const kind = addKind.getAttribute('data-kind-add');
                     const list = root.querySelector(`[data-kind-list="${kind}"]`);
@@ -1502,6 +1132,7 @@ public struct DrijfverenResponseMapToolScript: ReusableComponent {
                 }
 
                 const remove = event.target.closest('[data-kind-remove]');
+
                 if (remove) {
                     const row = remove.closest('[data-kind-row]');
                     const list = row?.parentElement;
