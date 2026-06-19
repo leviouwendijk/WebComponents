@@ -525,18 +525,15 @@ public struct DrijfverenResponseMapTool: ReusableComponent, Sendable {
         _ kind: DrijfverenResponseMapKind,
         selected: Bool
     ) -> any HTMLNode {
-        var attributes: [String: String] = [
+        var attributes: HTMLAttribute = [
             "value": kind.rawValue
         ]
 
         if selected {
-            attributes["selected"] = "selected"
+            attributes.merge(.bool("selected", true))
         }
 
-        return HTML.el(
-            "option",
-            attributes
-        ) {
+        return HTML.option(attributes) {
             HTML.text(kind.selectLabel)
         }
     }
