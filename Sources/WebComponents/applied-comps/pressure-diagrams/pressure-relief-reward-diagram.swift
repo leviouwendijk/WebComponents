@@ -40,7 +40,7 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
 
     public init(
         id: String = "pressure-relief-reward",
-        caption: String? = "Een aversieve prikkel beëindigen geeft opluchting. Wanneer een appetitieve uitkomst direct daarna verschijnt, kan de herstelperiode positiever en langer worden dan release alleen.",
+        caption: String? = "Een aversieve prikkel beëindigen geeft opluchting. Wanneer een appetitieve uitkomst kort daarna verschijnt, kan die opluchting overgaan in positiever en langduriger herstel.",
         includeNote: Bool = true,
         includeStyles: Bool = true
     ) {
@@ -63,7 +63,7 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                         [
                             "class": ClassName.stage,
                             "role": "img",
-                            "aria-label": "Druk of stress stijgt en stopt bij release. Daarna ontstaat een opluchtingsvenster. Een appetitieve beloning binnen dat venster verlengt positieve herstelwaarde."
+                            "aria-label": "Druk of stress stijgt en wordt opgeheven. Daarna ontstaat een opluchtingsvenster. Een appetitieve beloning binnen dat venster kan positieve herstelwaarde verlengen."
                         ]
                     ) {
                         Self.legend()
@@ -143,9 +143,9 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                 "rect",
                 [
                     "class": ClassName.reliefWindow,
-                    "x": "496",
+                    "x": "494",
                     "y": "62",
-                    "width": "184",
+                    "width": "190",
                     "height": "240",
                     "rx": "20",
                     "ry": "20"
@@ -167,9 +167,9 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                 "line",
                 [
                     "class": ClassName.rewardMarker,
-                    "x1": "578",
+                    "x1": "582",
                     "y1": "64",
-                    "x2": "578",
+                    "x2": "582",
                     "y2": "318"
                 ]
             ) {}
@@ -178,7 +178,7 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                 "path",
                 [
                     "class": "\(ClassName.curve) \(ClassName.stressCurve)",
-                    "d": "M 94 294 C 130 232, 164 181, 208 176 C 276 170, 342 170, 398 176 C 438 181, 468 170, 496 178 C 506 218, 522 260, 548 294"
+                    "d": "M 94 294 C 128 228, 166 184, 218 184 H 424 C 456 184, 480 184, 498 184 C 506 228, 526 270, 548 294"
                 ]
             ) {}
 
@@ -186,7 +186,7 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                 "path",
                 [
                     "class": "\(ClassName.curve) \(ClassName.reliefCurve)",
-                    "d": "M 482 294 C 496 250, 512 205, 548 180 C 592 150, 652 156, 708 190 C 750 216, 774 250, 794 286"
+                    "d": "M 482 294 C 500 242, 530 205, 574 192 C 626 176, 692 196, 744 238 C 768 258, 786 280, 802 294"
                 ]
             ) {}
 
@@ -194,7 +194,7 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                 "path",
                 [
                     "class": "\(ClassName.curve) \(ClassName.rewardCurve)",
-                    "d": "M 562 294 C 574 234, 594 194, 632 186 C 684 176, 748 182, 812 188 C 832 224, 850 260, 866 294"
+                    "d": "M 570 294 C 586 238, 620 208, 672 204 H 814 C 828 238, 846 270, 864 294"
                 ]
             ) {}
 
@@ -202,7 +202,7 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                 "path",
                 [
                     "class": "\(ClassName.curve) \(ClassName.nextCurve)",
-                    "d": "M 690 294 C 712 254, 740 230, 774 230 C 806 230, 828 250, 846 286"
+                    "d": "M 714 294 C 734 262, 758 246, 790 246 C 820 246, 838 264, 850 288"
                 ]
             ) {}
 
@@ -221,8 +221,8 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
             )
 
             graphText(
-                x: 122,
-                y: 166,
+                x: 126,
+                y: 174,
                 text: "druk / stressor",
                 className: ClassName.label
             )
@@ -230,36 +230,44 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
             graphText(
                 x: 514,
                 y: 82,
-                text: "release",
+                text: "opheffing",
                 className: ClassName.label
             )
 
             graphText(
-                x: 588,
+                x: 594,
                 y: 82,
                 text: "beloning",
                 className: ClassName.label
             )
 
             graphText(
-                x: 610,
+                x: 596,
                 y: 326,
                 text: "opluchtingsvenster",
                 className: "\(ClassName.label) \(ClassName.labelMuted)"
             )
 
             callout(
-                x: 620,
-                y: 106,
-                title: "Reward in relief window",
-                text: "appetitieve uitkomst valt samen met herstel"
+                x: 628,
+                y: 112,
+                width: 224,
+                title: "Beloning in opluchtingsvenster",
+                lines: [
+                    "appetitieve uitkomst",
+                    "valt samen met herstel"
+                ]
             )
 
             callout(
-                x: 626,
+                x: 628,
                 y: 238,
-                title: "Volgende respons",
-                text: "lager / korter bij voldoende controle"
+                width: 224,
+                title: "Volgende stressrespons",
+                lines: [
+                    "lager of korter",
+                    "bij voldoende controle"
+                ]
             )
         }
     }
@@ -282,7 +290,7 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                 HTML.span([
                     "class": "\(ClassName.legendLine) \(ClassName.legendRelief)"
                 ]) {}
-                HTML.text("opluchting na release")
+                HTML.text("opluchting na opheffing")
             }
 
             HTML.span(["class": ClassName.legendItem]) {
@@ -315,10 +323,13 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
     private static func callout(
         x: Int,
         y: Int,
+        width: Int,
         title: String,
-        text: String
+        lines: [String]
     ) -> any HTMLNode {
-        HTML.el(
+        let height = 42 + (lines.count * 17)
+
+        return HTML.el(
             "g",
             [
                 "class": ClassName.callout,
@@ -330,8 +341,8 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                 [
                     "x": "0",
                     "y": "0",
-                    "width": "214",
-                    "height": "66",
+                    "width": "\(width)",
+                    "height": "\(height)",
                     "rx": "15",
                     "ry": "15"
                 ]
@@ -342,7 +353,7 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                 [
                     "class": ClassName.calloutTitle,
                     "x": "14",
-                    "y": "25"
+                    "y": "24"
                 ]
             ) {
                 HTML.text(title)
@@ -356,7 +367,17 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                     "y": "46"
                 ]
             ) {
-                HTML.text(text)
+                for (index, line) in lines.enumerated() {
+                    HTML.el(
+                        "tspan",
+                        [
+                            "x": "14",
+                            "dy": index == 0 ? "0" : "17"
+                        ]
+                    ) {
+                        HTML.text(line)
+                    }
+                }
             }
         }
     }
@@ -367,7 +388,7 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                 HTML.text("Toepassing:")
             }
 
-            HTML.text(" niet “meer druk toevoegen”, maar lage en begrijpelijke druk zo doseren dat de hond controle ervaart: keuze → release → herstel → appetitieve uitkomst.")
+            HTML.text(" niet “meer druk toevoegen”, maar lage en begrijpelijke druk zo doseren dat de hond controle ervaart: keuze → opheffing → opluchting → herstel → appetitieve uitkomst.")
         }
     }
 
@@ -378,7 +399,7 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                     ".\(ClassName.root)",
                     CSS.decl("width", "min(920px, 100%)"),
                     CSS.decl("margin", "24px 0 30px"),
-                    CSS.decl("--wc-relief-stress", "color-mix(in srgb, var(--text-color) 82%, transparent)"),
+                    CSS.decl("--wc-relief-stress", "color-mix(in srgb, var(--text-color) 78%, transparent)"),
                     CSS.decl("--wc-relief-blue", "var(--link-color, #2563eb)"),
                     CSS.decl("--wc-relief-green", "var(--success, #2E8B57)"),
                     CSS.decl("--wc-relief-muted", "var(--muted-text-color, rgba(32, 33, 36, .66))")
@@ -407,7 +428,7 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                     CSS.decl("padding", "0 2px"),
                     CSS.decl("font-size", ".84rem"),
                     CSS.decl("line-height", "1.25"),
-                    CSS.decl("font-weight", "650"),
+                    CSS.decl("font-weight", "600"),
                     CSS.decl("color", "var(--wc-relief-muted)")
                 ),
 
@@ -525,9 +546,9 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(ClassName.label)",
-                    CSS.decl("font-family", "var(--mono-font, ui-monospace, SFMono-Regular, Menlo, monospace)"),
+                    CSS.decl("font-family", "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, monospace"),
                     CSS.decl("font-size", "12px"),
-                    CSS.decl("font-weight", "720"),
+                    CSS.decl("font-weight", "520"),
                     CSS.decl("fill", "var(--text-color)")
                 ),
 
@@ -547,14 +568,14 @@ public struct PressureReliefRewardDiagram: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.calloutTitle)",
                     CSS.decl("font-size", "13px"),
-                    CSS.decl("font-weight", "820"),
+                    CSS.decl("font-weight", "650"),
                     CSS.decl("fill", "var(--text-color)")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.calloutText)",
                     CSS.decl("font-size", "11px"),
-                    CSS.decl("font-weight", "560"),
+                    CSS.decl("font-weight", "470"),
                     CSS.decl("fill", "var(--muted-text-color)")
                 ),
 
