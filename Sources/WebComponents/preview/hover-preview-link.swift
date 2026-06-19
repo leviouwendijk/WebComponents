@@ -267,15 +267,20 @@ public struct HoverPreviewLink: SelectableComponent {
 
                 CSS.rule(
                     card,
-                    CSS.decl("position", "absolute"),
-                    CSS.decl("left", "50%"),
-                    CSS.decl("bottom", "calc(100% + 12px)"),
+                    CSS.decl("position", "fixed"),
+                    CSS.decl("left", "var(--wc-preview-left, 50vw)"),
+                    CSS.decl("top", "var(--wc-preview-top, 20vh)"),
+                    CSS.decl("bottom", "auto"),
                     CSS.decl("z-index", "var(--wc-hover-preview-z)"),
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "auto minmax(0, 1fr)"),
                     CSS.decl("gap", "12px"),
                     CSS.decl("width", "min(360px, calc(100vw - 32px))"),
                     CSS.decl("min-width", "280px"),
+                    CSS.decl("max-width", "calc(100vw - 28px)"),
+                    CSS.decl("max-height", "min(62vh, 420px)"),
+                    CSS.decl("overflow", "auto"),
+                    CSS.decl("-webkit-overflow-scrolling", "touch"),
                     CSS.decl("padding", "14px"),
                     CSS.decl("border", "1px solid var(--wc-hover-preview-border)"),
                     CSS.decl("border-radius", "18px"),
@@ -287,9 +292,15 @@ public struct HoverPreviewLink: SelectableComponent {
                     CSS.decl("opacity", "0"),
                     CSS.decl("visibility", "hidden"),
                     CSS.decl("pointer-events", "none"),
-                    CSS.decl("transform", "translate(-50%, 8px) scale(.985)"),
-                    CSS.decl("transform-origin", "bottom center"),
+                    CSS.decl("transform", "translateX(-50%) translateY(8px) scale(.985)"),
+                    CSS.decl("transform-origin", "center bottom"),
                     CSS.decl("transition", "opacity .16s ease, transform .16s ease, visibility 0s linear .16s")
+                ),
+
+                CSS.rule(
+                    "\(root)[data-preview-placement=\"below\"] \(card)",
+                    CSS.decl("transform", "translateX(-50%) translateY(-8px) scale(.985)"),
+                    CSS.decl("transform-origin", "center top")
                 ),
 
                 CSS.rule(
@@ -302,7 +313,7 @@ public struct HoverPreviewLink: SelectableComponent {
                     CSS.decl("opacity", "1"),
                     CSS.decl("visibility", "visible"),
                     CSS.decl("pointer-events", "auto"),
-                    CSS.decl("transform", "translate(-50%, 0) scale(1)"),
+                    CSS.decl("transform", "translateX(-50%) translateY(0) scale(1)"),
                     CSS.decl("transition-delay", "0s")
                 ),
 
@@ -310,7 +321,7 @@ public struct HoverPreviewLink: SelectableComponent {
                     "\(card)::after",
                     CSS.decl("content", "\"\""),
                     CSS.decl("position", "absolute"),
-                    CSS.decl("left", "50%"),
+                    CSS.decl("left", "var(--wc-preview-arrow-left, 50%)"),
                     CSS.decl("bottom", "-7px"),
                     CSS.decl("width", "14px"),
                     CSS.decl("height", "14px"),
@@ -318,6 +329,16 @@ public struct HoverPreviewLink: SelectableComponent {
                     CSS.decl("border-bottom", "1px solid var(--wc-hover-preview-border)"),
                     CSS.decl("background", "color-mix(in srgb, var(--wc-hover-preview-surface) 96%, var(--wc-hover-preview-ink) 4%)"),
                     CSS.decl("transform", "translateX(-50%) rotate(45deg)")
+                ),
+
+                CSS.rule(
+                    "\(root)[data-preview-placement=\"below\"] \(card)::after",
+                    CSS.decl("top", "-7px"),
+                    CSS.decl("bottom", "auto"),
+                    CSS.decl("border-right", "0"),
+                    CSS.decl("border-bottom", "0"),
+                    CSS.decl("border-left", "1px solid var(--wc-hover-preview-border)"),
+                    CSS.decl("border-top", "1px solid var(--wc-hover-preview-border)")
                 ),
 
                 CSS.rule(
@@ -444,7 +465,6 @@ public struct HoverPreviewLink: SelectableComponent {
                     CSS.decl("--wc-hover-preview-accent", "var(--link-color, #2563eb)")
                 ),
 
-                // additions
                 CSS.rule(
                     "\(root)[data-hover-preview-scope=\"same-page\"]",
                     CSS.decl("--wc-hover-preview-accent", "var(--wc-hover-preview-accent-same-page)")
@@ -464,14 +484,10 @@ public struct HoverPreviewLink: SelectableComponent {
                 CSS.media(
                     "(max-width: 640px)",
                     CSS.rule(
-                        root,
-                        CSS.decl("position", "relative")
-                    ),
-                    CSS.rule(
                         card,
-                        CSS.decl("position", "fixed"),
                         CSS.decl("left", "max(14px, env(safe-area-inset-left))"),
                         CSS.decl("right", "max(14px, env(safe-area-inset-right))"),
+                        CSS.decl("top", "auto"),
                         CSS.decl("bottom", "calc(88px + env(safe-area-inset-bottom))"),
                         CSS.decl("width", "auto"),
                         CSS.decl("min-width", "0"),
@@ -508,10 +524,14 @@ public struct HoverPreviewLinkScript: ReusableComponent {
 
     private static let source = #"""
     (() => {
-        if (window.wcHoverPreviewLinkScope?.initialized) return;
+        if (window.wcHoverPreviewLink?.initialized) return;
 
         const rootSelector = '[data-hover-preview]';
         const linkSelector = '.wc-hover-preview__link';
+        const cardSelector = '.wc-hover-preview__card';
+        const sheetQuery = '(max-width: 640px)';
+        const margin = 14;
+        const gap = 12;
 
         function normalizedPath(path) {
             const next = String(path || '/').replace(/\/+$/, '');
@@ -565,12 +585,153 @@ public struct HoverPreviewLinkScript: ReusableComponent {
             );
         }
 
+        function clamp(value, min, max) {
+            if (max < min) return min;
+            return Math.min(Math.max(value, min), max);
+        }
+
+        function viewportBox() {
+            const visual = window.visualViewport;
+
+            if (visual) {
+                return {
+                    left: visual.offsetLeft,
+                    top: visual.offsetTop,
+                    width: visual.width,
+                    height: visual.height
+                };
+            }
+
+            return {
+                left: 0,
+                top: 0,
+                width: document.documentElement.clientWidth || window.innerWidth,
+                height: window.innerHeight
+            };
+        }
+
+        function isSheetMode() {
+            return window.matchMedia?.(sheetQuery).matches ?? false;
+        }
+
+        function position(root) {
+            if (!root) return;
+
+            sync(root);
+
+            const trigger = root.querySelector(linkSelector) || root;
+            const card = root.querySelector(cardSelector);
+
+            if (!trigger || !card) return;
+
+            if (isSheetMode()) {
+                root.setAttribute('data-preview-placement', 'sheet');
+                return;
+            }
+
+            const triggerRect = trigger.getBoundingClientRect();
+            const cardRect = card.getBoundingClientRect();
+            const viewport = viewportBox();
+
+            const cardWidth = Math.min(
+                Math.max(cardRect.width || 1, 1),
+                Math.max(viewport.width - margin * 2, 1)
+            );
+
+            const cardHeight = Math.min(
+                Math.max(cardRect.height || 1, 1),
+                Math.max(viewport.height - margin * 2, 1)
+            );
+
+            const idealCenterX = triggerRect.left + triggerRect.width / 2;
+            const minCenterX = viewport.left + margin + cardWidth / 2;
+            const maxCenterX = viewport.left + viewport.width - margin - cardWidth / 2;
+            const centerX = clamp(idealCenterX, minCenterX, maxCenterX);
+
+            const topLimit = viewport.top + margin;
+            const bottomLimit = viewport.top + viewport.height - margin;
+            const spaceAbove = triggerRect.top - topLimit - gap;
+            const spaceBelow = bottomLimit - triggerRect.bottom - gap;
+
+            const placement = spaceAbove < cardHeight && spaceBelow > spaceAbove
+                ? 'below'
+                : 'above';
+
+            const rawTop = placement === 'above'
+                ? triggerRect.top - gap - cardHeight
+                : triggerRect.bottom + gap;
+
+            const top = clamp(rawTop, topLimit, bottomLimit - cardHeight);
+            const cardLeft = centerX - cardWidth / 2;
+            const arrowLeft = clamp(idealCenterX - cardLeft, 18, cardWidth - 18);
+
+            root.style.setProperty('--wc-preview-left', `${centerX}px`);
+            root.style.setProperty('--wc-preview-top', `${top}px`);
+            root.style.setProperty('--wc-preview-arrow-left', `${arrowLeft}px`);
+            root.setAttribute('data-preview-placement', placement);
+        }
+
+        function rootFromEvent(event) {
+            return event.target?.closest?.(rootSelector) || null;
+        }
+
+        function activeRoots() {
+            return Array.from(document.querySelectorAll(rootSelector)).filter(root => {
+                return root.matches(':hover') || root.contains(document.activeElement);
+            });
+        }
+
+        function updateActive() {
+            activeRoots().forEach(position);
+        }
+
         function init(scope = document) {
             const roots = scope.matches?.(rootSelector)
                 ? [scope]
                 : Array.from(scope.querySelectorAll?.(rootSelector) || []);
 
-            roots.forEach(sync);
+            roots.forEach(root => {
+                sync(root);
+
+                if (root.matches(':hover') || root.contains(document.activeElement)) {
+                    position(root);
+                }
+            });
+        }
+
+        document.addEventListener(
+            'mouseover',
+            event => {
+                const root = rootFromEvent(event);
+                if (root) position(root);
+            },
+            true
+        );
+
+        document.addEventListener(
+            'focusin',
+            event => {
+                const root = rootFromEvent(event);
+                if (root) position(root);
+            },
+            true
+        );
+
+        document.addEventListener(
+            'touchstart',
+            event => {
+                const root = rootFromEvent(event);
+                if (root) position(root);
+            },
+            { capture: true, passive: true }
+        );
+
+        window.addEventListener('resize', updateActive, { passive: true });
+        window.addEventListener('scroll', updateActive, true);
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', updateActive, { passive: true });
+            window.visualViewport.addEventListener('scroll', updateActive, { passive: true });
         }
 
         if (document.readyState === 'loading') {
@@ -581,10 +742,15 @@ public struct HoverPreviewLinkScript: ReusableComponent {
 
         window.addEventListener('popstate', () => init());
 
-        window.wcHoverPreviewLinkScope = {
+        const api = {
             initialized: true,
-            init
+            init,
+            position,
+            updateActive
         };
+
+        window.wcHoverPreviewLink = api;
+        window.wcHoverPreviewLinkScope = api;
     })();
     """#
 }
