@@ -535,7 +535,7 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(block)__change-list",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "9px"),
+                    CSS.decl("gap", "0"),
                     CSS.decl("margin", "0"),
                     CSS.decl("padding", "0"),
                     CSS.decl("list-style", "none")
@@ -543,13 +543,32 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(block)__change",
+                    CSS.decl("position", "relative"),
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "24px minmax(0, 1fr)"),
                     CSS.decl("align-items", "start"),
-                    CSS.decl("gap", "10px"),
+                    CSS.decl("column-gap", "10px"),
+                    CSS.decl("row-gap", "10px"),
+                    CSS.decl("padding", "0 0 12px"),
                     CSS.decl("font-size", ".92rem"),
                     CSS.decl("line-height", "1.48"),
                     CSS.decl("color", "var(--text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__change:last-child",
+                    CSS.decl("padding-bottom", "0")
+                ),
+
+                CSS.rule(
+                    ".\(block)__change:not(:last-child)::after",
+                    CSS.decl("content", "\"\""),
+                    CSS.decl("grid-column", "2 / -1"),
+                    CSS.decl("display", "block"),
+                    CSS.decl("height", "1px"),
+                    CSS.decl("margin-top", "2px"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 10%, transparent)")
                 ),
 
                 CSS.rule(
