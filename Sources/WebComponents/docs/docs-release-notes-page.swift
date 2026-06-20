@@ -3,6 +3,7 @@ import Constructors
 import CSS
 import HTML
 import Version
+import Primitives
 
 public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
     public enum MutationType: String, Sendable, CaseIterable {
@@ -59,8 +60,7 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
 
     public struct Entry: Sendable {
         public let version: ObjectVersion
-        public let date: String
-        public let dateLabel: String?
+        public let date: PartialDate
         public let title: String
         public let summary: String
         public let changes: [Change]
@@ -72,20 +72,133 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
             )
         }
 
+        public var dateValue: String {
+            let parts = dateParts
+
+            return "\(parts.year)-\(Self.twoDigit(parts.month))-\(Self.twoDigit(parts.day))"
+        }
+
+        public var dateLabel: String {
+            let parts = dateParts
+
+            return "\(parts.day) \(Self.monthName(parts.month)) \(parts.year)"
+        }
+
+        private var dateParts: (year: Int, month: Int, day: Int) {
+            do {
+                return try date.requireComplete()
+            } catch {
+                preconditionFailure("Release note dates must be complete day-level dates.")
+            }
+        }
+
         public init(
             version: ObjectVersion,
-            date: String,
-            dateLabel: String? = nil,
+            date: PartialDate,
             title: String,
             summary: String,
             changes: [Change]
         ) {
             self.version = version
-            self.date = date
-            self.dateLabel = dateLabel
+            self.date = Self.validated(date)
             self.title = title
             self.summary = summary
             self.changes = changes
+        }
+
+        private static func validated(
+            _ date: PartialDate
+        ) -> PartialDate {
+            let parts: (year: Int, month: Int, day: Int)
+
+            do {
+                parts = try date.requireComplete()
+            } catch {
+                preconditionFailure("Release note dates must be complete day-level dates.")
+            }
+
+            guard parts.year > 0 else {
+                preconditionFailure("Invalid release note year: \(parts.year).")
+            }
+
+            guard (1...12).contains(parts.month) else {
+                preconditionFailure("Invalid release note month: \(parts.month).")
+            }
+
+            guard (1...daysInMonth(year: parts.year, month: parts.month)).contains(parts.day) else {
+                preconditionFailure("Invalid release note day: \(parts.day) for \(parts.year)-\(parts.month).")
+            }
+
+            return date
+        }
+
+        private static func daysInMonth(
+            year: Int,
+            month: Int
+        ) -> Int {
+            switch month {
+            case 1, 3, 5, 7, 8, 10, 12:
+                return 31
+            case 4, 6, 9, 11:
+                return 30
+            case 2:
+                return isLeapYear(year) ? 29 : 28
+            default:
+                preconditionFailure("Invalid release note month: \(month).")
+            }
+        }
+
+        private static func isLeapYear(
+            _ year: Int
+        ) -> Bool {
+            if year.isMultiple(of: 400) {
+                return true
+            }
+
+            if year.isMultiple(of: 100) {
+                return false
+            }
+
+            return year.isMultiple(of: 4)
+        }
+
+        private static func twoDigit(
+            _ value: Int
+        ) -> String {
+            value < 10 ? "0\(value)" : "\(value)"
+        }
+
+        private static func monthName(
+            _ month: Int
+        ) -> String {
+            switch month {
+            case 1:
+                return "januari"
+            case 2:
+                return "februari"
+            case 3:
+                return "maart"
+            case 4:
+                return "april"
+            case 5:
+                return "mei"
+            case 6:
+                return "juni"
+            case 7:
+                return "juli"
+            case 8:
+                return "augustus"
+            case 9:
+                return "september"
+            case 10:
+                return "oktober"
+            case 11:
+                return "november"
+            case 12:
+                return "december"
+            default:
+                preconditionFailure("Invalid release note month: \(month).")
+            }
         }
     }
 
@@ -209,10 +322,10 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                         "time",
                         [
                             "class": "\(Self.block)__date",
-                            "datetime": entry.date
+                            "datetime": entry.dateValue
                         ]
                     ) {
-                        HTML.text(entry.dateLabel ?? entry.date)
+                        HTML.text(entry.dateLabel)
                     }
                 }
 
