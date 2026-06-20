@@ -101,7 +101,9 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
 
                     HTML.section(
                         [
-                            "class": "\(Self.block)__timeline",
+                            "class": entries.count <= 1
+                                ? "\(Self.block)__timeline \(Self.block)__timeline--single"
+                                : "\(Self.block)__timeline",
                             "aria-label": "Release notes"
                         ]
                     ) {
@@ -233,7 +235,12 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                     CSS.decl("--wc-docs-release-soft", "var(--surface-soft-color, #f1f5f9)"),
                     CSS.decl("--wc-docs-release-border", "var(--border-color, rgba(15, 23, 42, .12))"),
                     CSS.decl("--wc-docs-release-muted", "var(--muted-text-color, rgba(32, 33, 36, .66))"),
-                    CSS.decl("--wc-docs-release-accent", "var(--link-color, #2563eb)")
+                    CSS.decl("--wc-docs-release-accent", "var(--link-color, #2563eb)"),
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("width", "min(1120px, calc(100% - 48px))"),
+                    CSS.decl("max-width", "100%"),
+                    CSS.decl("margin", "0 auto"),
+                    CSS.decl("padding", "clamp(34px, 5vw, 56px) 0 64px")
                 ),
 
                 CSS.rule(
@@ -242,6 +249,32 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                     CSS.decl("--wc-docs-release-soft", "var(--surface-soft-color, #232429)"),
                     CSS.decl("--wc-docs-release-border", "var(--border-color, rgba(255, 255, 255, .13))"),
                     CSS.decl("--wc-docs-release-muted", "var(--muted-text-color, rgba(244, 244, 245, .68))")
+                ),
+
+                CSS.rule(
+                    ".\(block)__hero",
+                    CSS.decl("max-width", "880px"),
+                    CSS.decl("margin", "0 auto clamp(26px, 4vw, 40px)"),
+                    CSS.decl("padding", "0")
+                ),
+
+                CSS.rule(
+                    ".\(block)__eyebrow",
+                    CSS.decl("margin", "0 0 8px")
+                ),
+
+                CSS.rule(
+                    ".\(block)__hero h1",
+                    CSS.decl("margin", "0"),
+                    CSS.decl("font-size", "clamp(2rem, 4vw, 3.15rem)"),
+                    CSS.decl("line-height", ".95"),
+                    CSS.decl("letter-spacing", "-.055em")
+                ),
+
+                CSS.rule(
+                    ".\(block)__lead",
+                    CSS.decl("max-width", "70ch"),
+                    CSS.decl("margin", "14px 0 0")
                 ),
 
                 CSS.rule(
@@ -318,6 +351,22 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                     ".\(block)__entry--current .\(block)__dot",
                     CSS.decl("background", "var(--wc-docs-release-accent)"),
                     CSS.decl("box-shadow", "0 0 0 4px color-mix(in srgb, var(--wc-docs-release-accent) 14%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__timeline--single",
+                    CSS.decl("padding", "0"),
+                    CSS.decl("margin", "0 auto 56px")
+                ),
+
+                CSS.rule(
+                    ".\(block)__timeline--single::before, .\(block)__timeline--single .\(block)__entry-marker",
+                    CSS.decl("display", "none")
+                ),
+
+                CSS.rule(
+                    ".\(block)__timeline--single .\(block)__entry",
+                    CSS.decl("grid-template-columns", "minmax(0, 1fr)")
                 ),
 
                 CSS.rule(
