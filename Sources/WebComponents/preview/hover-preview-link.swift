@@ -185,17 +185,13 @@ public struct HoverPreviewLink: SelectableComponent {
                 CSS.rule(
                     root,
                     CSS.decl("position", "relative"),
-                    CSS.decl("z-index", "0"),
                     CSS.decl("display", "inline"),
                     CSS.decl("vertical-align", "baseline"),
-                    CSS.decl("isolation", "isolate"),
                     CSS.decl("--wc-hover-preview-z", "\(zIndex)"),
                     CSS.decl("--wc-hover-preview-surface", "var(--surface-color, #fff)"),
                     CSS.decl("--wc-hover-preview-soft", "var(--surface-soft-color, #f1f5f9)"),
                     CSS.decl("--wc-hover-preview-border", "var(--border-color, rgba(15, 23, 42, .12))"),
                     CSS.decl("--wc-hover-preview-ink", "var(--text-color, #202124)"),
-                    // CSS.decl("--wc-hover-preview-muted", "var(--muted-text-color, rgba(32, 33, 36, .66))"),
-                    // CSS.decl("--wc-hover-preview-accent", "var(--link-color, #2563eb)")
                     CSS.decl("--wc-hover-preview-muted", "var(--muted-text-color, rgba(32, 33, 36, .66))"),
                     CSS.decl("--wc-hover-preview-accent-same-page", "var(--success, #2E8B57)"),
                     CSS.decl("--wc-hover-preview-accent-same-site", "var(--link-color, #2563eb)"),
@@ -206,22 +202,22 @@ public struct HoverPreviewLink: SelectableComponent {
                 //     root,
                 //     CSS.decl("position", "relative"),
                 //     CSS.decl("z-index", "0"),
-                //     CSS.decl("display", "inline-flex"),
-                //     CSS.decl("align-items", "baseline"),
+                //     CSS.decl("display", "inline"),
+                //     CSS.decl("vertical-align", "baseline"),
                 //     CSS.decl("isolation", "isolate"),
                 //     CSS.decl("--wc-hover-preview-z", "\(zIndex)"),
                 //     CSS.decl("--wc-hover-preview-surface", "var(--surface-color, #fff)"),
                 //     CSS.decl("--wc-hover-preview-soft", "var(--surface-soft-color, #f1f5f9)"),
                 //     CSS.decl("--wc-hover-preview-border", "var(--border-color, rgba(15, 23, 42, .12))"),
                 //     CSS.decl("--wc-hover-preview-ink", "var(--text-color, #202124)"),
+                //     // CSS.decl("--wc-hover-preview-muted", "var(--muted-text-color, rgba(32, 33, 36, .66))"),
+                //     // CSS.decl("--wc-hover-preview-accent", "var(--link-color, #2563eb)")
                 //     CSS.decl("--wc-hover-preview-muted", "var(--muted-text-color, rgba(32, 33, 36, .66))"),
-                //     CSS.decl("--wc-hover-preview-accent", "var(--link-color, #2563eb)")
+                //     CSS.decl("--wc-hover-preview-accent-same-page", "var(--success, #2E8B57)"),
+                //     CSS.decl("--wc-hover-preview-accent-same-site", "var(--link-color, #2563eb)"),
+                //     CSS.decl("--wc-hover-preview-accent-external", "var(--external-link-color, var(--link-color, #2563eb))"),
+                //     CSS.decl("--wc-hover-preview-accent", "var(--wc-hover-preview-accent-same-site)")
                 // ),
-
-                CSS.rule(
-                    "\(root):hover, \(root):focus-within",
-                    CSS.decl("z-index", "var(--wc-hover-preview-z)")
-                ),
 
                 CSS.rule(
                     ".dark-mode \(root)",
@@ -271,7 +267,8 @@ public struct HoverPreviewLink: SelectableComponent {
                     CSS.decl("left", "var(--wc-preview-left, 50vw)"),
                     CSS.decl("top", "var(--wc-preview-top, 20vh)"),
                     CSS.decl("bottom", "auto"),
-                    CSS.decl("z-index", "var(--wc-hover-preview-z)"),
+                    // CSS.decl("z-index", "var(--wc-hover-preview-z)"),
+                    CSS.decl("z-index", "var(--z-overlay, var(--wc-hover-preview-z))"),
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "auto minmax(0, 1fr)"),
                     CSS.decl("gap", "12px"),
