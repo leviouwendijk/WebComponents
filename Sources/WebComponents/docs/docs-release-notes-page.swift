@@ -2,6 +2,7 @@ import Foundation
 import Constructors
 import CSS
 import HTML
+import Version
 
 public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
     public struct NoteSection: Sendable {
@@ -18,22 +19,27 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
     }
 
     public struct Entry: Sendable {
-        public let version: String
-        public let date: String?
+        public let version: ObjectVersion
+        public let date: String
         public let dateLabel: String?
         public let title: String
         public let summary: String
         public let sections: [NoteSection]
-        public let isCurrent: Bool
+
+        public var versionLabel: String {
+            version.string(
+                prefixStyle: .short,
+                prefixSpace: false
+            )
+        }
 
         public init(
-            version: String,
-            date: String? = nil,
+            version: ObjectVersion,
+            date: String,
             dateLabel: String? = nil,
             title: String,
             summary: String,
-            sections: [NoteSection],
-            isCurrent: Bool = false
+            sections: [NoteSection]
         ) {
             self.version = version
             self.date = date
@@ -41,7 +47,6 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
             self.title = title
             self.summary = summary
             self.sections = sections
-            self.isCurrent = isCurrent
         }
     }
 
@@ -50,22 +55,33 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
     public let eyebrow: String
     public let title: String
     public let lead: String
-    public let currentVersion: String
     public let entries: [Entry]
     public let includeStyles: Bool
+
+    private var sortedEntries: [Entry] {
+        entries.sorted { lhs, rhs in
+            lhs.version > rhs.version
+        }
+    }
+
+    private var currentEntry: Entry? {
+        sortedEntries.first
+    }
+
+    private var currentVersionLabel: String {
+        currentEntry?.versionLabel ?? ""
+    }
 
     public init(
         eyebrow: String = "Documentatie",
         title: String = "Release notes",
         lead: String = "Een overzicht van zichtbare wijzigingen in de documentatie.",
-        currentVersion: String,
         entries: [Entry],
         includeStyles: Bool = true
     ) {
         self.eyebrow = eyebrow
         self.title = title
         self.lead = lead
-        self.currentVersion = currentVersion
         self.entries = entries
         self.includeStyles = includeStyles
     }
@@ -90,7 +106,7 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                             }
 
                             HTML.span(["class": "\(Self.block)__current-version"]) {
-                                HTML.text(currentVersion)
+                                HTML.text(currentVersionLabel)
                             }
                         }
 
@@ -101,13 +117,13 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
 
                     HTML.section(
                         [
-                            "class": entries.count <= 1
+                            "class": sortedEntries.count <= 1
                                 ? "\(Self.block)__timeline \(Self.block)__timeline--single"
                                 : "\(Self.block)__timeline",
                             "aria-label": "Release notes"
                         ]
                     ) {
-                        for entry in entries {
+                        for entry in sortedEntries {
                             entry_node(entry)
                         }
                     }
@@ -120,12 +136,13 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
     private func entry_node(
         _ entry: Entry
     ) -> any HTMLNode {
-        let titleID = "\(Self.block)-\(slug(entry.version))-title"
+        let titleID = "\(Self.block)-\(slug(entry.versionLabel))-title"
+        let current = isCurrent(entry)
 
         return HTML.el(
             "article",
             [
-                "class": entry.isCurrent
+                "class": current
                     ? "\(Self.block)__entry \(Self.block)__entry--current"
                     : "\(Self.block)__entry",
                 "aria-labelledby": titleID
@@ -139,30 +156,24 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                 HTML.div(["class": "\(Self.block)__entry-header"]) {
                     HTML.div(["class": "\(Self.block)__version-group"]) {
                         HTML.span(["class": "\(Self.block)__version"]) {
-                            HTML.text(entry.version)
+                            HTML.text(entry.versionLabel)
                         }
 
-                        if entry.isCurrent {
+                        if current {
                             HTML.span(["class": "\(Self.block)__badge"]) {
                                 HTML.text("Actueel")
                             }
                         }
                     }
 
-                    if let date = entry.date {
-                        HTML.el(
-                            "time",
-                            [
-                                "class": "\(Self.block)__date",
-                                "datetime": date
-                            ]
-                        ) {
-                            HTML.text(entry.dateLabel ?? date)
-                        }
-                    } else if let dateLabel = entry.dateLabel {
-                        HTML.span(["class": "\(Self.block)__date"]) {
-                            HTML.text(dateLabel)
-                        }
+                    HTML.el(
+                        "time",
+                        [
+                            "class": "\(Self.block)__date",
+                            "datetime": entry.date
+                        ]
+                    ) {
+                        HTML.text(entry.dateLabel ?? entry.date)
                     }
                 }
 
@@ -188,6 +199,16 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                 }
             }
         }
+    }
+
+    private func isCurrent(
+        _ entry: Entry
+    ) -> Bool {
+        guard let currentEntry else {
+            return false
+        }
+
+        return entry.version == currentEntry.version
     }
 
     private func section_node(
