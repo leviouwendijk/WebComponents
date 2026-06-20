@@ -5,16 +5,55 @@ import HTML
 import Version
 
 public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
-    public struct NoteSection: Sendable {
-        public let title: String
-        public let items: [String]
+    public enum MutationType: String, Sendable, CaseIterable {
+        case added
+        case changed
+        case removed
+
+        public var symbol: String {
+            switch self {
+            case .added:
+                return "+"
+            case .changed:
+                return "~"
+            case .removed:
+                return "−"
+            }
+        }
+
+        public var label: String {
+            switch self {
+            case .added:
+                return "Nieuw"
+            case .changed:
+                return "Gewijzigd"
+            case .removed:
+                return "Verwijderd"
+            }
+        }
+
+        var sortRank: Int {
+            switch self {
+            case .added:
+                return 0
+            case .changed:
+                return 1
+            case .removed:
+                return 2
+            }
+        }
+    }
+
+    public struct Change: Sendable {
+        public let mutation: MutationType
+        public let text: String
 
         public init(
-            title: String,
-            items: [String]
+            mutation: MutationType,
+            text: String
         ) {
-            self.title = title
-            self.items = items
+            self.mutation = mutation
+            self.text = text
         }
     }
 
@@ -24,7 +63,7 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
         public let dateLabel: String?
         public let title: String
         public let summary: String
-        public let sections: [NoteSection]
+        public let changes: [Change]
 
         public var versionLabel: String {
             version.string(
@@ -39,14 +78,14 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
             dateLabel: String? = nil,
             title: String,
             summary: String,
-            sections: [NoteSection]
+            changes: [Change]
         ) {
             self.version = version
             self.date = date
             self.dateLabel = dateLabel
             self.title = title
             self.summary = summary
-            self.sections = sections
+            self.changes = changes
         }
     }
 
@@ -190,10 +229,10 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                     HTML.text(entry.summary)
                 }
 
-                if !entry.sections.isEmpty {
-                    HTML.div(["class": "\(Self.block)__sections"]) {
-                        for section in entry.sections {
-                            section_node(section)
+                if !entry.changes.isEmpty {
+                    HTML.ul(["class": "\(Self.block)__change-list"]) {
+                        for change in ordered_changes(entry.changes) {
+                            change_node(change)
                         }
                     }
                 }
@@ -211,20 +250,47 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
         return entry.version == currentEntry.version
     }
 
-    private func section_node(
-        _ section: NoteSection
+    private func ordered_changes(
+        _ changes: [Change]
+    ) -> [Change] {
+        changes
+            .enumerated()
+            .sorted { lhs, rhs in
+                let lhsRank = lhs.element.mutation.sortRank
+                let rhsRank = rhs.element.mutation.sortRank
+
+                if lhsRank != rhsRank {
+                    return lhsRank < rhsRank
+                }
+
+                return lhs.offset < rhs.offset
+            }
+            .map { indexed in
+                indexed.element
+            }
+    }
+
+    private func change_node(
+        _ change: Change
     ) -> any HTMLNode {
-        HTML.section(["class": "\(Self.block)__section"]) {
-            HTML.h3(["class": "\(Self.block)__section-title"]) {
-                HTML.text(section.title)
+        HTML.el(
+            "li",
+            [
+                "class": "\(Self.block)__change \(Self.block)__change--\(change.mutation.rawValue)",
+                "aria-label": "\(change.mutation.label): \(change.text)"
+            ]
+        ) {
+            HTML.span(
+                [
+                    "class": "\(Self.block)__change-symbol",
+                    "aria-hidden": "true"
+                ]
+            ) {
+                HTML.text(change.mutation.symbol)
             }
 
-            HTML.ul(["class": "\(Self.block)__list"]) {
-                for item in section.items {
-                    HTML.li {
-                        HTML.text(item)
-                    }
-                }
+            HTML.span(["class": "\(Self.block)__change-text"]) {
+                HTML.text(change.text)
             }
         }
     }
@@ -467,39 +533,59 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(block)__sections",
+                    ".\(block)__change-list",
                     CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-columns", "repeat(auto-fit, minmax(220px, 1fr))"),
-                    CSS.decl("gap", "12px")
-                ),
-
-                CSS.rule(
-                    ".\(block)__section",
-                    CSS.decl("padding", "14px"),
-                    CSS.decl("border", "1px solid color-mix(in srgb, var(--text-color) 9%, transparent)"),
-                    CSS.decl("border-radius", "16px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--wc-docs-release-soft) 74%, transparent)")
-                ),
-
-                CSS.rule(
-                    ".\(block)__section-title",
-                    CSS.decl("margin", "0 0 8px"),
-                    CSS.decl("font-size", ".86rem"),
-                    CSS.decl("line-height", "1.2")
-                ),
-
-                CSS.rule(
-                    ".\(block)__list",
+                    CSS.decl("gap", "9px"),
                     CSS.decl("margin", "0"),
-                    CSS.decl("padding-left", "1.1rem"),
-                    CSS.decl("color", "var(--text-color)"),
-                    CSS.decl("font-size", ".92rem"),
-                    CSS.decl("line-height", "1.5")
+                    CSS.decl("padding", "0"),
+                    CSS.decl("list-style", "none")
                 ),
 
                 CSS.rule(
-                    ".\(block)__list li + li",
-                    CSS.decl("margin-top", "5px")
+                    ".\(block)__change",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "24px minmax(0, 1fr)"),
+                    CSS.decl("align-items", "start"),
+                    CSS.decl("gap", "10px"),
+                    CSS.decl("font-size", ".92rem"),
+                    CSS.decl("line-height", "1.48"),
+                    CSS.decl("color", "var(--text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__change-symbol",
+                    CSS.decl("display", "inline-grid"),
+                    CSS.decl("place-items", "center"),
+                    CSS.decl("width", "21px"),
+                    CSS.decl("height", "21px"),
+                    CSS.decl("margin-top", ".08em"),
+                    CSS.decl("border", "1px solid currentColor"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("font-family", "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"),
+                    CSS.decl("font-size", ".72rem"),
+                    CSS.decl("font-weight", "850"),
+                    CSS.decl("line-height", "1"),
+                    CSS.decl("background", "color-mix(in srgb, currentColor 10%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__change--added .\(block)__change-symbol",
+                    CSS.decl("color", "var(--success, #2E8B57)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__change--changed .\(block)__change-symbol",
+                    CSS.decl("color", "var(--wc-docs-release-accent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__change--removed .\(block)__change-symbol",
+                    CSS.decl("color", "var(--danger, #D64545)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__change-text",
+                    CSS.decl("min-width", "0")
                 )
             ],
             media: [
