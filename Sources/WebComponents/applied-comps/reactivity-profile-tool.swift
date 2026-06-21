@@ -81,7 +81,10 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                     CSS.decl("color", "var(--text-color, #202124)")
                 ),
 
-                CSS.rule(".\(block), .\(block) *", CSS.decl("box-sizing", "border-box")),
+                CSS.rule(
+                    ".\(block), .\(block) *",
+                    CSS.decl("box-sizing", "border-box")
+                ),
 
                 CSS.rule(
                     ".\(block)__hero",
@@ -261,29 +264,159 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(block)__result-head",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "8px"),
+                    CSS.decl("gap", "10px"),
                     CSS.decl("padding", "16px"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--severity-color, var(--link-color)) 22%, var(--border-color))"),
                     CSS.decl("border-radius", "18px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--link-color) 10%, transparent)")
+                    CSS.decl("background", "linear-gradient(135deg, color-mix(in srgb, var(--severity-color, var(--link-color)) 13%, transparent), color-mix(in srgb, var(--surface-color, #fff) 92%, transparent))")
+                ),
+
+                CSS.rule(
+                    ".\(block)__result-topline",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("align-items", "flex-start"),
+                    CSS.decl("justify-content", "space-between"),
+                    CSS.decl("gap", "12px")
+                ),
+
+                CSS.rule(
+                    ".\(block)__result-title",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "4px"),
+                    CSS.decl("min-width", "0")
                 ),
 
                 CSS.rule(
                     ".\(block)__result-head strong",
-                    CSS.decl("font-size", "1.35rem"),
-                    CSS.decl("line-height", "1.1")
+                    CSS.decl("font-size", "1.28rem"),
+                    CSS.decl("line-height", "1.1"),
+                    CSS.decl("letter-spacing", "-.025em")
                 ),
 
                 CSS.rule(
                     ".\(block)__result-head span",
-                    CSS.decl("font-size", ".92rem"),
-                    CSS.decl("line-height", "1.45"),
+                    CSS.decl("font-size", ".9rem"),
+                    CSS.decl("line-height", "1.42"),
                     CSS.decl("color", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__severity-pill",
+                    CSS.decl("flex", "0 0 auto"),
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("justify-content", "center"),
+                    CSS.decl("height", "28px"),
+                    CSS.decl("padding", "0 10px"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("font-size", ".74rem"),
+                    CSS.decl("font-weight", "820"),
+                    CSS.decl("letter-spacing", ".02em"),
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("color", "color-mix(in srgb, var(--severity-color, var(--link-color)) 74%, var(--text-color))"),
+                    CSS.decl("background", "color-mix(in srgb, var(--severity-color, var(--link-color)) 13%, transparent)"),
+                    CSS.decl("box-shadow", "inset 0 0 0 1px color-mix(in srgb, var(--severity-color, var(--link-color)) 24%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__severity-rail",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "repeat(4, minmax(0, 1fr))"),
+                    CSS.decl("gap", "5px"),
+                    CSS.decl("align-items", "center")
+                ),
+
+                CSS.rule(
+                    ".\(block)__severity-step",
+                    CSS.decl("height", "6px"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 11%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__severity-step--active",
+                    CSS.decl("background", "var(--severity-color, var(--link-color))")
+                ),
+
+                CSS.rule(
+                    ".\(block)__section-title",
+                    CSS.decl("margin", "2px 0 -2px"),
+                    CSS.decl("font-size", ".82rem"),
+                    CSS.decl("font-weight", "850"),
+                    CSS.decl("letter-spacing", ".055em"),
+                    CSS.decl("text-transform", "uppercase"),
+                    CSS.decl("color", "color-mix(in srgb, var(--text-color) 74%, var(--muted-text-color))")
                 ),
 
                 CSS.rule(
                     ".\(block)__stack",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "10px")
+                    CSS.decl("gap", "9px")
+                ),
+
+                CSS.rule(
+                    ".\(block)__cluster-metric",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "6px"),
+                    CSS.decl("padding", "9px 0"),
+                    CSS.decl("border-top", "1px solid color-mix(in srgb, var(--text-color) 8%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__cluster-metric:first-child",
+                    CSS.decl("border-top", "0"),
+                    CSS.decl("padding-top", "0")
+                ),
+
+                CSS.rule(
+                    ".\(block)__cluster-metric--primary",
+                    CSS.decl("padding", "10px"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--severity-color, var(--link-color)) 20%, var(--border-color))"),
+                    CSS.decl("border-radius", "14px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--severity-color, var(--link-color)) 7%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__cluster-top",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "1fr auto"),
+                    CSS.decl("gap", "10px"),
+                    CSS.decl("align-items", "baseline")
+                ),
+
+                CSS.rule(
+                    ".\(block)__cluster-title",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("gap", "7px"),
+                    CSS.decl("min-width", "0"),
+                    CSS.decl("font-size", ".9rem"),
+                    CSS.decl("font-weight", "800")
+                ),
+
+                CSS.rule(
+                    ".\(block)__severity-dot",
+                    CSS.decl("display", "inline-block"),
+                    CSS.decl("flex", "0 0 auto"),
+                    CSS.decl("width", "8px"),
+                    CSS.decl("height", "8px"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "var(--severity-color, var(--link-color))"),
+                    CSS.decl("box-shadow", "0 0 0 3px color-mix(in srgb, var(--severity-color, var(--link-color)) 14%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__cluster-percent",
+                    CSS.decl("font-size", ".85rem"),
+                    CSS.decl("font-weight", "820")
+                ),
+
+                CSS.rule(
+                    ".\(block)__cluster-meta",
+                    CSS.decl("margin", "0"),
+                    CSS.decl("font-size", ".78rem"),
+                    CSS.decl("line-height", "1.35"),
+                    CSS.decl("color", "var(--muted-text-color)")
                 ),
 
                 CSS.rule(
@@ -293,17 +426,62 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(block)__metric--secondary",
+                    CSS.decl("opacity", ".82")
+                ),
+
+                CSS.rule(
                     ".\(block)__metric-top",
                     CSS.decl("display", "flex"),
                     CSS.decl("justify-content", "space-between"),
                     CSS.decl("gap", "12px"),
-                    CSS.decl("font-size", ".9rem"),
-                    CSS.decl("font-weight", "720")
+                    CSS.decl("font-size", ".88rem"),
+                    CSS.decl("font-weight", "760")
+                ),
+
+                CSS.rule(
+                    ".\(block)__axes-grid",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "repeat(3, minmax(0, 1fr))"),
+                    CSS.decl("gap", "8px")
+                ),
+
+                CSS.rule(
+                    ".\(block)__axis-card",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "6px"),
+                    CSS.decl("padding", "10px"),
+                    CSS.decl("border", "1px solid var(--border-color)"),
+                    CSS.decl("border-radius", "14px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, #fff) 86%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__axis-label",
+                    CSS.decl("font-size", ".76rem"),
+                    CSS.decl("font-weight", "820"),
+                    CSS.decl("letter-spacing", ".045em"),
+                    CSS.decl("text-transform", "uppercase"),
+                    CSS.decl("color", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__axis-band",
+                    CSS.decl("font-size", ".96rem"),
+                    CSS.decl("font-weight", "850"),
+                    CSS.decl("line-height", "1.05")
+                ),
+
+                CSS.rule(
+                    ".\(block)__axis-score",
+                    CSS.decl("font-size", ".74rem"),
+                    CSS.decl("font-family", "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"),
+                    CSS.decl("color", "var(--muted-text-color)")
                 ),
 
                 CSS.rule(
                     ".\(block)__bar",
-                    CSS.decl("height", "10px"),
+                    CSS.decl("height", "8px"),
                     CSS.decl("overflow", "hidden"),
                     CSS.decl("border-radius", "999px"),
                     CSS.decl("background", "color-mix(in srgb, var(--text-color) 10%, transparent)")
@@ -315,14 +493,14 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                     CSS.decl("width", "var(--value, 0%)"),
                     CSS.decl("height", "100%"),
                     CSS.decl("border-radius", "inherit"),
-                    CSS.decl("background", "var(--link-color)")
+                    CSS.decl("background", "var(--severity-color, var(--link-color))")
                 ),
 
                 CSS.rule(
                     ".\(block)__priority-list",
                     CSS.decl("margin", "0"),
                     CSS.decl("padding-left", "20px"),
-                    CSS.decl("font-size", ".92rem"),
+                    CSS.decl("font-size", ".9rem"),
                     CSS.decl("line-height", "1.45"),
                     CSS.decl("color", "var(--muted-text-color)")
                 )
@@ -330,9 +508,35 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
             media: [
                 CSS.media(
                     "(max-width: 860px)",
-                    CSS.rule(".\(block)__grid", CSS.decl("grid-template-columns", "1fr")),
-                    CSS.rule(".\(block)__field", CSS.decl("grid-template-columns", "1fr")),
-                    CSS.rule(".\(block)__choice-group", CSS.decl("grid-auto-flow", "row"), CSS.decl("grid-template-columns", "repeat(2, minmax(0, 1fr))"))
+                    CSS.rule(
+                        ".\(block)__grid",
+                        CSS.decl("grid-template-columns", "1fr")
+                    ),
+                    CSS.rule(
+                        ".\(block)__field",
+                        CSS.decl("grid-template-columns", "1fr")
+                    ),
+                    CSS.rule(
+                        ".\(block)__choice-group",
+                        CSS.decl("grid-auto-flow", "row"),
+                        CSS.decl("grid-template-columns", "repeat(2, minmax(0, 1fr))")
+                    )
+                ),
+
+                CSS.media(
+                    "(max-width: 520px)",
+                    CSS.rule(
+                        ".\(block)__axes-grid",
+                        CSS.decl("grid-template-columns", "1fr")
+                    ),
+                    CSS.rule(
+                        ".\(block)__result-topline",
+                        CSS.decl("display", "grid")
+                    ),
+                    CSS.rule(
+                        ".\(block)__severity-pill",
+                        CSS.decl("width", "fit-content")
+                    )
                 )
             ]
         )
@@ -386,17 +590,45 @@ public struct ReactivityProfileToolScript: ReusableComponent {
         ];
 
         const modifierOptions = [
-            [0, 'Onbekend'],
+            [0, 'Niet herkenbaar'],
             [1, 'Soms'],
             [2, 'Duidelijk'],
             [3, 'Sterk']
         ];
 
         const clusters = {
-            1: ['Lage-risico signaleerder', 'veel communicatie, weinig orale escalatie'],
-            2: ['Frustratie-escalator', 'hoge frustratie, vooral bij blokkade of beperking'],
-            3: ['Impulsieve escalator', 'meer posturing en contactrisico, ook zonder extreme frustratie'],
-            4: ['Snelle risico-escalator', 'hoog over alle assen; veiligheidsmarge eerst vergroten']
+            1: {
+                name: 'Lage-risico signaleerder',
+                tag: 'Cluster 1',
+                severity: 1,
+                severityLabel: 'mild',
+                tone: 'var(--success, #2E8B57)',
+                summary: 'veel communicatie, weinig orale escalatie'
+            },
+            2: {
+                name: 'Frustratie-escalator',
+                tag: 'Cluster 2',
+                severity: 2,
+                severityLabel: 'matig',
+                tone: 'var(--warning, #E7A94E)',
+                summary: 'hoge frustratie, vooral bij blokkade of beperking'
+            },
+            3: {
+                name: 'Impulsieve escalator',
+                tag: 'Cluster 3',
+                severity: 3,
+                severityLabel: 'hoog',
+                tone: 'color-mix(in srgb, var(--warning, #E7A94E) 52%, var(--danger, #D64545))',
+                summary: 'meer posturing en contactrisico, ook zonder extreme frustratie'
+            },
+            4: {
+                name: 'Snelle risico-escalator',
+                tag: 'Cluster 4',
+                severity: 4,
+                severityLabel: 'zeer hoog',
+                tone: 'var(--danger, #D64545)',
+                summary: 'hoog over alle assen; veiligheidsmarge eerst vergroten'
+            }
         };
 
         const loadings = {
@@ -431,17 +663,73 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             }).join('');
         }
 
-        function metricHTML(label, value, detail = '') {
+        function severityRailHTML(severity) {
             return `
-                <div class="wc-reactivity-profile-tool__metric">
+                <div class="wc-reactivity-profile-tool__severity-rail" aria-hidden="true">
+                    ${[1, 2, 3, 4].map(step => `
+                        <span class="wc-reactivity-profile-tool__severity-step${step <= severity ? ' wc-reactivity-profile-tool__severity-step--active' : ''}"></span>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function metricHTML(label, value, detail = '', variant = '') {
+            return `
+                <div class="wc-reactivity-profile-tool__metric${variant ? ` wc-reactivity-profile-tool__metric--${variant}` : ''}">
                     <div class="wc-reactivity-profile-tool__metric-top">
                         <span>${label}</span>
                         <span>${value}%</span>
                     </div>
+
                     <div class="wc-reactivity-profile-tool__bar" aria-hidden="true">
                         <span style="--value: ${value}%"></span>
                     </div>
+
                     ${detail ? `<p class="wc-reactivity-profile-tool__hint">${detail}</p>` : ''}
+                </div>
+            `;
+        }
+
+        function clusterMatchHTML(row, isPrimary = false) {
+            const cluster = clusters[row.id];
+            const value = Math.round(row.match);
+
+            return `
+                <div
+                    class="wc-reactivity-profile-tool__cluster-metric${isPrimary ? ' wc-reactivity-profile-tool__cluster-metric--primary' : ''}"
+                    style="--severity-color: ${cluster.tone}"
+                >
+                    <div class="wc-reactivity-profile-tool__cluster-top">
+                        <div class="wc-reactivity-profile-tool__cluster-title">
+                            <span class="wc-reactivity-profile-tool__severity-dot" aria-hidden="true"></span>
+                            <span>${cluster.name}</span>
+                        </div>
+
+                        <div class="wc-reactivity-profile-tool__cluster-percent">${value}%</div>
+                    </div>
+
+                    <div class="wc-reactivity-profile-tool__bar" aria-hidden="true">
+                        <span style="--value: ${value}%"></span>
+                    </div>
+
+                    <p class="wc-reactivity-profile-tool__cluster-meta">
+                        ${cluster.tag} · ernst: ${cluster.severityLabel} · ${cluster.summary}
+                    </p>
+                </div>
+            `;
+        }
+
+        function axisCardHTML(label, value, score, band) {
+            return `
+                <div class="wc-reactivity-profile-tool__axis-card">
+                    <div class="wc-reactivity-profile-tool__axis-label">${label}</div>
+                    <div class="wc-reactivity-profile-tool__axis-band">${band}</div>
+
+                    <div class="wc-reactivity-profile-tool__bar" aria-hidden="true">
+                        <span style="--value: ${value}%"></span>
+                    </div>
+
+                    <div class="wc-reactivity-profile-tool__axis-score">${score.toFixed(2)}</div>
                 </div>
             `;
         }
@@ -482,21 +770,29 @@ public struct ReactivityProfileToolScript: ReusableComponent {
                     </div>
 
                     <aside class="wc-reactivity-profile-tool__panel" aria-live="polite">
-                        <div class="wc-reactivity-profile-tool__result-head">
-                            <strong data-reactivity-primary>—</strong>
-                            <span data-reactivity-summary>Vul de observaties in om het profiel te berekenen.</span>
+                        <div class="wc-reactivity-profile-tool__result-head" data-reactivity-result-head>
+                            <div class="wc-reactivity-profile-tool__result-topline">
+                                <div class="wc-reactivity-profile-tool__result-title">
+                                    <strong data-reactivity-primary>—</strong>
+                                    <span data-reactivity-summary>Vul de observaties in om het profiel te berekenen.</span>
+                                </div>
+
+                                <div class="wc-reactivity-profile-tool__severity-pill" data-reactivity-severity>—</div>
+                            </div>
+
+                            <div data-reactivity-severity-rail></div>
                         </div>
 
-                        <h2>Cluster-overeenkomst</h2>
+                        <h2 class="wc-reactivity-profile-tool__section-title">Cluster-overeenkomst</h2>
                         <div class="wc-reactivity-profile-tool__stack" data-reactivity-matches></div>
 
-                        <h2>Gedragsassen</h2>
-                        <div class="wc-reactivity-profile-tool__stack" data-reactivity-axes></div>
+                        <h2 class="wc-reactivity-profile-tool__section-title">Gedragsassen</h2>
+                        <div class="wc-reactivity-profile-tool__axes-grid" data-reactivity-axes></div>
 
-                        <h2>Behandelmodifiers</h2>
+                        <h2 class="wc-reactivity-profile-tool__section-title">Behandelmodifiers</h2>
                         <div class="wc-reactivity-profile-tool__stack" data-reactivity-modifiers></div>
 
-                        <h2>Trainingsprioriteit</h2>
+                        <h2 class="wc-reactivity-profile-tool__section-title">Trainingsprioriteit</h2>
                         <ol class="wc-reactivity-profile-tool__priority-list" data-reactivity-priorities></ol>
                     </aside>
                 </div>
@@ -584,6 +880,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             if (value < cuts[0]) return 'laag';
             if (value < cuts[1]) return 'middel';
             if (value < cuts[2]) return 'hoog';
+
             return 'zeer hoog';
         }
 
@@ -595,20 +892,26 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             const behaviourState = values(root, '[data-reactivity-behaviour]');
             const modifierState = values(root, '[data-reactivity-modifier]');
 
+            const resultHeadNode = root.querySelector('[data-reactivity-result-head]');
             const primaryNode = root.querySelector('[data-reactivity-primary]');
             const summaryNode = root.querySelector('[data-reactivity-summary]');
+            const severityNode = root.querySelector('[data-reactivity-severity]');
+            const severityRailNode = root.querySelector('[data-reactivity-severity-rail]');
             const matchesNode = root.querySelector('[data-reactivity-matches]');
             const axesNode = root.querySelector('[data-reactivity-axes]');
             const modifiersNode = root.querySelector('[data-reactivity-modifiers]');
             const prioritiesNode = root.querySelector('[data-reactivity-priorities]');
 
-            if (!primaryNode || !summaryNode || !matchesNode || !axesNode || !modifiersNode || !prioritiesNode) {
+            if (!resultHeadNode || !primaryNode || !summaryNode || !severityNode || !severityRailNode || !matchesNode || !axesNode || !modifiersNode || !prioritiesNode) {
                 return;
             }
 
             if (!behaviourState.complete) {
+                resultHeadNode.style.removeProperty('--severity-color');
                 primaryNode.textContent = 'Nog niet compleet';
                 summaryNode.textContent = `Beantwoord eerst alle negen gedragingen. Ingevuld: ${behaviourState.answered}/${behaviourState.total}.`;
+                severityNode.textContent = 'open';
+                severityRailNode.innerHTML = severityRailHTML(0);
 
                 matchesNode.innerHTML = '';
                 axesNode.innerHTML = '';
@@ -626,23 +929,26 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             const cluster = clusters[primary.id];
             const ambiguous = primary.match - second.match < 15;
 
-            primaryNode.textContent = `${cluster[0]} · ${Math.round(primary.match)}% match`;
+            resultHeadNode.style.setProperty('--severity-color', cluster.tone);
+            primaryNode.textContent = `${cluster.name} · ${Math.round(primary.match)}% match`;
             summaryNode.textContent = ambiguous
-                ? `Grensprofiel: ook ${clusters[second.id][0]} past duidelijk. Interpreteer dit als mengbeeld, niet als harde categorie.`
-                : cluster[1];
+                ? `Grensprofiel: ook ${clusters[second.id].name} past duidelijk. Lees dit als mengbeeld.`
+                : cluster.summary;
+            severityNode.textContent = `${cluster.tag} · ${cluster.severityLabel}`;
+            severityRailNode.innerHTML = severityRailHTML(cluster.severity);
 
-            matchesNode.innerHTML = result.matches.map(row => {
-                return metricHTML(`${clusters[row.id][0]}`, Math.round(row.match), clusters[row.id][1]);
+            matchesNode.innerHTML = result.matches.map((row, index) => {
+                return clusterMatchHTML(row, index === 0);
             }).join('');
 
             const axes = [
-                ['Orale aanval', result.pc1, 3.8, axisLabel(result.pc1, [.75, 1.7, 3.0])],
-                ['Frustratie', result.pc2, 4.2, axisLabel(result.pc2, [1.4, 2.4, 3.4])],
-                ['Posturing', result.pc3, 4.6, axisLabel(result.pc3, [1.2, 2.1, 3.2])]
+                ['Orale aanval', pct(result.pc1 / 3.8), result.pc1, axisLabel(result.pc1, [.75, 1.7, 3.0])],
+                ['Frustratie', pct(result.pc2 / 4.2), result.pc2, axisLabel(result.pc2, [1.4, 2.4, 3.4])],
+                ['Posturing', pct(result.pc3 / 4.6), result.pc3, axisLabel(result.pc3, [1.2, 2.1, 3.2])]
             ];
 
-            axesNode.innerHTML = axes.map(([label, score, max, band]) => {
-                return metricHTML(`${label}: ${band}`, pct(score / max), `ruwe componentscore: ${score.toFixed(2)}`);
+            axesNode.innerHTML = axes.map(([label, value, score, band]) => {
+                return axisCardHTML(label, value, score, band);
             }).join('');
 
             const modifier = key => {
@@ -673,9 +979,9 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             );
 
             modifiersNode.innerHTML = [
-                metricHTML('Frustratiedruk', frustration, 'hoeveel herstel, ontlading en autonomie eerst nodig zijn'),
-                metricHTML('Escalatierisico', risk, 'hoe klein de veiligheidsmarge is bij onverwachte nabijheid'),
-                metricHTML('Managementbehoefte', management, 'hoe strak afstand, routes, materiaal en handler-plan moeten zijn')
+                metricHTML('Frustratiedruk', frustration, 'herstel, ontlading en autonomie eerst nodig', 'secondary'),
+                metricHTML('Escalatierisico', risk, 'veiligheidsmarge bij onverwachte nabijheid', 'secondary'),
+                metricHTML('Managementbehoefte', management, 'afstand, routes, materiaal en handler-plan', 'secondary')
             ].join('');
 
             const priorities = [];
