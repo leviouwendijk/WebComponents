@@ -363,7 +363,7 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(block)__cluster-metric:first-child",
+                    ".\(block)__cluster-metric:not(.\(block)__cluster-metric--primary):first-child",
                     CSS.decl("border-top", "0"),
                     CSS.decl("padding-top", "0")
                 ),
@@ -590,7 +590,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
         ];
 
         const modifierOptions = [
-            [0, 'Niet herkenbaar'],
+            [0, 'Onbekend'],
             [1, 'Soms'],
             [2, 'Duidelijk'],
             [3, 'Sterk']
