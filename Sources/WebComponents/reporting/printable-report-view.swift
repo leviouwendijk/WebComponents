@@ -451,7 +451,9 @@ public struct PrintableReportView: ReusableComponent, Sendable {
                     CSS.decl("display", "inline-flex"),
                     CSS.decl("align-items", "center"),
                     CSS.decl("justify-content", "center"),
+                    CSS.decl("align-self", "flex-start"),
                     CSS.decl("gap", ".45rem"),
+                    CSS.decl("margin", "clamp(20px, 3vw, 32px) 0 0"),
                     CSS.decl("border", "1px solid var(--border-color, rgba(15, 23, 42, .14))"),
                     CSS.decl("border-radius", "999px"),
                     CSS.decl("padding", ".65rem .95rem"),
@@ -461,10 +463,7 @@ public struct PrintableReportView: ReusableComponent, Sendable {
                     CSS.decl("color", "var(--text-color, #0f172a)"),
                     CSS.decl("background", "var(--surface-color, #fff)"),
                     CSS.decl("box-shadow", "0 8px 20px rgba(15, 23, 42, .08)"),
-                    CSS.decl("cursor", "pointer"),
-
-                    CSS.decl("margin", "clamp(20px, 3vw, 32px) 0 0"),
-                    CSS.decl("align-self", "flex-start"),
+                    CSS.decl("cursor", "pointer")
                 ),
 
                 CSS.rule(
@@ -483,6 +482,33 @@ public struct PrintableReportView: ReusableComponent, Sendable {
                     CSS.decl("background", "#fff"),
                     CSS.decl("font-family", #""Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif"#),
                     CSS.decl("line-height", "1.45")
+                ),
+
+                CSS.rule(
+                    """
+                    .\(ClassName.root),
+                    .\(ClassName.root) *,
+                    .\(ClassName.root) *::before,
+                    .\(ClassName.root) *::after
+                    """,
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("min-width", "0")
+                ),
+
+                CSS.rule(
+                    """
+                    .\(ClassName.metaValue),
+                    .\(ClassName.fieldValue),
+                    .\(ClassName.fieldNote),
+                    .\(ClassName.metricValue),
+                    .\(ClassName.metricNote),
+                    .\(ClassName.noticeText),
+                    .\(ClassName.summary),
+                    .\(ClassName.notesBox)
+                    """,
+                    CSS.decl("overflow-wrap", "anywhere"),
+                    CSS.decl("word-break", "normal"),
+                    CSS.decl("hyphens", "auto")
                 ),
 
                 CSS.rule(
@@ -600,8 +626,8 @@ public struct PrintableReportView: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(ClassName.metricValue)",
-                    CSS.decl("font-size", "1.45rem"),
-                    CSS.decl("line-height", "1.1")
+                    CSS.decl("font-size", "clamp(1rem, 2vw, 1.22rem)"),
+                    CSS.decl("line-height", "1.16")
                 ),
 
                 CSS.rule(
@@ -741,7 +767,7 @@ public struct PrintableReportView: ReusableComponent, Sendable {
 
                     CSS.rule(
                         ".\(ClassName.metrics)",
-                        CSS.decl("grid-template-columns", "repeat(3, minmax(0, 1fr))"),
+                        CSS.decl("grid-template-columns", "repeat(2, minmax(0, 1fr))"),
                         CSS.decl("gap", "7px")
                     ),
 
@@ -753,8 +779,9 @@ public struct PrintableReportView: ReusableComponent, Sendable {
 
                     CSS.rule(
                         ".\(ClassName.metricValue)",
-                        CSS.decl("font-size", "13pt"),
-                        CSS.decl("line-height", "1.05")
+                        CSS.decl("font-size", "10.5pt"),
+                        CSS.decl("line-height", "1.18"),
+                        CSS.decl("font-weight", "700")
                     ),
 
                     CSS.rule(
