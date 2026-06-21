@@ -386,7 +386,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
         ];
 
         const modifierOptions = [
-            [0, 'Niet herkenbaar'],
+            [0, 'Onbekend'],
             [1, 'Soms'],
             [2, 'Duidelijk'],
             [3, 'Sterk']
