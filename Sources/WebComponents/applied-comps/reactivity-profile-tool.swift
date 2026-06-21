@@ -380,13 +380,13 @@ public struct ReactivityProfileToolScript: ReusableComponent {
         ];
 
         const frequencyOptions = [
-            [0, 'Geen'],
+            [0, 'Nooit'],
             [1, 'Soms'],
             [2, 'Vaak']
         ];
 
         const modifierOptions = [
-            [0, 'Geen'],
+            [0, 'Niet herkenbaar'],
             [1, 'Soms'],
             [2, 'Duidelijk'],
             [3, 'Sterk']
@@ -415,9 +415,9 @@ public struct ReactivityProfileToolScript: ReusableComponent {
         const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
         const pct = value => Math.round(clamp(value) * 100);
 
-        function choicesHTML(options, currentValue = 0) {
+        function choicesHTML(options, currentValue = '') {
             return options.map(([value, label]) => {
-                const selected = Number(value) === Number(currentValue);
+                const selected = currentValue !== '' && String(value) === String(currentValue);
 
                 return `
                     <button
@@ -431,19 +431,34 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             }).join('');
         }
 
+        function metricHTML(label, value, detail = '') {
+            return `
+                <div class="wc-reactivity-profile-tool__metric">
+                    <div class="wc-reactivity-profile-tool__metric-top">
+                        <span>${label}</span>
+                        <span>${value}%</span>
+                    </div>
+                    <div class="wc-reactivity-profile-tool__bar" aria-hidden="true">
+                        <span style="--value: ${value}%"></span>
+                    </div>
+                    ${detail ? `<p class="wc-reactivity-profile-tool__hint">${detail}</p>` : ''}
+                </div>
+            `;
+        }
+
         function fieldHTML(kind, item) {
             const [key, label, help] = item;
             const attr = kind === 'behaviour' ? 'data-reactivity-behaviour' : 'data-reactivity-modifier';
             const options = kind === 'behaviour' ? frequencyOptions : modifierOptions;
 
             return `
-                <div class="wc-reactivity-profile-tool__field" ${attr}="${key}" data-reactivity-field data-value="0">
+                <div class="wc-reactivity-profile-tool__field" ${attr}="${key}" data-reactivity-field data-value="">
                     <div class="wc-reactivity-profile-tool__field-copy">
                         <span>${label}<small>${help}</small></span>
                     </div>
 
                     <div class="wc-reactivity-profile-tool__choice-group" role="group" aria-label="${label}">
-                        ${choicesHTML(options, 0)}
+                        ${choicesHTML(options, '')}
                     </div>
                 </div>
             `;
@@ -490,23 +505,46 @@ public struct ReactivityProfileToolScript: ReusableComponent {
 
         function values(root, selector) {
             const out = {};
+            let answered = 0;
+            let total = 0;
 
             root.querySelectorAll(selector).forEach(field => {
+                total += 1;
+
                 const key = field.getAttribute(
                     selector.includes('behaviour')
                         ? 'data-reactivity-behaviour'
                         : 'data-reactivity-modifier'
                 );
 
-                out[key] = Number(field.dataset.value || 0);
+                const raw = field.dataset.value ?? '';
+
+                if (raw === '') {
+                    out[key] = null;
+                    return;
+                }
+
+                answered += 1;
+                out[key] = Number(raw);
             });
 
-            return out;
+            return {
+                values: out,
+                answered,
+                total,
+                complete: answered === total
+            };
         }
 
         function componentScore(input, key) {
             return Object.keys(loadings[key]).reduce((sum, behaviour) => {
-                return sum + ((input[behaviour] || 0) * loadings[key][behaviour]);
+                const value = input[behaviour];
+
+                if (value === null || value === undefined) {
+                    return sum;
+                }
+
+                return sum + (value * loadings[key][behaviour]);
             }, 0);
         }
 
@@ -554,20 +592,46 @@ public struct ReactivityProfileToolScript: ReusableComponent {
 
             render(root);
 
-            const input = values(root, '[data-reactivity-behaviour]');
-            const mod = values(root, '[data-reactivity-modifier]');
+            const behaviourState = values(root, '[data-reactivity-behaviour]');
+            const modifierState = values(root, '[data-reactivity-modifier]');
+
+            const primaryNode = root.querySelector('[data-reactivity-primary]');
+            const summaryNode = root.querySelector('[data-reactivity-summary]');
+            const matchesNode = root.querySelector('[data-reactivity-matches]');
+            const axesNode = root.querySelector('[data-reactivity-axes]');
+            const modifiersNode = root.querySelector('[data-reactivity-modifiers]');
+            const prioritiesNode = root.querySelector('[data-reactivity-priorities]');
+
+            if (!primaryNode || !summaryNode || !matchesNode || !axesNode || !modifiersNode || !prioritiesNode) {
+                return;
+            }
+
+            if (!behaviourState.complete) {
+                primaryNode.textContent = 'Nog niet compleet';
+                summaryNode.textContent = `Beantwoord eerst alle negen gedragingen. Ingevuld: ${behaviourState.answered}/${behaviourState.total}.`;
+
+                matchesNode.innerHTML = '';
+                axesNode.innerHTML = '';
+                modifiersNode.innerHTML = '';
+                prioritiesNode.innerHTML = '';
+
+                return;
+            }
+
+            const input = behaviourState.values;
+            const mod = modifierState.values;
             const result = calculate(input);
             const primary = result.matches[0];
             const second = result.matches[1];
             const cluster = clusters[primary.id];
             const ambiguous = primary.match - second.match < 15;
 
-            root.querySelector('[data-reactivity-primary]').textContent = `${cluster[0]} · ${Math.round(primary.match)}% match`;
-            root.querySelector('[data-reactivity-summary]').textContent = ambiguous
+            primaryNode.textContent = `${cluster[0]} · ${Math.round(primary.match)}% match`;
+            summaryNode.textContent = ambiguous
                 ? `Grensprofiel: ook ${clusters[second.id][0]} past duidelijk. Interpreteer dit als mengbeeld, niet als harde categorie.`
                 : cluster[1];
 
-            root.querySelector('[data-reactivity-matches]').innerHTML = result.matches.map(row => {
+            matchesNode.innerHTML = result.matches.map(row => {
                 return metricHTML(`${clusters[row.id][0]}`, Math.round(row.match), clusters[row.id][1]);
             }).join('');
 
@@ -577,32 +641,38 @@ public struct ReactivityProfileToolScript: ReusableComponent {
                 ['Posturing', result.pc3, 4.6, axisLabel(result.pc3, [1.2, 2.1, 3.2])]
             ];
 
-            root.querySelector('[data-reactivity-axes]').innerHTML = axes.map(([label, score, max, band]) => {
+            axesNode.innerHTML = axes.map(([label, score, max, band]) => {
                 return metricHTML(`${label}: ${band}`, pct(score / max), `ruwe componentscore: ${score.toFixed(2)}`);
             }).join('');
 
+            const modifier = key => {
+                const value = mod[key];
+
+                return value === null || value === undefined ? 0 : value;
+            };
+
             const frustration = pct(
                 .48 * clamp(result.pc2 / 3.7) +
-                .18 * clamp((mod.restraint || 0) / 3) +
-                .18 * clamp((mod.recovery || 0) / 3) +
-                .16 * clamp((mod.disengage || 0) / 3)
+                .18 * clamp(modifier('restraint') / 3) +
+                .18 * clamp(modifier('recovery') / 3) +
+                .16 * clamp(modifier('disengage') / 3)
             );
 
             const risk = pct(
                 .46 * clamp(result.pc1 / 3.3) +
-                .22 * clamp((mod.contact || 0) / 3) +
-                .18 * clamp((mod.redirect || 0) / 3) +
+                .22 * clamp(modifier('contact') / 3) +
+                .18 * clamp(modifier('redirect') / 3) +
                 .14 * clamp(result.pc3 / 4.1)
             );
 
             const management = pct(
                 .40 * clamp(risk / 100) +
-                .24 * clamp((mod.distance || 0) / 3) +
-                .20 * clamp((mod.recovery || 0) / 3) +
-                .16 * clamp((mod.handling || 0) / 3)
+                .24 * clamp(modifier('distance') / 3) +
+                .20 * clamp(modifier('recovery') / 3) +
+                .16 * clamp(modifier('handling') / 3)
             );
 
-            root.querySelector('[data-reactivity-modifiers]').innerHTML = [
+            modifiersNode.innerHTML = [
                 metricHTML('Frustratiedruk', frustration, 'hoeveel herstel, ontlading en autonomie eerst nodig zijn'),
                 metricHTML('Escalatierisico', risk, 'hoe klein de veiligheidsmarge is bij onverwachte nabijheid'),
                 metricHTML('Managementbehoefte', management, 'hoe strak afstand, routes, materiaal en handler-plan moeten zijn')
@@ -632,7 +702,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
                 priorities.push('Omdat het profiel gemengd is: baseer de eerste trainingsstap op de hoogste modifier, niet alleen op de clustertitel.');
             }
 
-            root.querySelector('[data-reactivity-priorities]').innerHTML = priorities
+            prioritiesNode.innerHTML = priorities
                 .map(item => `<li>${item}</li>`)
                 .join('');
         }
@@ -646,13 +716,14 @@ public struct ReactivityProfileToolScript: ReusableComponent {
 
             if (!field || !root) return;
 
-            const current = Number(field.dataset.value || 0);
-            const next = Number(choice.dataset.reactivityValue || 0);
+            const current = field.dataset.value ?? '';
+            const next = choice.dataset.reactivityValue ?? '';
 
-            field.dataset.value = current === next ? '0' : String(next);
+            field.dataset.value = current === next ? '' : next;
 
             field.querySelectorAll('[data-reactivity-choice]').forEach(button => {
-                const selected = Number(button.dataset.reactivityValue || 0) === Number(field.dataset.value || 0);
+                const value = button.dataset.reactivityValue ?? '';
+                const selected = field.dataset.value !== '' && value === field.dataset.value;
 
                 button.classList.toggle('wc-reactivity-profile-tool__choice--selected', selected);
                 button.setAttribute('aria-pressed', selected ? 'true' : 'false');
