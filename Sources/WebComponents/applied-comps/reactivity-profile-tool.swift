@@ -18,7 +18,9 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
     }
 
     public var nodes: ReusableComponentNodes {
-        .body(
+        let report = report_nodes()
+
+        return .body(
             [
                 HTML.main(
                     [
@@ -32,15 +34,80 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                     HTML.section(["class": "\(Self.block)__surface"]) {
                         HTML.div(["class": "\(Self.block)__mount", "data-reactivity-mount": ""]) {}
                     }
+
+                    report.body
                 }
             ],
-            stylesheets: includeStyles ? [Self.stylesheet()] : [],
-            scripts: includeScript ? ReactivityProfileToolScript().nodes.scripts : []
+            stylesheets: (includeStyles ? [Self.stylesheet()] : []) + report.stylesheets,
+            scripts: (includeScript ? ReactivityProfileToolScript().nodes.scripts : []) + report.scripts
         )
     }
 
     public func node() -> any HTMLNode {
         nodes.body[0]
+    }
+
+    private func report_nodes() -> ReusableComponentNodes {
+        PrintableReportView(
+            report: report(
+                id: "reactivity-profile-report",
+                title: "Reactiviteitsprofiel",
+                subtitle: "Samenvatting van cluster, gedragsassen, behandelmodifiers en trainingsprioriteit.",
+                meta: [
+                    meta("Hulpmiddel", "Reactiviteitsprofiel"),
+                    meta("Datum", slot("date")),
+                    meta("Status", slot("status", fallback: "Nog niet berekend"))
+                ],
+                options: .init(
+                    styles: includeStyles,
+                    script: includeScript
+                )
+            ) {
+                summary(
+                    "Deze uitdraai vat de huidige inschatting van het reactiviteitsprofiel samen. Gebruik dit als werkdocument voor analyse en trainingsplanning."
+                )
+
+                fields("Profiel") {
+                    field("Hoofdcluster", slot("primary", fallback: "Nog niet compleet"))
+                    field("Ernst", slot("severity", fallback: "Open"))
+                    field("Clusterduiding", slot("summary", fallback: "Vul eerst alle gedragingen in."))
+                    field("Ingevulde gedragingen", slot("completeness", fallback: "0/9"))
+                    field("Ingevulde modifiers", slot("modifierCompleteness", fallback: "0/0"))
+                }
+
+                metrics("Gedragsassen") {
+                    metric("Orale aanval", slot("oralAttack", fallback: "—"))
+                    metric("Frustratie", slot("frustrationAxis", fallback: "—"))
+                    metric("Posturing", slot("posturing", fallback: "—"))
+                }
+
+                metrics("Behandelmodifiers") {
+                    metric("Frustratiedruk", slot("frustrationPressure", fallback: "—"))
+                    metric("Escalatierisico", slot("escalationRisk", fallback: "—"))
+                    metric("Managementbehoefte", slot("managementNeed", fallback: "—"))
+                }
+
+                fields("Training") {
+                    field("Prioriteit", slot("priorities", fallback: "Nog geen prioriteit berekend."))
+                    field("Cluster-overeenkomst", slot("matches", fallback: "Nog geen matches berekend."))
+                }
+
+                notice(
+                    "Gebruik",
+                    "Dit profiel is een hulpmiddel voor analyse en planning. Het vervangt geen professionele beoordeling van veiligheid, context en leerhistorie.",
+                    tone: .info
+                )
+
+                notes(
+                    "Aantekeningen",
+                    placeholder: "Ruimte voor context, observaties, veiligheidsmarge en vervolgstappen."
+                )
+            },
+            bind: .client(
+                source: "#content-area",
+                collector: "wcReactivityProfileTool.collectReport"
+            )
+        ).nodes
     }
 
     private func hero() -> any HTMLNode {
@@ -1052,10 +1119,163 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             init();
         }
 
+        function collectReport(root) {
+            if (!root) return {};
+
+            render(root);
+            update(root);
+
+            const date = new Date().toLocaleDateString(
+                'nl-NL',
+                {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                }
+            );
+
+            const behaviourState = values(root, '[data-reactivity-behaviour]');
+            const modifierState = values(root, '[data-reactivity-modifier]');
+
+            const baseSlots = {
+                date,
+                completeness: `${behaviourState.answered}/${behaviourState.total}`,
+                modifierCompleteness: `${modifierState.answered}/${modifierState.total}`
+            };
+
+            if (!behaviourState.complete) {
+                return {
+                    status: 'Nog niet compleet',
+                    slots: {
+                        ...baseSlots,
+                        status: 'Nog niet compleet',
+                        primary: 'Nog niet compleet',
+                        severity: 'Open',
+                        summary: `Beantwoord eerst alle negen gedragingen. Ingevuld: ${behaviourState.answered}/${behaviourState.total}.`,
+                        oralAttack: '—',
+                        frustrationAxis: '—',
+                        posturing: '—',
+                        frustrationPressure: '—',
+                        escalationRisk: '—',
+                        managementNeed: '—',
+                        priorities: 'Nog geen prioriteit berekend.',
+                        matches: 'Nog geen matches berekend.'
+                    }
+                };
+            }
+
+            const input = behaviourState.values;
+            const mod = modifierState.values;
+            const result = calculate(input);
+            const primary = result.matches[0];
+            const second = result.matches[1];
+            const cluster = clusters[primary.id];
+            const ambiguous = primary.match - second.match < 15;
+
+            const modifier = key => {
+                const value = mod[key];
+
+                return value === null || value === undefined ? 0 : value;
+            };
+
+            const axes = [
+                ['Orale aanval', pct(result.pc1 / 3.8), result.pc1, axisLabel(result.pc1, [.75, 1.7, 3.0])],
+                ['Frustratie', pct(result.pc2 / 4.2), result.pc2, axisLabel(result.pc2, [1.4, 2.4, 3.4])],
+                ['Posturing', pct(result.pc3 / 4.6), result.pc3, axisLabel(result.pc3, [1.2, 2.1, 3.2])]
+            ];
+
+            const frustration = pct(
+                .48 * clamp(result.pc2 / 3.7) +
+                .18 * clamp(modifier('restraint') / 3) +
+                .18 * clamp(modifier('recovery') / 3) +
+                .16 * clamp(modifier('disengage') / 3)
+            );
+
+            const risk = pct(
+                .46 * clamp(result.pc1 / 3.3) +
+                .22 * clamp(modifier('contact') / 3) +
+                .18 * clamp(modifier('redirect') / 3) +
+                .14 * clamp(result.pc3 / 4.1)
+            );
+
+            const management = pct(
+                .40 * clamp(risk / 100) +
+                .24 * clamp(modifier('distance') / 3) +
+                .20 * clamp(modifier('recovery') / 3) +
+                .16 * clamp(modifier('handling') / 3)
+            );
+
+            const priorities = [];
+
+            if (risk >= 70) {
+                priorities.push('Begin met veiligheidsmarge: afstand, voorspelbare routes, materiaalcontrole en geen geplande hond-hond confrontaties.');
+            } else if (risk >= 45) {
+                priorities.push('Houd management actief terwijl je alternatief gedrag opbouwt; test niet te snel dichterbij.');
+            } else {
+                priorities.push('Werk vooral aan tijdig signaleren, afstand nemen en rustig disengagen voordat spanning oploopt.');
+            }
+
+            if (frustration >= 70) {
+                priorities.push('Plan arousal-outlet en herstelmomenten expliciet in; blootstelling zonder ontlading zal waarschijnlijk vastlopen.');
+            } else if (frustration >= 45) {
+                priorities.push('Bouw frustratietolerantie op via voorspelbare keuze, afstand en beloonbare alternatieven.');
+            }
+
+            if (primary.id === 3 || primary.id === 4 || risk >= 65) {
+                priorities.push('Behandel contactrisico als apart thema: niet alleen minder blaffen, maar vooral meer remming, herstel en veilige beslissingen.');
+            }
+
+            if (ambiguous) {
+                priorities.push('Omdat het profiel gemengd is: baseer de eerste trainingsstap op de hoogste modifier, niet alleen op de clustertitel.');
+            }
+
+            const matches = result.matches
+                .map(row => {
+                    const matchedCluster = clusters[row.id];
+
+                    return `${matchedCluster.name}: ${Math.round(row.match)}%`;
+                })
+                .join(', ');
+
+            const slots = {
+                ...baseSlots,
+                status: 'Berekend',
+                primary: `${cluster.name} · ${Math.round(primary.match)}% match`,
+                severity: `${cluster.tag} · ${cluster.severityLabel}`,
+                summary: ambiguous
+                    ? `Grensprofiel: ook ${clusters[second.id].name} past duidelijk. Lees dit als mengbeeld.`
+                    : cluster.summary,
+                oralAttack: `${axes[0][3]} · ${axes[0][2].toFixed(2)} · ${axes[0][1]}%`,
+                frustrationAxis: `${axes[1][3]} · ${axes[1][2].toFixed(2)} · ${axes[1][1]}%`,
+                posturing: `${axes[2][3]} · ${axes[2][2].toFixed(2)} · ${axes[2][1]}%`,
+                frustrationPressure: `${frustration}%`,
+                escalationRisk: `${risk}%`,
+                managementNeed: `${management}%`,
+                priorities,
+                matches
+            };
+
+            return {
+                status: 'Berekend',
+                cluster: cluster.name,
+                primaryMatch: Math.round(primary.match),
+                severity: cluster.severityLabel,
+                ambiguous,
+                axes,
+                frustration,
+                risk,
+                management,
+                priorities,
+                matches,
+                slots
+            };
+        }
+
         window.wcReactivityProfileTool = {
             initialized: true,
             init,
-            update
+            update,
+            collectReport
         };
     })();
     """#

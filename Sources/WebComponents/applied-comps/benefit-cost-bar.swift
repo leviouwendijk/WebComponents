@@ -735,10 +735,52 @@ public struct BenefitCostBarScript: ReusableComponent {
             init();
         }
 
+        function collectReport(root) {
+            if (!root) return {};
+
+            update(root);
+
+            const benefit = root.querySelector('[data-benefit-cost-slider="benefit"]');
+            const cost = root.querySelector('[data-benefit-cost-slider="cost"]');
+
+            const benefitValue = numeric(benefit?.value);
+            const costValue = numeric(cost?.value);
+            const result = benefitValue - costValue;
+            const state = stateFor(result);
+            const expectation = expectationText[state];
+
+            const date = new Date().toLocaleDateString(
+                'nl-NL',
+                {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                }
+            );
+
+            return {
+                benefit: display(benefitValue),
+                cost: display(costValue),
+                result: signed(result),
+                state,
+                expectation,
+                date,
+                slots: {
+                    benefit: display(benefitValue),
+                    cost: display(costValue),
+                    result: signed(result),
+                    state,
+                    expectation,
+                    date
+                }
+            };
+        }
+
         window.wcBenefitCostBar = {
             initialized: true,
             init,
-            update
+            update,
+            collectReport
         };
     })();
     """#
