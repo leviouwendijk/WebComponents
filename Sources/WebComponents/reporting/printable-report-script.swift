@@ -19,6 +19,7 @@ public struct PrintableReportScript: ReusableComponent {
         const actionSelector = '[data-print-report-action="print"]';
         const rootSelector = '[data-print-report-root]';
         const registry = new Map();
+        const activeReports = new WeakMap();
 
         function pathGet(object, path) {
             if (!object || !path) return undefined;
@@ -133,6 +134,21 @@ public struct PrintableReportScript: ReusableComponent {
         }
 
         function begin(report) {
+            const marker = document.createComment('wc-print-report-marker');
+            const parent = report.parentNode;
+
+            if (parent) {
+                parent.insertBefore(marker, report);
+                activeReports.set(
+                    report,
+                    {
+                        marker
+                    }
+                );
+
+                document.body.appendChild(report);
+            }
+
             report.removeAttribute('aria-hidden');
             document.body.classList.add('wc-print-reporting');
         }
@@ -140,6 +156,16 @@ public struct PrintableReportScript: ReusableComponent {
         function end(report) {
             document.body.classList.remove('wc-print-reporting');
             report.setAttribute('aria-hidden', 'true');
+
+            const active = activeReports.get(report);
+            const marker = active?.marker;
+
+            if (marker?.parentNode) {
+                marker.parentNode.insertBefore(report, marker);
+                marker.remove();
+            }
+
+            activeReports.delete(report);
         }
 
         function print(id) {

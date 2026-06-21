@@ -461,7 +461,10 @@ public struct PrintableReportView: ReusableComponent, Sendable {
                     CSS.decl("color", "var(--text-color, #0f172a)"),
                     CSS.decl("background", "var(--surface-color, #fff)"),
                     CSS.decl("box-shadow", "0 8px 20px rgba(15, 23, 42, .08)"),
-                    CSS.decl("cursor", "pointer")
+                    CSS.decl("cursor", "pointer"),
+
+                    CSS.decl("margin", "clamp(20px, 3vw, 32px) 0 0"),
+                    CSS.decl("align-self", "flex-start"),
                 ),
 
                 CSS.rule(
@@ -646,22 +649,29 @@ public struct PrintableReportView: ReusableComponent, Sendable {
                 CSS.media(
                     "print",
                     CSS.rule(
-                        "body.wc-print-reporting *",
-                        CSS.decl("visibility", "hidden !important")
+                        "html, body",
+                        CSS.decl("width", "100%"),
+                        CSS.decl("min-height", "auto"),
+                        CSS.decl("margin", "0 !important"),
+                        CSS.decl("padding", "0 !important"),
+                        CSS.decl("background", "#fff !important")
                     ),
 
                     CSS.rule(
-                        "body.wc-print-reporting .\(ClassName.root), body.wc-print-reporting .\(ClassName.root) *",
-                        CSS.decl("visibility", "visible !important")
+                        "body.wc-print-reporting > :not(.\(ClassName.root))",
+                        CSS.decl("display", "none !important")
                     ),
 
                     CSS.rule(
                         "body.wc-print-reporting .\(ClassName.root)",
                         CSS.decl("display", "block !important"),
-                        CSS.decl("position", "absolute"),
-                        CSS.decl("inset", "0 auto auto 0"),
+                        CSS.decl("position", "static !important"),
+                        CSS.decl("inset", "auto !important"),
                         CSS.decl("width", "100%"),
-                        CSS.decl("background", "#fff")
+                        CSS.decl("margin", "0"),
+                        CSS.decl("padding", "0"),
+                        CSS.decl("background", "#fff"),
+                        CSS.decl("color", "#111827")
                     ),
 
                     CSS.rule(
@@ -671,15 +681,93 @@ public struct PrintableReportView: ReusableComponent, Sendable {
 
                     CSS.rule(
                         ".\(ClassName.paper)",
+                        CSS.decl("box-sizing", "border-box"),
                         CSS.decl("max-width", "none"),
+                        CSS.decl("margin", "0"),
                         CSS.decl("padding", "0"),
+                        CSS.decl("font-size", "10.5pt"),
+                        CSS.decl("line-height", "1.32"),
                         CSS.decl("-webkit-print-color-adjust", "exact"),
                         CSS.decl("print-color-adjust", "exact")
                     ),
 
                     CSS.rule(
+                        ".\(ClassName.header)",
+                        CSS.decl("padding-bottom", "10px"),
+                        CSS.decl("margin-bottom", "14px"),
+                        CSS.decl("border-bottom", "1px solid #d1d5db")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.title)",
+                        CSS.decl("font-size", "18pt"),
+                        CSS.decl("line-height", "1.08")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.subtitle)",
+                        CSS.decl("margin-top", "5px"),
+                        CSS.decl("font-size", "9.5pt")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.meta)",
+                        CSS.decl("grid-template-columns", "repeat(3, minmax(0, 1fr))"),
+                        CSS.decl("gap", "6px 14px"),
+                        CSS.decl("margin-top", "12px")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.section)",
+                        CSS.decl("break-inside", "avoid"),
+                        CSS.decl("page-break-inside", "avoid"),
+                        CSS.decl("margin", "0 0 13px")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.sectionTitle)",
+                        CSS.decl("margin", "0 0 7px"),
+                        CSS.decl("font-size", "10.5pt"),
+                        CSS.decl("letter-spacing", ".06em"),
+                        CSS.decl("text-transform", "uppercase")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.field)",
+                        CSS.decl("grid-template-columns", "130px minmax(0, 1fr)"),
+                        CSS.decl("gap", "10px"),
+                        CSS.decl("padding", "6px 0")
+                    ),
+
+                    CSS.rule(
                         ".\(ClassName.metrics)",
-                        CSS.decl("grid-template-columns", "repeat(3, minmax(0, 1fr))")
+                        CSS.decl("grid-template-columns", "repeat(3, minmax(0, 1fr))"),
+                        CSS.decl("gap", "7px")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.metric)",
+                        CSS.decl("padding", "9px 10px"),
+                        CSS.decl("border-radius", "10px")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.metricValue)",
+                        CSS.decl("font-size", "13pt"),
+                        CSS.decl("line-height", "1.05")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.notice)",
+                        CSS.decl("padding", "10px 12px"),
+                        CSS.decl("border-radius", "10px")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.notesBox)",
+                        CSS.decl("min-height", "46px"),
+                        CSS.decl("padding", "10px"),
+                        CSS.decl("border-radius", "10px")
                     )
                 ),
 
