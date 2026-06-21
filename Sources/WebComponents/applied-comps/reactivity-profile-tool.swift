@@ -590,7 +590,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
         ];
 
         const modifierOptions = [
-            [0, 'Onbekend'],
+            [0, 'Niet'],
             [1, 'Soms'],
             [2, 'Duidelijk'],
             [3, 'Sterk']
