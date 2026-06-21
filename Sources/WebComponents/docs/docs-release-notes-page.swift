@@ -4,6 +4,7 @@ import CSS
 import HTML
 import Version
 import Primitives
+import Difference
 
 public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
     public enum MutationType: String, Sendable, CaseIterable {
@@ -45,16 +46,31 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
         }
     }
 
+    public enum ChangeAnnotation: Sendable {
+        case note(
+            title: String,
+            body: String
+        )
+
+        case diff(
+            title: String,
+            layout: DifferenceLayout
+        )
+    }
+
     public struct Change: Sendable {
         public let mutation: MutationType
         public let text: String
+        public let annotation: ChangeAnnotation?
 
         public init(
             mutation: MutationType,
-            text: String
+            text: String,
+            annotation: ChangeAnnotation? = nil
         ) {
             self.mutation = mutation
             self.text = text
+            self.annotation = annotation
         }
     }
 
@@ -402,9 +418,150 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                 HTML.text(change.mutation.symbol)
             }
 
-            HTML.span(["class": "\(Self.block)__change-text"]) {
-                HTML.text(change.text)
+            HTML.div(["class": "\(Self.block)__change-body"]) {
+                HTML.span(["class": "\(Self.block)__change-text"]) {
+                    HTML.text(change.text)
+                }
+
+                if let annotation = change.annotation {
+                    annotation_node(annotation)
+                }
             }
+        }
+    }
+
+    private func annotation_node(
+        _ annotation: ChangeAnnotation
+    ) -> any HTMLNode {
+        switch annotation {
+        case .note(let title, let body):
+            return note_annotation_node(
+                title: title,
+                body: body
+            )
+
+        case .diff(let title, let layout):
+            return diff_annotation_node(
+                title: title,
+                layout: layout
+            )
+        }
+    }
+
+    private func note_annotation_node(
+        title: String,
+        body: String
+    ) -> any HTMLNode {
+        HTML.el(
+            "details",
+            [
+                "class": "\(Self.block)__annotation \(Self.block)__annotation--note"
+            ]
+        ) {
+            HTML.el("summary", ["class": "\(Self.block)__annotation-summary"]) {
+                HTML.span(["class": "\(Self.block)__annotation-title"]) {
+                    HTML.text(title)
+                }
+            }
+
+            HTML.div(["class": "\(Self.block)__annotation-body"]) {
+                HTML.p(["class": "\(Self.block)__annotation-note"]) {
+                    HTML.text(body)
+                }
+            }
+        }
+    }
+
+    private func diff_annotation_node(
+        title: String,
+        layout: DifferenceLayout
+    ) -> any HTMLNode {
+        HTML.el(
+            "details",
+            [
+                "class": "\(Self.block)__annotation \(Self.block)__annotation--diff"
+            ]
+        ) {
+            HTML.el("summary", ["class": "\(Self.block)__annotation-summary"]) {
+                HTML.span(["class": "\(Self.block)__annotation-title"]) {
+                    HTML.text(title)
+                }
+            }
+
+            HTML.div(["class": "\(Self.block)__annotation-body"]) {
+                HTML.div(
+                    [
+                        "class": "\(Self.block)__diff",
+                        "role": "list"
+                    ]
+                ) {
+                    for line in layout.lines {
+                        diff_line_node(line)
+                    }
+                }
+            }
+        }
+    }
+
+    private func diff_line_node(
+        _ line: DifferenceLayout.Line
+    ) -> any HTMLNode {
+        HTML.div(
+            [
+                "class": "\(Self.block)__diff-line \(Self.block)__diff-line--\(diff_role_class(line.role))",
+                "role": "listitem"
+            ]
+        ) {
+            HTML.span(
+                [
+                    "class": "\(Self.block)__diff-prefix",
+                    "aria-hidden": "true"
+                ]
+            ) {
+                HTML.text(diff_prefix(line.role))
+            }
+
+            HTML.el("code", ["class": "\(Self.block)__diff-code"]) {
+                HTML.text(line.text)
+            }
+        }
+    }
+
+    private func diff_prefix(
+        _ role: DifferenceLayout.Role
+    ) -> String {
+        switch role {
+        case .headerOld:
+            return "---"
+        case .headerNew:
+            return "+++"
+        case .equal:
+            return " "
+        case .insert:
+            return "+"
+        case .delete:
+            return "−"
+        case .separator:
+            return "…"
+        }
+    }
+
+    private func diff_role_class(
+        _ role: DifferenceLayout.Role
+    ) -> String {
+        switch role {
+        case .headerOld:
+            return "header-old"
+        case .headerNew:
+            return "header-new"
+        case .equal:
+            return "equal"
+        case .insert:
+            return "insert"
+        case .delete:
+            return "delete"
+        case .separator:
+            return "separator"
         }
     }
 
@@ -716,8 +873,142 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(block)__change-body",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "8px"),
+                    CSS.decl("min-width", "0")
+                ),
+
+                CSS.rule(
                     ".\(block)__change-text",
                     CSS.decl("min-width", "0")
+                ),
+
+                CSS.rule(
+                    ".\(block)__annotation",
+                    CSS.decl("width", "100%"),
+                    CSS.decl("overflow", "hidden"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-docs-release-border) 82%, transparent)"),
+                    CSS.decl("border-radius", "14px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-docs-release-surface) 90%, var(--text-color) 10%)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__annotation-summary",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("gap", "8px"),
+                    CSS.decl("padding", "8px 10px"),
+                    CSS.decl("cursor", "pointer"),
+                    CSS.decl("list-style", "none"),
+                    CSS.decl("color", "var(--wc-docs-release-muted)"),
+                    CSS.decl("font-size", ".78rem"),
+                    CSS.decl("font-weight", "760")
+                ),
+
+                CSS.rule(
+                    ".\(block)__annotation-summary::-webkit-details-marker",
+                    CSS.decl("display", "none")
+                ),
+
+                CSS.rule(
+                    ".\(block)__annotation-summary::before",
+                    CSS.decl("content", "\"›\""),
+                    CSS.decl("display", "inline-grid"),
+                    CSS.decl("place-items", "center"),
+                    CSS.decl("width", "16px"),
+                    CSS.decl("height", "16px"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 8%, transparent)"),
+                    CSS.decl("transition", "transform .16s ease")
+                ),
+
+                CSS.rule(
+                    ".\(block)__annotation[open] .\(block)__annotation-summary::before",
+                    CSS.decl("transform", "rotate(90deg)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__annotation-title",
+                    CSS.decl("min-width", "0")
+                ),
+
+                CSS.rule(
+                    ".\(block)__annotation-body",
+                    CSS.decl("padding", "0 10px 10px 34px"),
+                    CSS.decl("border-top", "1px solid color-mix(in srgb, var(--wc-docs-release-border) 72%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__annotation-note",
+                    CSS.decl("margin", "10px 0 0"),
+                    CSS.decl("color", "var(--wc-docs-release-muted)"),
+                    CSS.decl("font-size", ".86rem"),
+                    CSS.decl("line-height", "1.5")
+                ),
+
+                CSS.rule(
+                    ".\(block)__diff",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "1px"),
+                    CSS.decl("overflow-x", "auto"),
+                    CSS.decl("margin-top", "10px"),
+                    CSS.decl("padding", "6px"),
+                    CSS.decl("border-radius", "12px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 7%, transparent)"),
+                    CSS.decl("font-family", "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"),
+                    CSS.decl("font-size", ".76rem"),
+                    CSS.decl("line-height", "1.45")
+                ),
+
+                CSS.rule(
+                    ".\(block)__diff-line",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "34px max-content"),
+                    CSS.decl("gap", "8px"),
+                    CSS.decl("min-width", "100%"),
+                    CSS.decl("padding", "2px 6px"),
+                    CSS.decl("border-radius", "8px"),
+                    CSS.decl("white-space", "pre"),
+                    CSS.decl("color", "var(--text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__diff-prefix",
+                    CSS.decl("text-align", "right"),
+                    CSS.decl("color", "var(--wc-docs-release-muted)"),
+                    CSS.decl("user-select", "none")
+                ),
+
+                CSS.rule(
+                    ".\(block)__diff-code",
+                    CSS.decl("font", "inherit"),
+                    CSS.decl("color", "inherit"),
+                    CSS.decl("white-space", "pre")
+                ),
+
+                CSS.rule(
+                    ".\(block)__diff-line--insert",
+                    CSS.decl("color", "var(--success, #2E8B57)"),
+                    CSS.decl("background", "color-mix(in srgb, var(--success, #2E8B57) 10%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__diff-line--delete",
+                    CSS.decl("color", "var(--danger, #D64545)"),
+                    CSS.decl("background", "color-mix(in srgb, var(--danger, #D64545) 10%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__diff-line--header-old, .\(block)__diff-line--header-new",
+                    CSS.decl("color", "var(--wc-docs-release-muted)"),
+                    CSS.decl("font-weight", "780")
+                ),
+
+                CSS.rule(
+                    ".\(block)__diff-line--separator",
+                    CSS.decl("color", "var(--wc-docs-release-muted)"),
+                    CSS.decl("font-style", "italic")
                 )
             ],
             media: [
