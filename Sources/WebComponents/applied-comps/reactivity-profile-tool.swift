@@ -178,7 +178,7 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(block)__field",
                     CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-columns", "minmax(160px, 1fr) minmax(140px, 210px)"),
+                    CSS.decl("grid-template-columns", "minmax(170px, 1fr) minmax(260px, .95fr)"),
                     CSS.decl("gap", "12px"),
                     CSS.decl("align-items", "center"),
                     CSS.decl("padding", "12px"),
@@ -204,15 +204,58 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(block) select",
-                    CSS.decl("width", "100%"),
+                    ".\(block)__choice-group",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-auto-flow", "column"),
+                    CSS.decl("grid-auto-columns", "minmax(0, 1fr)"),
+                    CSS.decl("gap", "6px"),
+                    CSS.decl("align-items", "stretch")
+                ),
+
+                CSS.rule(
+                    ".\(block)__choice",
+                    CSS.decl("appearance", "none"),
+                    CSS.decl("-webkit-appearance", "none"),
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("justify-content", "center"),
+                    CSS.decl("min-height", "34px"),
+                    CSS.decl("padding", "7px 9px"),
                     CSS.decl("border", "1px solid var(--border-color)"),
                     CSS.decl("border-radius", "999px"),
-                    CSS.decl("padding", "9px 12px"),
                     CSS.decl("font", "inherit"),
-                    CSS.decl("font-weight", "650"),
+                    CSS.decl("font-size", ".8rem"),
+                    CSS.decl("font-weight", "720"),
+                    CSS.decl("line-height", "1.1"),
+                    CSS.decl("color", "var(--muted-text-color)"),
+                    CSS.decl("background", "var(--surface-color, #fff)"),
+                    CSS.decl("cursor", "pointer"),
+                    CSS.decl("transition", "background-color .14s ease, border-color .14s ease, color .14s ease, box-shadow .14s ease, transform .14s ease")
+                ),
+
+                CSS.rule(
+                    ".\(block)__choice:hover",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--link-color) 35%, var(--border-color))"),
+                    CSS.decl("color", "var(--text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__choice:active",
+                    CSS.decl("transform", "scale(.98)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__choice:focus-visible",
+                    CSS.decl("outline", "2px solid var(--link-color)"),
+                    CSS.decl("outline-offset", "2px")
+                ),
+
+                CSS.rule(
+                    ".\(block)__choice--selected",
+                    CSS.decl("border-color", "color-mix(in srgb, var(--link-color) 48%, var(--border-color))"),
+                    CSS.decl("background", "color-mix(in srgb, var(--link-color) 14%, var(--surface-color, #fff))"),
                     CSS.decl("color", "var(--text-color)"),
-                    CSS.decl("background", "var(--surface-color, #fff)")
+                    CSS.decl("box-shadow", "inset 0 0 0 1px color-mix(in srgb, var(--link-color) 12%, transparent)")
                 ),
 
                 CSS.rule(
@@ -288,7 +331,8 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                 CSS.media(
                     "(max-width: 860px)",
                     CSS.rule(".\(block)__grid", CSS.decl("grid-template-columns", "1fr")),
-                    CSS.rule(".\(block)__field", CSS.decl("grid-template-columns", "1fr"))
+                    CSS.rule(".\(block)__field", CSS.decl("grid-template-columns", "1fr")),
+                    CSS.rule(".\(block)__choice-group", CSS.decl("grid-auto-flow", "row"), CSS.decl("grid-template-columns", "repeat(2, minmax(0, 1fr))"))
                 )
             ]
         )
@@ -336,16 +380,16 @@ public struct ReactivityProfileToolScript: ReusableComponent {
         ];
 
         const frequencyOptions = [
-            [0, 'Nooit'],
+            [0, 'Geen'],
             [1, 'Soms'],
-            [2, 'Vaak / altijd']
+            [2, 'Vaak']
         ];
 
         const modifierOptions = [
-            [0, 'Laag / niet herkenbaar'],
-            [1, 'Soms herkenbaar'],
-            [2, 'Duidelijk herkenbaar'],
-            [3, 'Sterk bepalend']
+            [0, 'Geen'],
+            [1, 'Soms'],
+            [2, 'Duidelijk'],
+            [3, 'Sterk']
         ];
 
         const clusters = {
@@ -371,23 +415,20 @@ public struct ReactivityProfileToolScript: ReusableComponent {
         const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
         const pct = value => Math.round(clamp(value) * 100);
 
-        function optionsHTML(options) {
-            return options.map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
-        }
+        function choicesHTML(options, currentValue = 0) {
+            return options.map(([value, label]) => {
+                const selected = Number(value) === Number(currentValue);
 
-        function metricHTML(label, value, detail = '') {
-            return `
-                <div class="wc-reactivity-profile-tool__metric">
-                    <div class="wc-reactivity-profile-tool__metric-top">
-                        <span>${label}</span>
-                        <span>${value}%</span>
-                    </div>
-                    <div class="wc-reactivity-profile-tool__bar" aria-hidden="true">
-                        <span style="--value: ${value}%"></span>
-                    </div>
-                    ${detail ? `<p class="wc-reactivity-profile-tool__hint">${detail}</p>` : ''}
-                </div>
-            `;
+                return `
+                    <button
+                        class="wc-reactivity-profile-tool__choice${selected ? ' wc-reactivity-profile-tool__choice--selected' : ''}"
+                        type="button"
+                        data-reactivity-choice
+                        data-reactivity-value="${value}"
+                        aria-pressed="${selected ? 'true' : 'false'}"
+                    >${label}</button>
+                `;
+            }).join('');
         }
 
         function fieldHTML(kind, item) {
@@ -396,10 +437,15 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             const options = kind === 'behaviour' ? frequencyOptions : modifierOptions;
 
             return `
-                <label class="wc-reactivity-profile-tool__field">
-                    <span>${label}<small>${help}</small></span>
-                    <select ${attr}="${key}">${optionsHTML(options)}</select>
-                </label>
+                <div class="wc-reactivity-profile-tool__field" ${attr}="${key}" data-reactivity-field data-value="0">
+                    <div class="wc-reactivity-profile-tool__field-copy">
+                        <span>${label}<small>${help}</small></span>
+                    </div>
+
+                    <div class="wc-reactivity-profile-tool__choice-group" role="group" aria-label="${label}">
+                        ${choicesHTML(options, 0)}
+                    </div>
+                </div>
             `;
         }
 
@@ -444,10 +490,17 @@ public struct ReactivityProfileToolScript: ReusableComponent {
 
         function values(root, selector) {
             const out = {};
-            root.querySelectorAll(selector).forEach(input => {
-                const key = input.getAttribute(selector.includes('behaviour') ? 'data-reactivity-behaviour' : 'data-reactivity-modifier');
-                out[key] = Number(input.value || 0);
+
+            root.querySelectorAll(selector).forEach(field => {
+                const key = field.getAttribute(
+                    selector.includes('behaviour')
+                        ? 'data-reactivity-behaviour'
+                        : 'data-reactivity-modifier'
+                );
+
+                out[key] = Number(field.dataset.value || 0);
             });
+
             return out;
         }
 
@@ -584,12 +637,28 @@ public struct ReactivityProfileToolScript: ReusableComponent {
                 .join('');
         }
 
-        document.addEventListener('input', event => {
-            update(event.target?.closest?.(rootSelector));
-        }, true);
+        document.addEventListener('click', event => {
+            const choice = event.target?.closest?.('[data-reactivity-choice]');
+            if (!choice) return;
 
-        document.addEventListener('change', event => {
-            update(event.target?.closest?.(rootSelector));
+            const field = choice.closest('[data-reactivity-field]');
+            const root = choice.closest(rootSelector);
+
+            if (!field || !root) return;
+
+            const current = Number(field.dataset.value || 0);
+            const next = Number(choice.dataset.reactivityValue || 0);
+
+            field.dataset.value = current === next ? '0' : String(next);
+
+            field.querySelectorAll('[data-reactivity-choice]').forEach(button => {
+                const selected = Number(button.dataset.reactivityValue || 0) === Number(field.dataset.value || 0);
+
+                button.classList.toggle('wc-reactivity-profile-tool__choice--selected', selected);
+                button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+            });
+
+            update(root);
         }, true);
 
         function init(scope = document) {
