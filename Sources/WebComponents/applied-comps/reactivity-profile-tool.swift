@@ -650,12 +650,12 @@ public struct ReactivityProfileToolScript: ReusableComponent {
 
         const modifiers = [
             ['restraint', 'Lijn- / barrière-effect', 'Wordt het duidelijk erger aan lijn, hek, raam, deur of auto?'],
-            ['recovery', 'Herstel na prikkel', 'Hoe lang blijft de hond hoog na een ontmoeting?'],
-            ['distance', 'Afstandsgevoeligheid', 'Hoeveel afstand is nodig om nog bereikbaar te blijven?'],
-            ['disengage', 'Loskomen van prikkel', 'Kan de hond wegkijken, snuffelen, eten of terugkoppelen?'],
+            ['recovery', 'Lang herstel na prikkel', 'Blijft de hond lang hoog na een ontmoeting?'],
+            ['distance', 'Hoge afstandsbehoefte', 'Is er veel afstand nodig om bereikbaar of veilig hanteerbaar te blijven?'],
+            ['disengage', 'Moeite met loskomen', 'Blijft de hond vastzitten op de prikkel en is wegkijken, snuffelen, eten of terugkoppelen moeilijk?'],
             ['contact', 'Contactgeschiedenis', 'Is er eerder fysiek contact of schade geweest?'],
             ['redirect', 'Herleidings-risico', 'Richt spanning zich soms op lijn, geleider of huisgenoot (misplaatst bijten)?'],
-            ['handling', 'Controleerbaarheid', 'Kan de geleider veilig afstand maken en de hond houden?']
+            ['handling', 'Beperkte controleerbaarheid', 'Is het moeilijk om veilig afstand te maken, de hond te houden of de situatie hanteerbaar te houden?']
         ];
 
         const frequencyOptions = [
@@ -840,7 +840,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
                         <div class="wc-reactivity-profile-tool__fields">${behaviours.map(item => fieldHTML('behaviour', item)).join('')}</div>
 
                         <h2>Behandelmodifiers</h2>
-                        <p class="wc-reactivity-profile-tool__hint">Deze velden veranderen de cluster niet. Ze helpen bepalen hoeveel veiligheidsmarge, herstel en arousal-outlet het plan nodig heeft.</p>
+                        <p class="wc-reactivity-profile-tool__hint">Deze risicofactoren veranderen de paper-cluster niet. Ze sturen alleen veiligheidsmarge, herstel, afstand, controleerbaarheid en arousal-outlet.</p>
                         <div class="wc-reactivity-profile-tool__fields">${modifiers.map(item => fieldHTML('modifier', item)).join('')}</div>
                     </div>
 
@@ -959,6 +959,159 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             return 'zeer hoog';
         }
 
+        function axesFor(result) {
+            return [
+                ['Orale aanval', pct(result.pc1 / 3.8), result.pc1, axisLabel(result.pc1, [.75, 1.7, 3.0])],
+                ['Frustratie', pct(result.pc2 / 4.2), result.pc2, axisLabel(result.pc2, [1.4, 2.4, 3.4])],
+                ['Postuur', pct(result.pc3 / 4.6), result.pc3, axisLabel(result.pc3, [1.2, 2.1, 3.2])]
+            ];
+        }
+
+        function headlineFor(result) {
+            const primary = result.matches[0];
+            const second = result.matches[1];
+            const cluster = clusters[primary.id];
+            const secondCluster = clusters[second.id];
+            const primaryMatch = Math.round(primary.match);
+            const secondMatch = Math.round(second.match);
+            const ambiguous = primary.match - second.match < 15;
+
+            if (!ambiguous) {
+                return {
+                    primary,
+                    second,
+                    cluster,
+                    secondCluster,
+                    ambiguous,
+                    title: `${cluster.name} · ${primaryMatch}% match`,
+                    summary: cluster.summary,
+                    severityText: `${cluster.tag} · ${cluster.severityLabel}`,
+                    railSeverity: cluster.severity,
+                    tone: cluster.tone
+                };
+            }
+
+            return {
+                primary,
+                second,
+                cluster,
+                secondCluster,
+                ambiguous,
+                title: `Grensprofiel · ${primaryMatch}/${secondMatch}`,
+                summary: `Dichtstbijzijnde clusters: ${cluster.name} (${primaryMatch}%) en ${secondCluster.name} (${secondMatch}%). Lees dit als mengbeeld; de gedragsassen zijn leidend.`,
+                severityText: `mengbeeld · hoogste marge ${Math.max(cluster.severity, secondCluster.severity)}/4`,
+                railSeverity: Math.max(cluster.severity, secondCluster.severity),
+                tone: cluster.tone
+            };
+        }
+
+        function modifierNoticeHTML(modifierState) {
+            return `
+                <div class="wc-reactivity-profile-tool__cluster-metric">
+                    <p class="wc-reactivity-profile-tool__hint">
+                        Vul alle behandelmodifiers in voordat de behandelbelasting wordt berekend.
+                        Ingevuld: ${modifierState.answered}/${modifierState.total}.
+                    </p>
+                </div>
+            `;
+        }
+
+        function modifierValue(modifiers, key) {
+            const value = modifiers[key];
+
+            return value === null || value === undefined ? 0 : value;
+        }
+
+        function treatmentScores(result, modifierState) {
+            if (!modifierState.complete) return null;
+
+            const mod = modifierState.values;
+            const modifier = key => modifierValue(mod, key);
+
+            const frustration = pct(
+                .48 * clamp(result.pc2 / 3.7) +
+                .18 * clamp(modifier('restraint') / 3) +
+                .18 * clamp(modifier('recovery') / 3) +
+                .16 * clamp(modifier('disengage') / 3)
+            );
+
+            const risk = pct(
+                .46 * clamp(result.pc1 / 3.3) +
+                .22 * clamp(modifier('contact') / 3) +
+                .18 * clamp(modifier('redirect') / 3) +
+                .14 * clamp(result.pc3 / 4.1)
+            );
+
+            const management = pct(
+                .40 * clamp(risk / 100) +
+                .24 * clamp(modifier('distance') / 3) +
+                .20 * clamp(modifier('recovery') / 3) +
+                .16 * clamp(modifier('handling') / 3)
+            );
+
+            return {
+                frustration,
+                risk,
+                management
+            };
+        }
+
+        function treatmentMetricsHTML(scores, modifierState) {
+            if (!scores) {
+                return modifierNoticeHTML(modifierState);
+            }
+
+            return [
+                metricHTML('Frustratiedruk', scores.frustration, 'herstel, ontlading en keuzeruimte eerst nodig', 'secondary'),
+                metricHTML('Escalatierisico', scores.risk, 'veiligheidsmarge bij onverwachte nabijheid', 'secondary'),
+                metricHTML('Managementbehoefte', scores.management, 'afstand, routes, materiaal en geleider-plan', 'secondary')
+            ].join('');
+        }
+
+        function prioritiesFor(headline, scores, modifierState) {
+            if (!scores) {
+                return [
+                    `Vul de behandelmodifiers in voor trainingsprioriteit. Nu ingevuld: ${modifierState.answered}/${modifierState.total}.`
+                ];
+            }
+
+            const priorities = [];
+
+            if (scores.risk >= 70) {
+                priorities.push('Begin met veiligheidsmarge: afstand, voorspelbare routes, materiaalcontrole en geen geplande hond-hond confrontaties.');
+            } else if (scores.risk >= 45) {
+                priorities.push('Houd management actief terwijl je alternatief gedrag opbouwt; test niet te snel dichterbij.');
+            } else {
+                priorities.push('Werk vooral aan tijdig signaleren, afstand nemen en rustig disengagen voordat spanning oploopt.');
+            }
+
+            if (scores.frustration >= 70) {
+                priorities.push('Plan arousal-outlet en herstelmomenten expliciet in; blootstelling zonder ontlading zal waarschijnlijk vastlopen.');
+            } else if (scores.frustration >= 45) {
+                priorities.push('Bouw frustratietolerantie op via voorspelbare keuze, afstand en beloonbare alternatieven.');
+            }
+
+            if (headline.primary.id === 3 || headline.primary.id === 4 || scores.risk >= 65) {
+                priorities.push('Behandel contactrisico als apart thema: niet alleen minder blaffen, maar vooral meer remming, herstel en veilige beslissingen.');
+            }
+
+            if (headline.ambiguous) {
+                priorities.push('Omdat het profiel gemengd is: baseer de eerste trainingsstap op de assen en behandelmodifiers, niet alleen op de dichtstbijzijnde clustertitel.');
+            }
+
+            return priorities;
+        }
+
+        function matchesText(result) {
+            return result.matches
+                .map(row => {
+                    const cluster = clusters[row.id];
+
+                    return `${cluster.name}: ${Math.round(row.match)}%`;
+                })
+                .join(', ');
+        }
+
         function update(root) {
             if (!root) return;
 
@@ -996,92 +1149,27 @@ public struct ReactivityProfileToolScript: ReusableComponent {
                 return;
             }
 
-            const input = behaviourState.values;
-            const mod = modifierState.values;
-            const result = calculate(input);
-            const primary = result.matches[0];
-            const second = result.matches[1];
-            const cluster = clusters[primary.id];
-            const ambiguous = primary.match - second.match < 15;
+            const result = calculate(behaviourState.values);
+            const headline = headlineFor(result);
+            const axes = axesFor(result);
+            const scores = treatmentScores(result, modifierState);
+            const priorities = prioritiesFor(headline, scores, modifierState);
 
-            resultHeadNode.style.setProperty('--severity-color', cluster.tone);
-            primaryNode.textContent = `${cluster.name} · ${Math.round(primary.match)}% match`;
-            summaryNode.textContent = ambiguous
-                ? `Grensprofiel: ook ${clusters[second.id].name} past duidelijk. Lees dit als mengbeeld.`
-                : cluster.summary;
-            severityNode.textContent = `${cluster.tag} · ${cluster.severityLabel}`;
-            severityRailNode.innerHTML = severityRailHTML(cluster.severity);
+            resultHeadNode.style.setProperty('--severity-color', headline.tone);
+            primaryNode.textContent = headline.title;
+            summaryNode.textContent = headline.summary;
+            severityNode.textContent = headline.severityText;
+            severityRailNode.innerHTML = severityRailHTML(headline.railSeverity);
 
             matchesNode.innerHTML = result.matches.map((row, index) => {
                 return clusterMatchHTML(row, index === 0);
             }).join('');
 
-            const axes = [
-                ['Orale aanval', pct(result.pc1 / 3.8), result.pc1, axisLabel(result.pc1, [.75, 1.7, 3.0])],
-                ['Frustratie', pct(result.pc2 / 4.2), result.pc2, axisLabel(result.pc2, [1.4, 2.4, 3.4])],
-                ['Postuur', pct(result.pc3 / 4.6), result.pc3, axisLabel(result.pc3, [1.2, 2.1, 3.2])]
-            ];
-
             axesNode.innerHTML = axes.map(([label, value, score, band]) => {
                 return axisCardHTML(label, value, score, band);
             }).join('');
 
-            const modifier = key => {
-                const value = mod[key];
-
-                return value === null || value === undefined ? 0 : value;
-            };
-
-            const frustration = pct(
-                .48 * clamp(result.pc2 / 3.7) +
-                .18 * clamp(modifier('restraint') / 3) +
-                .18 * clamp(modifier('recovery') / 3) +
-                .16 * clamp(modifier('disengage') / 3)
-            );
-
-            const risk = pct(
-                .46 * clamp(result.pc1 / 3.3) +
-                .22 * clamp(modifier('contact') / 3) +
-                .18 * clamp(modifier('redirect') / 3) +
-                .14 * clamp(result.pc3 / 4.1)
-            );
-
-            const management = pct(
-                .40 * clamp(risk / 100) +
-                .24 * clamp(modifier('distance') / 3) +
-                .20 * clamp(modifier('recovery') / 3) +
-                .16 * clamp(modifier('handling') / 3)
-            );
-
-            modifiersNode.innerHTML = [
-                metricHTML('Frustratiedruk', frustration, 'herstel, ontlading en autonomie eerst nodig', 'secondary'),
-                metricHTML('Escalatierisico', risk, 'veiligheidsmarge bij onverwachte nabijheid', 'secondary'),
-                metricHTML('Managementbehoefte', management, 'afstand, routes, materiaal en geleider-plan', 'secondary')
-            ].join('');
-
-            const priorities = [];
-
-            if (risk >= 70) {
-                priorities.push('Begin met veiligheidsmarge: afstand, voorspelbare routes, materiaalcontrole en geen geplande hond-hond confrontaties.');
-            } else if (risk >= 45) {
-                priorities.push('Houd management actief terwijl je alternatief gedrag opbouwt; test niet te snel dichterbij.');
-            } else {
-                priorities.push('Werk vooral aan tijdig signaleren, afstand nemen en rustig disengagen voordat spanning oploopt.');
-            }
-
-            if (frustration >= 70) {
-                priorities.push('Plan arousal-outlet en herstelmomenten expliciet in; blootstelling zonder ontlading zal waarschijnlijk vastlopen.');
-            } else if (frustration >= 45) {
-                priorities.push('Bouw frustratietolerantie op via voorspelbare keuze, afstand en beloonbare alternatieven.');
-            }
-
-            if (primary.id === 3 || primary.id === 4 || risk >= 65) {
-                priorities.push('Behandel contactrisico als apart thema: niet alleen minder blaffen, maar vooral meer remming, herstel en veilige beslissingen.');
-            }
-
-            if (ambiguous) {
-                priorities.push('Omdat het profiel gemengd is: baseer de eerste trainingsstap op de hoogste modifier, niet alleen op de clustertitel.');
-            }
+            modifiersNode.innerHTML = treatmentMetricsHTML(scores, modifierState);
 
             prioritiesNode.innerHTML = priorities
                 .map(item => `<li>${item}</li>`)
@@ -1172,107 +1260,40 @@ public struct ReactivityProfileToolScript: ReusableComponent {
                 };
             }
 
-            const input = behaviourState.values;
-            const mod = modifierState.values;
-            const result = calculate(input);
-            const primary = result.matches[0];
-            const second = result.matches[1];
-            const cluster = clusters[primary.id];
-            const ambiguous = primary.match - second.match < 15;
-
-            const modifier = key => {
-                const value = mod[key];
-
-                return value === null || value === undefined ? 0 : value;
-            };
-
-            const axes = [
-                ['Orale aanval', pct(result.pc1 / 3.8), result.pc1, axisLabel(result.pc1, [.75, 1.7, 3.0])],
-                ['Frustratie', pct(result.pc2 / 4.2), result.pc2, axisLabel(result.pc2, [1.4, 2.4, 3.4])],
-                ['Postuur', pct(result.pc3 / 4.6), result.pc3, axisLabel(result.pc3, [1.2, 2.1, 3.2])]
-            ];
-
-            const frustration = pct(
-                .48 * clamp(result.pc2 / 3.7) +
-                .18 * clamp(modifier('restraint') / 3) +
-                .18 * clamp(modifier('recovery') / 3) +
-                .16 * clamp(modifier('disengage') / 3)
-            );
-
-            const risk = pct(
-                .46 * clamp(result.pc1 / 3.3) +
-                .22 * clamp(modifier('contact') / 3) +
-                .18 * clamp(modifier('redirect') / 3) +
-                .14 * clamp(result.pc3 / 4.1)
-            );
-
-            const management = pct(
-                .40 * clamp(risk / 100) +
-                .24 * clamp(modifier('distance') / 3) +
-                .20 * clamp(modifier('recovery') / 3) +
-                .16 * clamp(modifier('handling') / 3)
-            );
-
-            const priorities = [];
-
-            if (risk >= 70) {
-                priorities.push('Begin met veiligheidsmarge: afstand, voorspelbare routes, materiaalcontrole en geen geplande hond-hond confrontaties.');
-            } else if (risk >= 45) {
-                priorities.push('Houd management actief terwijl je alternatief gedrag opbouwt; test niet te snel dichterbij.');
-            } else {
-                priorities.push('Werk vooral aan tijdig signaleren, afstand nemen en rustig disengagen voordat spanning oploopt.');
-            }
-
-            if (frustration >= 70) {
-                priorities.push('Plan arousal-outlet en herstelmomenten expliciet in; blootstelling zonder ontlading zal waarschijnlijk vastlopen.');
-            } else if (frustration >= 45) {
-                priorities.push('Bouw frustratietolerantie op via voorspelbare keuze, afstand en beloonbare alternatieven.');
-            }
-
-            if (primary.id === 3 || primary.id === 4 || risk >= 65) {
-                priorities.push('Behandel contactrisico als apart thema: niet alleen minder blaffen, maar vooral meer remming, herstel en veilige beslissingen.');
-            }
-
-            if (ambiguous) {
-                priorities.push('Omdat het profiel gemengd is: baseer de eerste trainingsstap op de hoogste modifier, niet alleen op de clustertitel.');
-            }
-
-            const matches = result.matches
-                .map(row => {
-                    const matchedCluster = clusters[row.id];
-
-                    return `${matchedCluster.name}: ${Math.round(row.match)}%`;
-                })
-                .join(', ');
+            const result = calculate(behaviourState.values);
+            const headline = headlineFor(result);
+            const axes = axesFor(result);
+            const scores = treatmentScores(result, modifierState);
+            const priorities = prioritiesFor(headline, scores, modifierState);
+            const matches = matchesText(result);
+            const modifierMissing = `Nog niet compleet (${modifierState.answered}/${modifierState.total})`;
 
             const slots = {
                 ...baseSlots,
                 status: 'Berekend',
-                primary: `${cluster.name} · ${Math.round(primary.match)}% match`,
-                severity: `${cluster.tag} · ${cluster.severityLabel}`,
-                summary: ambiguous
-                    ? `Grensprofiel: ook ${clusters[second.id].name} past duidelijk. Lees dit als mengbeeld.`
-                    : cluster.summary,
+                primary: headline.title,
+                severity: headline.severityText,
+                summary: headline.summary,
                 oralAttack: `${axes[0][3]} · ${axes[0][2].toFixed(2)} · ${axes[0][1]}%`,
                 frustrationAxis: `${axes[1][3]} · ${axes[1][2].toFixed(2)} · ${axes[1][1]}%`,
                 posturing: `${axes[2][3]} · ${axes[2][2].toFixed(2)} · ${axes[2][1]}%`,
-                frustrationPressure: `${frustration}%`,
-                escalationRisk: `${risk}%`,
-                managementNeed: `${management}%`,
+                frustrationPressure: scores ? `${scores.frustration}%` : modifierMissing,
+                escalationRisk: scores ? `${scores.risk}%` : modifierMissing,
+                managementNeed: scores ? `${scores.management}%` : modifierMissing,
                 priorities,
                 matches
             };
 
             return {
                 status: 'Berekend',
-                cluster: cluster.name,
-                primaryMatch: Math.round(primary.match),
-                severity: cluster.severityLabel,
-                ambiguous,
+                cluster: headline.cluster.name,
+                primaryMatch: Math.round(headline.primary.match),
+                severity: headline.severityText,
+                ambiguous: headline.ambiguous,
                 axes,
-                frustration,
-                risk,
-                management,
+                frustration: scores?.frustration ?? null,
+                risk: scores?.risk ?? null,
+                management: scores?.management ?? null,
                 priorities,
                 matches,
                 slots
