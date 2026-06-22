@@ -1134,7 +1134,37 @@ public extension SiteNotifier {
                 CSS.rule(
                     s.historyJSON,
                     CSS.decl("border-top", "1px solid rgba(255,255,255,.1)"),
-                    CSS.decl("padding", ".8rem 1rem 1rem")
+                    CSS.decl("padding", ".8rem 1.15rem 1rem"),
+                    CSS.decl("overflow", "hidden")
+                ),
+
+                CSS.rule(
+                    CSSSelector.raw(".\(s.historyJSON.rawValue) summary"),
+                    CSS.decl("cursor", "pointer"),
+                    CSS.decl("font-size", ".78rem"),
+                    CSS.decl("font-weight", "850"),
+                    CSS.decl("color", "rgba(255,255,255,.72)"),
+                    CSS.decl("list-style", "none")
+                ),
+
+                CSS.rule(
+                    CSSSelector.raw(".\(s.historyJSON.rawValue) summary::-webkit-details-marker"),
+                    CSS.decl("display", "none")
+                ),
+
+                CSS.rule(
+                    CSSSelector.raw(".\(s.historyJSON.rawValue) summary::after"),
+                    CSS.decl("content", "\"+\""),
+                    CSS.decl("display", "inline-grid"),
+                    CSS.decl("place-items", "center"),
+                    CSS.decl("width", "1.15rem"),
+                    CSS.decl("height", "1.15rem"),
+                    CSS.decl("margin-left", ".45rem"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "rgba(255,255,255,.08)"),
+                    CSS.decl("color", "rgba(255,255,255,.72)"),
+                    CSS.decl("font-size", ".72rem"),
+                    CSS.decl("transition", "transform 240ms ease, background 180ms ease")
                 ),
 
                 CSS.rule(
