@@ -513,7 +513,30 @@ public extension SiteNotifier {
             rules: [
                 CSS.rule(
                     s.root,
-                    CSS.decl("display", "contents")
+                    CSS.decl("display", "contents"),
+                    CSS.decl(
+                        "font-family",
+                        "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Ubuntu, \"Helvetica Neue\", sans-serif"
+                    ),
+                    CSS.decl("-webkit-font-smoothing", "auto"),
+                    CSS.decl("text-rendering", "auto")
+                ),
+
+                CSS.rule(
+                    CSSSelector.raw(".\(s.root.rawValue) *, .\(s.root.rawValue) *::before, .\(s.root.rawValue) *::after"),
+                    CSS.decl("box-sizing", "border-box")
+                ),
+
+                CSS.rule(
+                    CSSSelector.raw(".\(s.root.rawValue) button, .\(s.root.rawValue) a"),
+                    CSS.decl("font", "inherit"),
+                    CSS.decl("-webkit-tap-highlight-color", "transparent")
+                ),
+
+                CSS.rule(
+                    CSSSelector.raw(".\(s.root.rawValue) button"),
+                    CSS.decl("-webkit-appearance", "none"),
+                    CSS.decl("appearance", "none")
                 ),
 
                 CSS.rule(
