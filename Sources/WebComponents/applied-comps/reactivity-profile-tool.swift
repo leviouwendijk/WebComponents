@@ -1043,7 +1043,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
                     <div class="wc-reactivity-profile-tool__panel">
                         <div class="wc-reactivity-profile-tool__identity-card">
                             <h2>Rapportgegevens</h2>
-                            <p class="wc-reactivity-profile-tool__hint">Optioneel voor lokaal gebruik. De naam komt mee in het printbare rapport.</p>
+                            <p class="wc-reactivity-profile-tool__hint">Voor welke hond maak je dit profiel?</p>
 
                             <label class="wc-reactivity-profile-tool__label">
                                 Naam hond
