@@ -26,7 +26,8 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                     [
                         "id": "content-area",
                         "class": Self.block,
-                        "data-reactivity-profile-tool": ""
+                        "data-reactivity-profile-tool": "",
+                        "data-reactivity-submit-endpoint": "/connector/v2/reactivity-profile"
                     ]
                 ) {
                     hero()
@@ -55,6 +56,7 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                 subtitle: "Samenvatting van cluster, gedragsassen, behandelmodifiers en trainingsprioriteit.",
                 meta: [
                     meta("Hulpmiddel", "Reactiviteitsprofiel"),
+                    meta("Hond", slot("dogName", fallback: "—")),
                     meta("Datum", slot("date")),
                     meta("Status", slot("status", fallback: "Nog niet berekend"))
                 ],
@@ -570,6 +572,124 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                     CSS.decl("font-size", ".9rem"),
                     CSS.decl("line-height", "1.45"),
                     CSS.decl("color", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__identity-card",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", ".75rem"),
+                    CSS.decl("padding", "1rem"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--border-color) 76%, transparent)"),
+                    CSS.decl("border-radius", "1rem"),
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, #fff) 92%, var(--link-color) 5%)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__identity-card h2",
+                    CSS.decl("margin", "0"),
+                    CSS.decl("font-size", "1rem")
+                ),
+
+                CSS.rule(
+                    ".\(block)__input-grid",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "repeat(2, minmax(0, 1fr))"),
+                    CSS.decl("gap", ".75rem")
+                ),
+
+                CSS.rule(
+                    ".\(block)__label",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", ".35rem"),
+                    CSS.decl("font-size", ".82rem"),
+                    CSS.decl("font-weight", "750"),
+                    CSS.decl("color", "color-mix(in srgb, var(--text-color) 78%, var(--muted-text-color))")
+                ),
+
+                CSS.rule(
+                    ".\(block)__input",
+                    CSS.decl("width", "100%"),
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("border", "1px solid var(--border-color)"),
+                    CSS.decl("border-radius", ".85rem"),
+                    CSS.decl("padding", ".72rem .82rem"),
+                    CSS.decl("font", "inherit"),
+                    CSS.decl("background", "var(--surface-color, #fff)"),
+                    CSS.decl("color", "var(--text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__input:focus",
+                    CSS.decl("outline", "2px solid color-mix(in srgb, var(--link-color) 42%, transparent)"),
+                    CSS.decl("outline-offset", "2px")
+                ),
+
+                CSS.rule(
+                    ".\(block)__submit-card",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", ".85rem"),
+                    CSS.decl("margin-top", "1rem"),
+                    CSS.decl("padding", "1rem"),
+                    CSS.decl("border", "1px solid color-mix(in srgb, var(--border-color) 76%, transparent)"),
+                    CSS.decl("border-radius", "1rem"),
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, #fff) 94%, var(--link-color) 4%)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__submit-card h2",
+                    CSS.decl("margin", "0"),
+                    CSS.decl("font-size", "1rem")
+                ),
+
+                CSS.rule(
+                    ".\(block)__inline-actions",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("flex-wrap", "wrap"),
+                    CSS.decl("gap", ".65rem"),
+                    CSS.decl("align-items", "center")
+                ),
+
+                CSS.rule(
+                    ".\(block)__submit-panel",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", ".75rem")
+                ),
+
+                CSS.rule(
+                    ".\(block)__submit-panel[hidden]",
+                    CSS.decl("display", "none")
+                ),
+
+                CSS.rule(
+                    ".\(block)__submit-consent",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("gap", ".55rem"),
+                    CSS.decl("align-items", "flex-start"),
+                    CSS.decl("font-size", ".82rem"),
+                    CSS.decl("line-height", "1.45"),
+                    CSS.decl("color", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__submit-status",
+                    CSS.decl("min-height", "1.2rem"),
+                    CSS.decl("font-size", ".84rem"),
+                    CSS.decl("font-weight", "750")
+                ),
+
+                CSS.rule(
+                    ".\(block)__submit-status[data-state=\"loading\"]",
+                    CSS.decl("color", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__submit-status[data-state=\"error\"]",
+                    CSS.decl("color", "var(--danger, #D64545)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__submit-status[data-state=\"success\"]",
+                    CSS.decl("color", "var(--success, #2E8B57)")
                 )
             ],
             media: [
@@ -595,6 +715,10 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                     CSS.rule(
                         ".\(block)__field[data-reactivity-modifier] .\(block)__choice-group",
                         CSS.decl("grid-template-columns", "repeat(2, minmax(0, 1fr))")
+                    ),
+                    CSS.rule(
+                        ".\(block)__input-grid",
+                        CSS.decl("grid-template-columns", "1fr")
                     )
                 ),
 
@@ -835,6 +959,22 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             mount.innerHTML = `
                 <div class="wc-reactivity-profile-tool__grid">
                     <div class="wc-reactivity-profile-tool__panel">
+                        <div class="wc-reactivity-profile-tool__identity-card">
+                            <h2>Rapportgegevens</h2>
+                            <p class="wc-reactivity-profile-tool__hint">Optioneel voor lokaal gebruik. De naam komt mee in het printbare rapport.</p>
+
+                            <label class="wc-reactivity-profile-tool__label">
+                                Naam hond
+                                <input
+                                    class="wc-reactivity-profile-tool__input"
+                                    type="text"
+                                    autocomplete="off"
+                                    data-reactivity-dog-name
+                                    placeholder="Bijvoorbeeld: Nala"
+                                >
+                            </label>
+                        </div>
+
                         <h2>Gedragingen bij andere honden</h2>
                         <p class="wc-reactivity-profile-tool__hint">Deze negen gedragingen vormen de paper-derived rekenlaag. Vul in hoe vaak ze optreden tijdens reactiviteit naar honden.</p>
                         <div class="wc-reactivity-profile-tool__fields">${behaviours.map(item => fieldHTML('behaviour', item)).join('')}</div>
@@ -869,6 +1009,56 @@ public struct ReactivityProfileToolScript: ReusableComponent {
 
                         <h2 class="wc-reactivity-profile-tool__section-title">Trainingsprioriteit</h2>
                         <ol class="wc-reactivity-profile-tool__priority-list" data-reactivity-priorities></ol>
+
+                        <div class="wc-reactivity-profile-tool__submit-card">
+                            <h2>Profiel delen</h2>
+                            <p class="wc-reactivity-profile-tool__hint">Stuur het ingevulde profiel veilig naar Hondenmeesters. Hiervoor zijn hondnaam, jouw naam, contact en beveiligingscontrole verplicht.</p>
+
+                            <div class="wc-reactivity-profile-tool__inline-actions">
+                                <button class="wc-reactivity-profile-tool__action" type="button" data-reactivity-submit-open aria-expanded="false">
+                                    Stuur naar Hondenmeesters
+                                </button>
+                            </div>
+
+                            <form class="wc-reactivity-profile-tool__submit-panel" data-reactivity-submit-form hidden>
+                                <div class="wc-reactivity-profile-tool__input-grid">
+                                    <label class="wc-reactivity-profile-tool__label">
+                                        Naam hond
+                                        <input class="wc-reactivity-profile-tool__input" type="text" autocomplete="off" data-reactivity-submit-dog-name required>
+                                    </label>
+
+                                    <label class="wc-reactivity-profile-tool__label">
+                                        Jouw naam
+                                        <input class="wc-reactivity-profile-tool__input" type="text" autocomplete="name" data-reactivity-submit-owner-name required>
+                                    </label>
+
+                                    <label class="wc-reactivity-profile-tool__label">
+                                        E-mailadres
+                                        <input class="wc-reactivity-profile-tool__input" type="email" autocomplete="email" data-reactivity-submit-email>
+                                    </label>
+
+                                    <label class="wc-reactivity-profile-tool__label">
+                                        Telefoonnummer
+                                        <input class="wc-reactivity-profile-tool__input" type="tel" autocomplete="tel" data-reactivity-submit-phone>
+                                    </label>
+                                </div>
+
+                                <label class="wc-reactivity-profile-tool__submit-consent">
+                                    <input type="checkbox" data-reactivity-submit-consent required>
+                                    <span>Ik geef toestemming om dit profiel en mijn contactgegevens naar Hondenmeesters te versturen voor opvolging.</span>
+                                </label>
+
+                                <input type="text" tabindex="-1" autocomplete="off" data-reactivity-submit-honeypot hidden>
+
+                                <div class="wc-reactivity-profile-tool__inline-actions">
+                                    <button class="wc-reactivity-profile-tool__action" type="submit" data-reactivity-submit-button>
+                                        Verzenden
+                                    </button>
+                                </div>
+
+                                <p class="wc-reactivity-profile-tool__submit-status" data-reactivity-submit-status></p>
+                            </form>
+                        </div>
                     </aside>
                 </div>
             `;
@@ -1176,6 +1366,240 @@ public struct ReactivityProfileToolScript: ReusableComponent {
                 .join('');
         }
 
+        function textInputValue(root, selector) {
+            return (root.querySelector(selector)?.value || '').trim();
+        }
+
+        function dogName(root) {
+            return textInputValue(root, '[data-reactivity-dog-name]');
+        }
+
+        function setSubmitStatus(root, state, message) {
+            const node = root.querySelector('[data-reactivity-submit-status]');
+            if (!node) return;
+
+            node.dataset.state = state || '';
+            node.textContent = message || '';
+        }
+
+        function setSubmitPending(root, pending) {
+            const button = root.querySelector('[data-reactivity-submit-button]');
+            if (!button) return;
+
+            button.disabled = pending;
+            button.textContent = pending ? 'Verzenden…' : 'Verzenden';
+        }
+
+        function notifySubmit(root, state, message) {
+            setSubmitStatus(root, state, message);
+
+            if (state === 'loading') return;
+
+            const notifier = window.hondenmeestersNotifier || window.notifier || window.Notifier;
+
+            if (notifier?.push) {
+                notifier.push({
+                    type: state === 'success' ? 'success' : 'error',
+                    title: state === 'success' ? 'Profiel verzonden' : 'Niet verzonden',
+                    message
+                });
+            }
+        }
+
+        function submissionContact(root) {
+            return {
+                dogName: textInputValue(root, '[data-reactivity-submit-dog-name]') || dogName(root),
+                ownerName: textInputValue(root, '[data-reactivity-submit-owner-name]'),
+                email: textInputValue(root, '[data-reactivity-submit-email]'),
+                phone: textInputValue(root, '[data-reactivity-submit-phone]'),
+                consent: !!root.querySelector('[data-reactivity-submit-consent]')?.checked,
+                honeypot: textInputValue(root, '[data-reactivity-submit-honeypot]')
+            };
+        }
+
+        async function captchaPayload() {
+            const api = window.captcha || window.captcher || window.hondenmeestersCaptcha;
+
+            if (!api) {
+                throw new Error('captcha_missing');
+            }
+
+            const initResult = typeof api.initCaptcha === 'function'
+                ? await api.initCaptcha()
+                : null;
+
+            if (typeof api.execute === 'function') {
+                await api.execute();
+            }
+
+            const metrics = typeof api.getMetrics === 'function'
+                ? api.getMetrics()
+                : {};
+
+            let token = (
+                metrics?.token ||
+                metrics?.securityToken ||
+                initResult?.token ||
+                initResult?.securityToken ||
+                api.token ||
+                ''
+            ).trim();
+
+            if (!token && typeof api.getToken === 'function') {
+                token = String(await api.getToken()).trim();
+            }
+
+            if (!token) {
+                throw new Error('captcha_missing');
+            }
+
+            return {
+                ...metrics,
+                token,
+                securityToken: metrics?.securityToken || token
+            };
+        }
+
+        function validateSubmission(contact, report) {
+            if (!report || report.status !== 'Berekend') {
+                return 'Vul eerst alle negen gedragingen in.';
+            }
+
+            if (!contact.dogName) {
+                return 'Vul de naam van de hond in.';
+            }
+
+            if (!contact.ownerName) {
+                return 'Vul je eigen naam in.';
+            }
+
+            if (!contact.email && !contact.phone) {
+                return 'Vul een e-mailadres of telefoonnummer in.';
+            }
+
+            if (!contact.consent) {
+                return 'Geef toestemming om het profiel te versturen.';
+            }
+
+            if (contact.honeypot) {
+                return 'Verzenden is geblokkeerd.';
+            }
+
+            return '';
+        }
+
+        function submissionPayload(root, contact, report, captcha) {
+            return {
+                schema_version: 1,
+                form_id: 'docs_reactivity_profile',
+                dog_name: contact.dogName,
+                owner_name: contact.ownerName,
+                email: contact.email || null,
+                phone: contact.phone || null,
+                consent: contact.consent,
+                my_custom_field: contact.honeypot || '',
+                page_url: window.location.href,
+                page_title: document.title,
+                report,
+                behaviours: report.behaviours || {},
+                modifiers: report.modifiers || {},
+                captcha
+            };
+        }
+
+        async function submitProfile(root) {
+            const contact = submissionContact(root);
+            const report = collectReport(root);
+            const validationError = validateSubmission(contact, report);
+
+            if (validationError) {
+                notifySubmit(root, 'error', validationError);
+                return;
+            }
+
+            setSubmitPending(root, true);
+            notifySubmit(root, 'loading', 'Beveiligingscontrole uitvoeren…');
+
+            try {
+                const captcha = await captchaPayload();
+                const endpoint = root.dataset.reactivitySubmitEndpoint || '/connector/v2/reactivity-profile';
+                const payload = submissionPayload(root, contact, report, captcha);
+
+                notifySubmit(root, 'loading', 'Profiel verzenden…');
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok || data.status === 'error' || data.status === 'validation_error') {
+                    throw new Error(data.message || 'submit_failed');
+                }
+
+                notifySubmit(root, 'success', 'Profiel verzonden. Dank je.');
+            } catch (error) {
+                const message = error?.message === 'captcha_missing'
+                    ? 'Beveiligingscontrole is nog niet geladen of verlopen. Probeer opnieuw of herlaad de pagina.'
+                    : 'Verzenden is niet gelukt. Probeer het later opnieuw.';
+
+                notifySubmit(root, 'error', message);
+            } finally {
+                setSubmitPending(root, false);
+            }
+        }
+
+        document.addEventListener('click', event => {
+            const open = event.target?.closest?.('[data-reactivity-submit-open]');
+            if (!open) return;
+
+            const root = open.closest(rootSelector);
+            const panel = root?.querySelector('[data-reactivity-submit-form]');
+
+            if (!root || !panel) return;
+
+            const nextHidden = !panel.hidden;
+            panel.hidden = nextHidden;
+            open.setAttribute('aria-expanded', nextHidden ? 'false' : 'true');
+
+            const submitDogName = root.querySelector('[data-reactivity-submit-dog-name]');
+            if (submitDogName && !submitDogName.value.trim()) {
+                submitDogName.value = dogName(root);
+            }
+        }, true);
+
+        document.addEventListener('submit', event => {
+            const form = event.target?.closest?.('[data-reactivity-submit-form]');
+            if (!form) return;
+
+            const root = form.closest(rootSelector);
+            if (!root) return;
+
+            event.preventDefault();
+            submitProfile(root);
+        }, true);
+
+        document.addEventListener('input', event => {
+            const input = event.target?.closest?.('[data-reactivity-dog-name]');
+            if (!input) return;
+
+            const root = input.closest(rootSelector);
+            if (!root) return;
+
+            const submitDogName = root.querySelector('[data-reactivity-submit-dog-name]');
+            if (submitDogName && !submitDogName.matches(':focus')) {
+                submitDogName.value = input.value;
+            }
+
+            update(root);
+        }, true);
+
         document.addEventListener('click', event => {
             const choice = event.target?.closest?.('[data-reactivity-choice]');
             if (!choice) return;
@@ -1233,7 +1657,10 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             const behaviourState = values(root, '[data-reactivity-behaviour]');
             const modifierState = values(root, '[data-reactivity-modifier]');
 
+            const reportDogName = dogName(root);
+
             const baseSlots = {
+                dogName: reportDogName || '—',
                 date,
                 completeness: `${behaviourState.answered}/${behaviourState.total}`,
                 modifierCompleteness: `${modifierState.answered}/${modifierState.total}`
@@ -1286,6 +1713,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
 
             return {
                 status: 'Berekend',
+                dogName: reportDogName || '',
                 cluster: headline.cluster.name,
                 primaryMatch: Math.round(headline.primary.match),
                 severity: headline.severityText,
@@ -1296,6 +1724,14 @@ public struct ReactivityProfileToolScript: ReusableComponent {
                 management: scores?.management ?? null,
                 priorities,
                 matches,
+                matchRows: result.matches.map(row => ({
+                    cluster: clusters[row.id].name,
+                    tag: clusters[row.id].tag,
+                    match: Math.round(row.match),
+                    distance: Number(row.distance.toFixed(3))
+                })),
+                behaviours: behaviourState.values,
+                modifiers: modifierState.values,
                 slots
             };
         }
