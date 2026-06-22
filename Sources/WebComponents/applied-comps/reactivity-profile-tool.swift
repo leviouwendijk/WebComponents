@@ -646,8 +646,87 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                     CSS.decl("display", "flex"),
                     CSS.decl("flex-wrap", "wrap"),
                     CSS.decl("gap", ".65rem"),
-                    CSS.decl("align-items", "center")
+                    CSS.decl("align-items", "stretch")
                 ),
+
+                CSS.rule(
+                    ".\(block)__submit-card .\(block)__inline-actions",
+                    CSS.decl("width", "100%")
+                ),
+
+                CSS.rule(
+                    ".\(block)__action",
+                    CSS.decl("-webkit-appearance", "none"),
+                    CSS.decl("appearance", "none"),
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("justify-content", "center"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("gap", ".35rem"),
+                    CSS.decl("width", "100%"),
+                    CSS.decl("min-height", "44px"),
+                    CSS.decl("padding", ".82rem 1.05rem"),
+                    CSS.decl("border-radius", ".75rem"),
+                    CSS.decl("border", "1px solid var(--cta-border, transparent)"),
+                    CSS.decl("background", "var(--gray-800, #1f2937)"),
+                    CSS.decl("color", "var(--cta-fg, #fff)"),
+                    CSS.decl("font", "inherit"),
+                    CSS.decl("font-size", ".95rem"),
+                    CSS.decl("font-weight", "700"),
+                    CSS.decl("line-height", "1.1"),
+                    CSS.decl("text-align", "center"),
+                    CSS.decl("cursor", "pointer"),
+                    CSS.decl("box-shadow", "none"),
+                    CSS.decl("transition", "transform .06s ease, background .12s ease, border-color .12s ease, opacity .12s ease")
+                ),
+
+                CSS.rule(
+                    ".\(block)__action:hover",
+                    CSS.decl("background", "var(--gray-700, #374151)"),
+                    CSS.decl("border-color", "var(--cta-hover-bg, var(--gray-700, #374151))"),
+                    CSS.decl("transform", "translateY(-1px)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__action:focus-visible",
+                    CSS.decl("outline", "2px solid color-mix(in srgb, var(--link-color) 48%, transparent)"),
+                    CSS.decl("outline-offset", "3px")
+                ),
+
+                CSS.rule(
+                    ".\(block)__action:disabled",
+                    CSS.decl("background", "var(--gray-700, #374151)"),
+                    CSS.decl("opacity", ".55"),
+                    CSS.decl("cursor", "default"),
+                    CSS.decl("transform", "none")
+                ),
+
+                CSS.rule(
+                    ".\(block)__action[data-reactivity-submit-open]",
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, #fff) 88%, var(--text-color) 12%)"),
+                    CSS.decl("color", "var(--text-color)"),
+                    CSS.decl("border-color", "color-mix(in srgb, var(--border-color) 82%, var(--text-color) 12%)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__action[data-reactivity-submit-open]:hover",
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, #fff) 80%, var(--text-color) 20%)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__action[data-reactivity-submit-open][aria-expanded=\"true\"]",
+                    CSS.decl("background", "var(--gray-800, #1f2937)"),
+                    CSS.decl("color", "var(--cta-fg, #fff)"),
+                    CSS.decl("border-color", "var(--gray-800, #1f2937)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__submit-consent input",
+                    CSS.decl("accent-color", "var(--gray-800, #1f2937)"),
+                    CSS.decl("width", "1rem"),
+                    CSS.decl("height", "1rem"),
+                    CSS.decl("margin-top", ".15rem"),
+                    CSS.decl("flex", "0 0 auto")
+                )
 
                 CSS.rule(
                     ".\(block)__submit-panel",
