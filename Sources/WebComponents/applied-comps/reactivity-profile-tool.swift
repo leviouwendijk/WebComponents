@@ -8,13 +8,16 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
 
     public let includeStyles: Bool
     public let includeScript: Bool
+    public let submitEndpoint: String
 
     public init(
         includeStyles: Bool = true,
-        includeScript: Bool = true
+        includeScript: Bool = true,
+        submitEndpoint: String
     ) {
         self.includeStyles = includeStyles
         self.includeScript = includeScript
+        self.submitEndpoint = submitEndpoint
     }
 
     public var nodes: ReusableComponentNodes {
@@ -27,7 +30,7 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                         "id": "content-area",
                         "class": Self.block,
                         "data-reactivity-profile-tool": "",
-                        "data-reactivity-submit-endpoint": "/connector/v2/reactivity-profile"
+                        "data-reactivity-submit-endpoint": submitEndpoint
                     ]
                 ) {
                     hero()
