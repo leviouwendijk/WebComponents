@@ -585,7 +585,14 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                     ),
                     CSS.rule(
                         ".\(block)__choice-group",
-                        CSS.decl("grid-auto-flow", "row"),
+                        CSS.decl("grid-auto-flow", "row")
+                    ),
+                    CSS.rule(
+                        ".\(block)__field[data-reactivity-behaviour] .\(block)__choice-group",
+                        CSS.decl("grid-template-columns", "repeat(3, minmax(0, 1fr))")
+                    ),
+                    CSS.rule(
+                        ".\(block)__field[data-reactivity-modifier] .\(block)__choice-group",
                         CSS.decl("grid-template-columns", "repeat(2, minmax(0, 1fr))")
                     )
                 ),
@@ -646,8 +653,8 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             ['distance', 'Afstandsgevoeligheid', 'Hoeveel afstand is nodig om nog bereikbaar te blijven?'],
             ['disengage', 'Loskomen van prikkel', 'Kan de hond wegkijken, snuffelen, eten of terugkoppelen?'],
             ['contact', 'Contactgeschiedenis', 'Is er eerder fysiek contact of schade geweest?'],
-            ['redirect', 'Redirectie-risico', 'Richt spanning zich soms op lijn, handler of huisgenoot?'],
-            ['handling', 'Controleerbaarheid', 'Kan de handler veilig afstand maken en de hond houden?']
+            ['redirect', 'Redirectie-risico', 'Richt spanning zich soms op lijn, geleider of huisgenoot?'],
+            ['handling', 'Controleerbaarheid', 'Kan de geleider veilig afstand maken en de hond houden?']
         ];
 
         const frequencyOptions = [
@@ -686,7 +693,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
                 severity: 3,
                 severityLabel: 'hoog',
                 tone: 'color-mix(in srgb, var(--warning, #E7A94E) 52%, var(--danger, #D64545))',
-                summary: 'meer posturing en contactrisico, ook zonder extreme frustratie'
+                summary: 'meer posturale spanning en contactrisico, ook zonder extreme frustratie'
             },
             4: {
                 name: 'Snelle risico-escalator',
@@ -1011,7 +1018,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             const axes = [
                 ['Orale aanval', pct(result.pc1 / 3.8), result.pc1, axisLabel(result.pc1, [.75, 1.7, 3.0])],
                 ['Frustratie', pct(result.pc2 / 4.2), result.pc2, axisLabel(result.pc2, [1.4, 2.4, 3.4])],
-                ['Posturing', pct(result.pc3 / 4.6), result.pc3, axisLabel(result.pc3, [1.2, 2.1, 3.2])]
+                ['Postuur', pct(result.pc3 / 4.6), result.pc3, axisLabel(result.pc3, [1.2, 2.1, 3.2])]
             ];
 
             axesNode.innerHTML = axes.map(([label, value, score, band]) => {
@@ -1048,7 +1055,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             modifiersNode.innerHTML = [
                 metricHTML('Frustratiedruk', frustration, 'herstel, ontlading en autonomie eerst nodig', 'secondary'),
                 metricHTML('Escalatierisico', risk, 'veiligheidsmarge bij onverwachte nabijheid', 'secondary'),
-                metricHTML('Managementbehoefte', management, 'afstand, routes, materiaal en handler-plan', 'secondary')
+                metricHTML('Managementbehoefte', management, 'afstand, routes, materiaal en geleider-plan', 'secondary')
             ].join('');
 
             const priorities = [];
@@ -1181,7 +1188,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             const axes = [
                 ['Orale aanval', pct(result.pc1 / 3.8), result.pc1, axisLabel(result.pc1, [.75, 1.7, 3.0])],
                 ['Frustratie', pct(result.pc2 / 4.2), result.pc2, axisLabel(result.pc2, [1.4, 2.4, 3.4])],
-                ['Posturing', pct(result.pc3 / 4.6), result.pc3, axisLabel(result.pc3, [1.2, 2.1, 3.2])]
+                ['Postuur', pct(result.pc3 / 4.6), result.pc3, axisLabel(result.pc3, [1.2, 2.1, 3.2])]
             ];
 
             const frustration = pct(
