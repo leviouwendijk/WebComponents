@@ -1474,14 +1474,29 @@ public struct ReactivityProfileToolScript: ReusableComponent {
 
             if (state === 'loading') return;
 
-            const notifier = window.hondenmeestersNotifier || window.notifier || window.Notifier;
+            const notifier = window.Notifier
+                || window.HondenmeestersNotify
+                || window.hondenmeestersNotifier
+                || window.notifier;
+
+            const notice = {
+                type: state === 'success' ? 'success' : 'error',
+                title: state === 'success' ? 'Profiel verzonden' : 'Niet verzonden',
+                message
+            };
+
+            if (notifier?.show) {
+                notifier.show(notice);
+                return;
+            }
+
+            if (notifier?.notify) {
+                notifier.notify(notice);
+                return;
+            }
 
             if (notifier?.push) {
-                notifier.push({
-                    type: state === 'success' ? 'success' : 'error',
-                    title: state === 'success' ? 'Profiel verzonden' : 'Niet verzonden',
-                    message
-                });
+                notifier.push(notice);
             }
         }
 

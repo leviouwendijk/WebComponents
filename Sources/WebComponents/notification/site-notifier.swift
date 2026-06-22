@@ -513,7 +513,7 @@ public extension SiteNotifier {
             rules: [
                 CSS.rule(
                     s.root,
-                    CSS.decl("pointer-events", "none")
+                    CSS.decl("display", "contents")
                 ),
 
                 CSS.rule(
@@ -528,8 +528,8 @@ public extension SiteNotifier {
                     CSS.decl("z-index", "2147483000"),
                     CSS.decl("display", "grid"),
                     CSS.decl("justify-items", "center"),
-                    CSS.decl("gap", ".65rem"),
-                    CSS.decl("padding", "0 1rem"),
+                    CSS.decl("gap", ".75rem"),
+                    CSS.decl("padding", "0 clamp(1rem, 4vw, 2rem)"),
                     CSS.decl("pointer-events", "none")
                 ),
 
@@ -759,7 +759,7 @@ public extension SiteNotifier {
                     CSS.decl("left", "max(1rem, env(safe-area-inset-left))"),
                     CSS.decl(
                         "bottom",
-                        "calc(var(\(model.keyboardOffsetProperty), 0px) + max(1rem, env(safe-area-inset-bottom)) + var(\(model.stackHeightProperty), 0px) + .75rem)"
+                        "calc(var(\(model.keyboardOffsetProperty), 0px) + max(1rem, env(safe-area-inset-bottom)))"
                     ),
                     CSS.decl("z-index", "2147482999"),
                     CSS.decl("display", "inline-grid"),
@@ -783,12 +783,14 @@ public extension SiteNotifier {
                     CSS.decl(
                         "transition",
                         "bottom 360ms cubic-bezier(.2, .9, .22, 1), background 180ms ease, color 180ms ease, box-shadow 180ms ease, transform 180ms ease"
-                    ),
-                    CSS.decl("pointer-events", "auto")
+                    )
                 ),
 
                 CSS.rule(
-                    s.historyToggle.pseudoClass("hover"),
+                    CSSSelector.group(
+                        s.historyToggle.pseudoClass("hover"),
+                        s.historyToggle.pseudoClass("focus-visible")
+                    ),
                     CSS.decl("background", "linear-gradient(135deg, rgba(255,255,255,.18), rgba(9, 3, 2, .34))"),
                     CSS.decl("color", "#fff"),
                     CSS.decl(
@@ -806,16 +808,22 @@ public extension SiteNotifier {
                     s.historyToggleCount,
                     CSS.decl("display", "inline-grid"),
                     CSS.decl("place-items", "center"),
-                    CSS.decl("min-width", "1.55rem"),
+                    CSS.decl("width", "1.55rem"),
                     CSS.decl("height", "1.55rem"),
-                    CSS.decl("padding", "0 .28rem"),
+                    CSS.decl("border", "0"),
                     CSS.decl("border-radius", "999px"),
                     CSS.decl("background", "rgba(255,255,255,.08)"),
-                    CSS.decl("box-shadow", "inset 0 0 0 1px rgba(255,255,255,.14), inset 0 1px 0 rgba(255,255,255,.12)"),
+                    CSS.decl(
+                        "box-shadow",
+                        "inset 0 0 0 1px rgba(255,255,255,.14), inset 0 1px 0 rgba(255,255,255,.12)"
+                    ),
                     CSS.decl("color", "rgba(255,255,255,.84)"),
                     CSS.decl("font-size", ".74rem"),
                     CSS.decl("line-height", "1"),
-                    CSS.decl("transition", "transform 180ms ease, background 180ms ease")
+                    CSS.decl(
+                        "transition",
+                        "background 180ms ease, color 180ms ease, box-shadow 180ms ease, transform 180ms cubic-bezier(.2, .9, .22, 1)"
+                    )
                 ),
 
                 CSS.rule(
@@ -897,16 +905,6 @@ public extension SiteNotifier {
                     CSS.decl("z-index", "auto")
                 ),
 
-                // CSS.rule(
-                //     s.historyPanelHeader,
-                //     CSS.decl("display", "flex"),
-                //     CSS.decl("justify-content", "space-between"),
-                //     CSS.decl("align-items", "start"),
-                //     CSS.decl("gap", "1rem"),
-                //     CSS.decl("padding", "1.1rem 1.15rem .8rem"),
-                //     CSS.decl("border-bottom", "1px solid rgba(255,255,255,.1)")
-                // ),
-
                 CSS.rule(
                     s.historyPanelEyebrow,
                     CSS.decl("margin", "0 0 .25rem"),
@@ -921,11 +919,14 @@ public extension SiteNotifier {
                     s.historyPanelTitle,
                     CSS.decl("margin", "0"),
                     CSS.decl("font-size", "1.2rem"),
-                    CSS.decl("font-weight", "900")
+                    CSS.decl("font-weight", "900"),
+                    CSS.decl("line-height", "1.1")
                 ),
 
                 CSS.rule(
                     s.historyPanelClose,
+                    CSS.decl("-webkit-appearance", "none"),
+                    CSS.decl("appearance", "none"),
                     CSS.decl("border", "1px solid rgba(255,255,255,.16)"),
                     CSS.decl("border-radius", "999px"),
                     CSS.decl("background", "rgba(255,255,255,.08)"),
@@ -933,7 +934,13 @@ public extension SiteNotifier {
                     CSS.decl("padding", ".45rem .72rem"),
                     CSS.decl("font-size", ".78rem"),
                     CSS.decl("font-weight", "800"),
+                    CSS.decl("line-height", "1"),
                     CSS.decl("cursor", "pointer")
+                ),
+
+                CSS.rule(
+                    s.historyPanelClose.pseudoClass("hover"),
+                    CSS.decl("background", "rgba(255,255,255,.14)")
                 ),
 
                 CSS.rule(
@@ -967,6 +974,8 @@ public extension SiteNotifier {
                         s.historyPanelReport,
                         s.historyPanelClear
                     ),
+                    CSS.decl("-webkit-appearance", "none"),
+                    CSS.decl("appearance", "none"),
                     CSS.decl("display", "inline-flex"),
                     CSS.decl("align-items", "center"),
                     CSS.decl("justify-content", "center"),
@@ -978,8 +987,17 @@ public extension SiteNotifier {
                     CSS.decl("color", "#fff"),
                     CSS.decl("font-size", ".78rem"),
                     CSS.decl("font-weight", "800"),
+                    CSS.decl("line-height", "1"),
                     CSS.decl("text-decoration", "none"),
                     CSS.decl("cursor", "pointer")
+                ),
+
+                CSS.rule(
+                    CSSSelector.group(
+                        s.historyPanelReport.pseudoClass("hover"),
+                        s.historyPanelClear.pseudoClass("hover")
+                    ),
+                    CSS.decl("background", "rgba(255,255,255,.14)")
                 ),
 
                 CSS.rule(
@@ -989,11 +1007,18 @@ public extension SiteNotifier {
                 ),
 
                 CSS.rule(
+                    s.historyPanelClear.pseudoClass("hover"),
+                    CSS.decl("background", "rgba(255,255,255,.08)"),
+                    CSS.decl("color", "#fff")
+                ),
+
+                CSS.rule(
                     s.historyPanelList,
                     CSS.decl("overflow", "auto"),
                     CSS.decl("display", "grid"),
                     CSS.decl("gap", ".65rem"),
-                    CSS.decl("padding", "1rem 1.15rem")
+                    CSS.decl("padding", "1rem 1.15rem"),
+                    CSS.decl("min-height", "0")
                 ),
 
                 CSS.rule(
@@ -1003,6 +1028,7 @@ public extension SiteNotifier {
                     CSS.decl("border-radius", "18px"),
                     CSS.decl("color", "rgba(255,255,255,.68)"),
                     CSS.decl("font-size", ".9rem"),
+                    CSS.decl("line-height", "1.4"),
                     CSS.decl("text-align", "center")
                 ),
 
@@ -1067,6 +1093,11 @@ public extension SiteNotifier {
                 ),
 
                 CSS.rule(
+                    s.historyItemBody,
+                    CSS.decl("min-width", "0")
+                ),
+
+                CSS.rule(
                     s.historyItemHead,
                     CSS.decl("display", "flex"),
                     CSS.decl("justify-content", "space-between"),
@@ -1078,7 +1109,8 @@ public extension SiteNotifier {
                     s.historyItemTitle,
                     CSS.decl("margin", "0"),
                     CSS.decl("font-size", ".9rem"),
-                    CSS.decl("font-weight", "850")
+                    CSS.decl("font-weight", "850"),
+                    CSS.decl("line-height", "1.2")
                 ),
 
                 CSS.rule(
@@ -1114,7 +1146,8 @@ public extension SiteNotifier {
                     CSS.decl("background", "rgba(255,255,255,.08)"),
                     CSS.decl("color", "rgba(255,255,255,.72)"),
                     CSS.decl("font-size", ".68rem"),
-                    CSS.decl("font-weight", "750")
+                    CSS.decl("font-weight", "750"),
+                    CSS.decl("line-height", "1")
                 ),
 
                 CSS.rule(
@@ -1128,6 +1161,7 @@ public extension SiteNotifier {
                     CSS.decl("color", "#fff"),
                     CSS.decl("font-size", ".68rem"),
                     CSS.decl("font-weight", "800"),
+                    CSS.decl("line-height", "1"),
                     CSS.decl("text-decoration", "none")
                 ),
 
@@ -1257,6 +1291,10 @@ public extension SiteNotifier {
                         CSS.decl("max-height", "min(760px, calc(100dvh - 1.5rem))"),
                         CSS.decl("border-radius", "20px")
                     ),
+                    // CSS.rule(
+                    //     s.historyPanelActions,
+                    //     CSS.decl("align-items", "stretch")
+                    // ),
                     CSS.rule(
                         s.historyItemHead,
                         CSS.decl("display", "grid")
