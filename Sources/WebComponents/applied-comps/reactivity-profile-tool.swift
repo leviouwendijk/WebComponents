@@ -726,7 +726,7 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                     CSS.decl("height", "1rem"),
                     CSS.decl("margin-top", ".15rem"),
                     CSS.decl("flex", "0 0 auto")
-                )
+                ),
 
                 CSS.rule(
                     ".\(block)__submit-panel",
