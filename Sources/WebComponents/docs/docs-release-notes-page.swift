@@ -61,6 +61,7 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
     public struct Change: Sendable {
         public let mutation: MutationType
         public let text: String
+        public let label: @Sendable () -> HTMLFragment
         public let annotation: ChangeAnnotation?
 
         public init(
@@ -70,6 +71,23 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
         ) {
             self.mutation = mutation
             self.text = text
+            self.label = {
+                [
+                    HTML.text(text)
+                ]
+            }
+            self.annotation = annotation
+        }
+
+        public init(
+            mutation: MutationType,
+            text: String,
+            label: @escaping @Sendable () -> HTMLFragment,
+            annotation: ChangeAnnotation? = nil
+        ) {
+            self.mutation = mutation
+            self.text = text
+            self.label = label
             self.annotation = annotation
         }
     }
@@ -419,8 +437,11 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
             }
 
             HTML.div(["class": "\(Self.block)__change-body"]) {
+                // HTML.span(["class": "\(Self.block)__change-text"]) {
+                //     HTML.text(change.text)
+                // }
                 HTML.span(["class": "\(Self.block)__change-text"]) {
-                    HTML.text(change.text)
+                    change.label()
                 }
 
                 if let annotation = change.annotation {
