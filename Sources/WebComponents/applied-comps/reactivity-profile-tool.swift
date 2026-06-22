@@ -649,12 +649,12 @@ public struct ReactivityProfileToolScript: ReusableComponent {
         ];
 
         const modifiers = [
-            ['restraint', 'Lijn / barrière-effect', 'Wordt het duidelijk erger aan lijn, hek, raam, deur of auto?'],
+            ['restraint', 'Lijn- / barrière-effect', 'Wordt het duidelijk erger aan lijn, hek, raam, deur of auto?'],
             ['recovery', 'Herstel na prikkel', 'Hoe lang blijft de hond hoog na een ontmoeting?'],
             ['distance', 'Afstandsgevoeligheid', 'Hoeveel afstand is nodig om nog bereikbaar te blijven?'],
             ['disengage', 'Loskomen van prikkel', 'Kan de hond wegkijken, snuffelen, eten of terugkoppelen?'],
             ['contact', 'Contactgeschiedenis', 'Is er eerder fysiek contact of schade geweest?'],
-            ['redirect', 'Redirectie-risico', 'Richt spanning zich soms op lijn, geleider of huisgenoot?'],
+            ['redirect', 'Herleidings-risico', 'Richt spanning zich soms op lijn, geleider of huisgenoot (misplaatst bijten)?'],
             ['handling', 'Controleerbaarheid', 'Kan de geleider veilig afstand maken en de hond houden?']
         ];
 
