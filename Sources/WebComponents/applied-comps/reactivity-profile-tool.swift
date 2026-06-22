@@ -585,7 +585,8 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                     ),
                     CSS.rule(
                         ".\(block)__choice-group",
-                        CSS.decl("grid-auto-flow", "row")
+                        CSS.decl("grid-auto-flow", "row"),
+                        CSS.decl("grid-auto-columns", "auto")
                     ),
                     CSS.rule(
                         ".\(block)__field[data-reactivity-behaviour] .\(block)__choice-group",
