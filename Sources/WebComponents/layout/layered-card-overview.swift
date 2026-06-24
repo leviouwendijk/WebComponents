@@ -487,16 +487,16 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.groups)",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "20px")
+                    CSS.decl("gap", "16px")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.group)",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "10px"),
+                    CSS.decl("gap", "8px"),
                     CSS.decl("padding", "0"),
                     CSS.decl("border", "0"),
-                    CSS.decl("border-top", "1px solid var(--wc-layered-overview-border)"),
+                    CSS.decl("border-top", "1px solid color-mix(in srgb, var(--wc-layered-overview-border) 70%, transparent)"),
                     CSS.decl("border-radius", "0"),
                     CSS.decl("background", "transparent")
                 ),
@@ -510,9 +510,9 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
                     ".\(ClassName.groupHeader)",
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "auto minmax(0, 1fr)"),
-                    CSS.decl("gap", "10px"),
+                    CSS.decl("gap", "8px"),
                     CSS.decl("align-items", "baseline"),
-                    CSS.decl("padding", "14px 0 2px")
+                    CSS.decl("padding", "9px 0 0")
                 ),
 
                 CSS.rule(
@@ -523,19 +523,23 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.groupIndex)",
                     CSS.decl("display", "inline-block"),
-                    CSS.decl("min-width", "2.2ch"),
+                    CSS.decl("min-width", "2ch"),
                     CSS.decl("font-family", "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"),
-                    CSS.decl("font-size", ".68rem"),
-                    CSS.decl("font-weight", "700"),
+                    CSS.decl("font-size", ".62rem"),
+                    CSS.decl("font-weight", "650"),
                     CSS.decl("line-height", "1"),
                     CSS.decl("color", "var(--wc-layered-overview-muted)"),
                     CSS.decl("background", "transparent"),
                     CSS.decl("box-shadow", "none"),
-                    CSS.decl("opacity", ".75")
+                    CSS.decl("opacity", ".48")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.groupCopy)",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("flex-wrap", "wrap"),
+                    CSS.decl("align-items", "baseline"),
+                    CSS.decl("gap", "6px 10px"),
                     CSS.decl("min-width", "0")
                 ),
 
@@ -547,21 +551,23 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.groupTitle)",
                     CSS.decl("margin", "0"),
-                    CSS.decl("font-size", "1rem"),
-                    CSS.decl("font-weight", "760"),
+                    CSS.decl("font-size", ".84rem"),
+                    CSS.decl("font-weight", "720"),
                     CSS.decl("letter-spacing", "0"),
                     CSS.decl("line-height", "1.25"),
                     CSS.decl("text-transform", "none"),
-                    CSS.decl("color", "var(--wc-layered-overview-ink)")
+                    CSS.decl("color", "color-mix(in srgb, var(--wc-layered-overview-ink) 72%, var(--wc-layered-overview-muted))")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.groupSummary)",
-                    CSS.decl("max-width", "70ch"),
-                    CSS.decl("margin", ".28rem 0 0"),
-                    CSS.decl("font-size", ".9rem"),
-                    CSS.decl("line-height", "1.45"),
-                    CSS.decl("color", "var(--wc-layered-overview-muted)")
+                    CSS.decl("max-width", "none"),
+                    CSS.decl("margin", "0"),
+                    CSS.decl("font-size", ".84rem"),
+                    CSS.decl("font-weight", "400"),
+                    CSS.decl("line-height", "1.35"),
+                    CSS.decl("color", "var(--wc-layered-overview-muted)"),
+                    CSS.decl("opacity", ".82")
                 ),
 
                 CSS.rule(
