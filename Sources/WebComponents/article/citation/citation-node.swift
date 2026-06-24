@@ -1,4 +1,5 @@
 import HTML
+import References
 
 public struct Citation: HTMLNode {
     public let reference: any Referencable

@@ -1,4 +1,5 @@
 import HTML
+import References
 
 public struct Reference: HTMLNode {
     public struct Comment: Sendable {

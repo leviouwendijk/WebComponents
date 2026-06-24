@@ -1,4 +1,5 @@
 import HTML
+import References
 
 public extension HTML {
     static func cite(_ ref: any Referencable) -> any HTMLNode {

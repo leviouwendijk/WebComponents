@@ -1,5 +1,5 @@
 {
-  "originHash" : "3958dd0ee5e22acf3d59c9380dd57ad55fc6561f868b4c9440a92bed85f48481",
+  "originHash" : "b3a0eb0828cd42a96546a48e6d89b3223950dbdf89a3ebf362e165cfb25c8686",
   "pins" : [
     {
       "identity" : "ansi",
@@ -61,7 +61,7 @@
       "location" : "https://github.com/leviouwendijk/HTML.git",
       "state" : {
         "branch" : "master",
-        "revision" : "10b29da650719e559059784519385ba77414658d"
+        "revision" : "09c1168c04f97b254219d56ba87d52cec2445563"
       }
     },
     {
@@ -142,7 +142,7 @@
       "location" : "https://github.com/leviouwendijk/Primitives.git",
       "state" : {
         "branch" : "master",
-        "revision" : "9c07dc28206dddc67bb0052a84aaecf803a55f67"
+        "revision" : "eb58bcd1ea305d13ff0c0f6fcd03d869a8612802"
       }
     },
     {
@@ -161,6 +161,15 @@
       "state" : {
         "branch" : "master",
         "revision" : "9aec5eaf7cd193202bed6c09a86f180ec1e55b6b"
+      }
+    },
+    {
+      "identity" : "references",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/References.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "007806583cf4e2246c491b991b51827ea7622940"
       }
     },
     {

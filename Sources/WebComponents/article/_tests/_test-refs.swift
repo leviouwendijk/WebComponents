@@ -1,3 +1,5 @@
+import References
+
 public enum _TestRefs: String, Referencable {
     case some_ref_example
     case beyond_cortisol

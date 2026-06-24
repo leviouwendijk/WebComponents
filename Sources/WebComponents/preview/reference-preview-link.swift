@@ -2,6 +2,7 @@ import Constructors
 import CSS
 import HTML
 import JS
+import References
 
 public struct ReferencePreviewLink: ReusableComponent, Sendable {
     private enum ClassName {

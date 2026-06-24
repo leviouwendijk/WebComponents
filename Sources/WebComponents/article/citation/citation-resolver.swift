@@ -1,4 +1,5 @@
 import HTML
+import References
 
 public enum CitationResolver {
     public static func resolve(
