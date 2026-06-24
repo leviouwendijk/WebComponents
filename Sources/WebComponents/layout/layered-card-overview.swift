@@ -105,7 +105,7 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
 
     public let id: String
     public let eyebrow: String?
-    public let title: String
+    public let title: String?
     public let lead: String?
     public let groups: [Group]
     public let includeStyles: Bool
@@ -113,7 +113,7 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
     public init(
         id: String = "layered-card-overview",
         eyebrow: String? = nil,
-        title: String,
+        title: String? = nil,
         lead: String? = nil,
         groups: [Group],
         includeStyles: Bool = true
@@ -136,13 +136,7 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
                     ]
                 ) {
                     [
-                        HTML.div(
-                            [
-                                "class": ClassName.stage,
-                                "role": "group",
-                                "aria-label": title
-                            ]
-                        ) {
+                        HTML.div(stage_attributes) {
                             header_nodes()
                             + [
                                 HTML.div([ "class": ClassName.groups ]) {
@@ -166,24 +160,44 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
         nodes.body[0]
     }
 
+    private var stage_attributes: HTMLAttribute {
+        guard let title = non_empty(title) else {
+            return [
+                "class": ClassName.stage
+            ]
+        }
+
+        return [
+            "class": ClassName.stage,
+            "role": "group",
+            "aria-label": title
+        ]
+    }
+
     private func header_nodes() -> HTMLFragment {
-        [
+        let header = optional_text_node(
+            tag: "p",
+            className: ClassName.eyebrow,
+            text: eyebrow
+        )
+        + optional_text_node(
+            tag: "h2",
+            className: ClassName.title,
+            text: title
+        )
+        + optional_text_node(
+            tag: "p",
+            className: ClassName.lead,
+            text: lead
+        )
+
+        guard !header.isEmpty else {
+            return []
+        }
+
+        return [
             HTML.header([ "class": ClassName.header ]) {
-                optional_text_node(
-                    tag: "p",
-                    className: ClassName.eyebrow,
-                    text: eyebrow
-                )
-                + [
-                    HTML.el("h2", [ "class": ClassName.title ]) {
-                        HTML.text(title)
-                    }
-                ]
-                + optional_text_node(
-                    tag: "p",
-                    className: ClassName.lead,
-                    text: lead
-                )
+                header
             }
         ]
     }
