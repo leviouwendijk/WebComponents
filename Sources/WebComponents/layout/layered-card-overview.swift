@@ -487,16 +487,16 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.groups)",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "16px")
+                    CSS.decl("gap", "14px")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.group)",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "8px"),
+                    CSS.decl("gap", "6px"),
                     CSS.decl("padding", "0"),
                     CSS.decl("border", "0"),
-                    CSS.decl("border-top", "1px solid color-mix(in srgb, var(--wc-layered-overview-border) 70%, transparent)"),
+                    CSS.decl("border-top", "1px solid color-mix(in srgb, var(--wc-layered-overview-border) 62%, transparent)"),
                     CSS.decl("border-radius", "0"),
                     CSS.decl("background", "transparent")
                 ),
@@ -508,11 +508,11 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(ClassName.groupHeader)",
-                    CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-columns", "auto minmax(0, 1fr)"),
-                    CSS.decl("gap", "8px"),
+                    CSS.decl("display", "flex"),
                     CSS.decl("align-items", "baseline"),
-                    CSS.decl("padding", "9px 0 0")
+                    CSS.decl("gap", "6px"),
+                    CSS.decl("min-width", "0"),
+                    CSS.decl("padding", "7px 0 1px")
                 ),
 
                 CSS.rule(
@@ -523,23 +523,21 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.groupIndex)",
                     CSS.decl("display", "inline-block"),
-                    CSS.decl("min-width", "2ch"),
+                    CSS.decl("min-width", "1.8ch"),
                     CSS.decl("font-family", "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"),
-                    CSS.decl("font-size", ".62rem"),
-                    CSS.decl("font-weight", "650"),
+                    CSS.decl("font-size", ".58rem"),
+                    CSS.decl("font-weight", "600"),
                     CSS.decl("line-height", "1"),
                     CSS.decl("color", "var(--wc-layered-overview-muted)"),
                     CSS.decl("background", "transparent"),
                     CSS.decl("box-shadow", "none"),
-                    CSS.decl("opacity", ".48")
+                    CSS.decl("opacity", ".42")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.groupCopy)",
                     CSS.decl("display", "flex"),
-                    CSS.decl("flex-wrap", "wrap"),
                     CSS.decl("align-items", "baseline"),
-                    CSS.decl("gap", "6px 10px"),
                     CSS.decl("min-width", "0")
                 ),
 
@@ -551,23 +549,18 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.groupTitle)",
                     CSS.decl("margin", "0"),
-                    CSS.decl("font-size", ".84rem"),
-                    CSS.decl("font-weight", "720"),
+                    CSS.decl("font-size", ".78rem"),
+                    CSS.decl("font-weight", "620"),
                     CSS.decl("letter-spacing", "0"),
-                    CSS.decl("line-height", "1.25"),
+                    CSS.decl("line-height", "1.2"),
                     CSS.decl("text-transform", "none"),
-                    CSS.decl("color", "color-mix(in srgb, var(--wc-layered-overview-ink) 72%, var(--wc-layered-overview-muted))")
+                    CSS.decl("color", "var(--wc-layered-overview-muted)"),
+                    CSS.decl("opacity", ".82")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.groupSummary)",
-                    CSS.decl("max-width", "none"),
-                    CSS.decl("margin", "0"),
-                    CSS.decl("font-size", ".84rem"),
-                    CSS.decl("font-weight", "400"),
-                    CSS.decl("line-height", "1.35"),
-                    CSS.decl("color", "var(--wc-layered-overview-muted)"),
-                    CSS.decl("opacity", ".82")
+                    CSS.decl("display", "none")
                 ),
 
                 CSS.rule(
@@ -679,13 +672,12 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
 
                     CSS.rule(
                         ".\(ClassName.groups)",
-                        CSS.decl("gap", "18px")
+                        CSS.decl("gap", "14px")
                     ),
 
                     CSS.rule(
                         ".\(ClassName.groupHeader)",
-                        CSS.decl("grid-template-columns", "auto minmax(0, 1fr)"),
-                        CSS.decl("padding-top", "13px")
+                        CSS.decl("padding-top", "7px")
                     ),
 
                     CSS.rule(
