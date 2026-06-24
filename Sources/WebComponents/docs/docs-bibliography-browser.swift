@@ -168,13 +168,17 @@ public struct DocsBibliographyBrowser: ReusableComponent {
                     HTML.text("\(count)")
                 }
 
-                HTML.text(" / ")
+                HTML.span(["aria-hidden": "true"]) {
+                    HTML.text("/")
+                }
 
                 HTML.span(["data-reference-total-count": "\(count)"]) {
                     HTML.text("\(count)")
                 }
 
-                HTML.text(" bronnen")
+                HTML.span {
+                    HTML.text("bronnen")
+                }
             }
         }
     }
@@ -384,6 +388,7 @@ public struct DocsBibliographyBrowser: ReusableComponent {
                     ".\(block)__count",
                     CSS.decl("display", "inline-flex"),
                     CSS.decl("align-items", "center"),
+                    CSS.decl("gap", "5px"),
                     CSS.decl("min-height", "34px"),
                     CSS.decl("padding", "0 12px"),
                     CSS.decl("border", "1px solid var(--border-color)"),
