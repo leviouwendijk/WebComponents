@@ -9,6 +9,7 @@ public struct DocsBibliographyBrowser: ReusableComponent {
 
     public let references: [any ReferenceProviding]
     public let sections: [ReferenceTagSection]
+    public let tagLabels: [String: String]
     public let title: String
     public let lead: String?
     public let searchPlaceholder: String
@@ -18,6 +19,7 @@ public struct DocsBibliographyBrowser: ReusableComponent {
     public init(
         references: [any ReferenceProviding],
         sections: [ReferenceTagSection] = [],
+        tagLabels: [String: String] = [:],
         title: String = "Bibliografie",
         lead: String? = nil,
         searchPlaceholder: String = "Zoek op titel, auteur, DOI, tag of bron...",
@@ -26,6 +28,7 @@ public struct DocsBibliographyBrowser: ReusableComponent {
     ) {
         self.references = references
         self.sections = sections
+        self.tagLabels = tagLabels
         self.title = title
         self.lead = lead
         self.searchPlaceholder = searchPlaceholder
@@ -41,6 +44,24 @@ public struct DocsBibliographyBrowser: ReusableComponent {
         }
     }
 
+    private func tagLabel(
+        _ tag: ReferenceTag
+    ) -> String {
+        tagLabels[tag.id] ?? tag.label
+    }
+
+    private func tagSearchText(
+        _ tag: ReferenceTag
+    ) -> String {
+        [
+            tag.id,
+            tag.label,
+            tagLabel(tag)
+        ]
+        .joined(separator: " ")
+        .lowercased()
+    }
+
     private var allTags: [ReferenceTag] {
         var seen: Set<String> = []
         var tags: [ReferenceTag] = []
@@ -54,7 +75,7 @@ public struct DocsBibliographyBrowser: ReusableComponent {
         }
 
         return tags.sorted {
-            $0.label.localizedCaseInsensitiveCompare($1.label) == .orderedAscending
+            tagLabel($0).localizedCaseInsensitiveCompare(tagLabel($1)) == .orderedAscending
         }
     }
 
@@ -274,11 +295,12 @@ public struct DocsBibliographyBrowser: ReusableComponent {
                 "type": "button",
                 "class": "\(Self.block)__tag",
                 "aria-pressed": "false",
-                "data-reference-filter-tag": tag.id
+                "data-reference-filter-tag": tag.id,
+                "data-reference-filter-search": tagSearchText(tag)
             ]
         ) {
             HTML.span(["class": "\(Self.block)__tag-label"]) {
-                HTML.text(tag.label)
+                HTML.text(tagLabel(tag))
             }
 
             HTML.span(["class": "\(Self.block)__tag-count"]) {
@@ -631,11 +653,33 @@ public struct DocsBibliographyBrowserScript: ReusableComponent {
             return selected.some((tag) => tags.includes(tag));
         }
 
-        function itemMatchesSearch(item, query) {
+        function tagSearchMap(root) {
+            const map = new Map();
+
+            root.querySelectorAll(tagSelector).forEach((button) => {
+                const id = button.getAttribute('data-reference-filter-tag');
+                const search = button.getAttribute('data-reference-filter-search');
+
+                if (id && search) {
+                    map.set(id, search);
+                }
+            });
+
+            return map;
+        }
+
+        function itemMatchesSearch(item, query, tagSearch) {
             if (!query) return true;
 
-            const haystack = String(item.getAttribute('data-reference-search') || '').toLowerCase();
-            return haystack.includes(query);
+            const base = String(item.getAttribute('data-reference-search') || '').toLowerCase();
+            const tags = split(item.getAttribute('data-reference-tags'));
+
+            const localizedTags = tags
+                .map((tag) => tagSearch.get(tag) || '')
+                .join(' ')
+                .toLowerCase();
+
+            return `${base} ${localizedTags}`.includes(query);
         }
 
         function update(root) {
@@ -647,11 +691,12 @@ public struct DocsBibliographyBrowserScript: ReusableComponent {
 
             const selected = selectedTags(root);
             const mode = matchMode(root);
+            const tagSearch = tagSearchMap(root);
 
             let visible = 0;
 
             root.querySelectorAll(itemSelector).forEach((item) => {
-                const isVisible = itemMatchesSearch(item, query)
+                const isVisible = itemMatchesSearch(item, query, tagSearch)
                     && itemMatchesTags(item, selected, mode);
 
                 item.hidden = !isVisible;
