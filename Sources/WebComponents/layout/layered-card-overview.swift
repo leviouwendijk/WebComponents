@@ -487,16 +487,19 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.groups)",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "14px")
+                    CSS.decl("gap", "18px")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.group)",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "6px"),
+                    CSS.decl("gap", "8px"),
                     CSS.decl("padding", "0"),
                     CSS.decl("border", "0"),
-                    CSS.decl("border-top", "1px solid color-mix(in srgb, var(--wc-layered-overview-border) 62%, transparent)"),
+                    CSS.decl(
+                        "border-top",
+                        "1px solid color-mix(in srgb, var(--wc-layered-overview-border) 62%, transparent)"
+                    ),
                     CSS.decl("border-radius", "0"),
                     CSS.decl("background", "transparent")
                 ),
@@ -512,7 +515,7 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
                     CSS.decl("align-items", "baseline"),
                     CSS.decl("gap", "6px"),
                     CSS.decl("min-width", "0"),
-                    CSS.decl("padding", "7px 0 1px")
+                    CSS.decl("padding", "12px 0 2px")
                 ),
 
                 CSS.rule(
@@ -661,12 +664,12 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
 
                     CSS.rule(
                         ".\(ClassName.groups)",
-                        CSS.decl("gap", "14px")
+                        CSS.decl("gap", "16px")
                     ),
 
                     CSS.rule(
                         ".\(ClassName.groupHeader)",
-                        CSS.decl("padding-top", "7px")
+                        CSS.decl("padding-top", "10px")
                     ),
 
                     CSS.rule(
