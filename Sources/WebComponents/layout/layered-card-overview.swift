@@ -576,7 +576,7 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "minmax(170px, 230px) minmax(0, 1fr)"),
                     CSS.decl("gap", "14px"),
-                    CSS.decl("align-items", "baseline"),
+                    CSS.decl("align-items", "start"),
                     CSS.decl("min-width", "0"),
                     CSS.decl("padding", "13px 16px"),
                     CSS.decl("border", "1px solid var(--wc-layered-overview-border-strong)"),
@@ -619,47 +619,36 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.details), .\(ClassName.meta), .\(ClassName.chips)",
+                    ".\(ClassName.details), .\(ClassName.meta)",
                     CSS.decl("display", "none")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.detail)",
-                    CSS.decl("display", "grid"),
-                    CSS.decl("gap", "3px")
+                    ".\(ClassName.chips)",
+                    CSS.decl("grid-column", "2"),
+                    CSS.decl("display", "flex"),
+                    CSS.decl("flex-wrap", "wrap"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("gap", "7px"),
+                    CSS.decl("min-width", "0"),
+                    CSS.decl("margin", "2px 0 0")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.detailLabel)",
-                    CSS.decl("font-size", ".72rem"),
-                    CSS.decl("font-weight", "820"),
-                    CSS.decl("letter-spacing", ".05em"),
-                    CSS.decl("text-transform", "uppercase"),
-                    CSS.decl("color", "var(--wc-layered-overview-ink)")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.detailText)",
-                    CSS.decl("margin", "0"),
-                    CSS.decl("font-size", ".84rem"),
-                    CSS.decl("line-height", "1.42"),
-                    CSS.decl("color", "var(--wc-layered-overview-muted)")
-                ),
-
-                CSS.rule(
-                    ".\(ClassName.metaItem), .\(ClassName.chip)",
+                    ".\(ClassName.chip)",
                     CSS.decl("display", "inline-flex"),
                     CSS.decl("align-items", "center"),
                     CSS.decl("width", "fit-content"),
                     CSS.decl("min-width", "0"),
-                    CSS.decl("padding", "4px 8px"),
+                    CSS.decl("padding", "6px 10px"),
                     CSS.decl("border-radius", "999px"),
-                    CSS.decl("font-size", ".72rem"),
-                    CSS.decl("font-weight", "760"),
-                    CSS.decl("line-height", "1.1"),
-                    CSS.decl("color", "var(--wc-layered-overview-muted)"),
-                    CSS.decl("background", "var(--wc-layered-overview-soft)"),
-                    CSS.decl("box-shadow", "inset 0 0 0 1px var(--wc-layered-overview-border)")
+                    CSS.decl("font-size", ".76rem"),
+                    CSS.decl("font-weight", "820"),
+                    CSS.decl("line-height", "1.05"),
+                    CSS.decl("letter-spacing", "-.01em"),
+                    CSS.decl("color", "var(--wc-layered-overview-ink)"),
+                    CSS.decl("background", "color-mix(in srgb, var(--link-color, var(--wc-layered-overview-ink)) 10%, var(--wc-layered-overview-surface))"),
+                    CSS.decl("box-shadow", "inset 0 0 0 1px color-mix(in srgb, var(--link-color, var(--wc-layered-overview-ink)) 22%, var(--wc-layered-overview-border))")
                 )
             ],
             media: [
@@ -685,6 +674,12 @@ public struct LayeredCardOverview: ReusableComponent, Sendable {
                         CSS.decl("grid-template-columns", "1fr"),
                         CSS.decl("gap", "5px"),
                         CSS.decl("padding", "13px 14px")
+                    ),
+
+                    CSS.rule(
+                        ".\(ClassName.chips)",
+                        CSS.decl("grid-column", "1"),
+                        CSS.decl("margin-top", "4px")
                     ),
 
                     CSS.rule(
