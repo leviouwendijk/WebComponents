@@ -48,7 +48,7 @@ public struct DocsReferenceSection: SelectableComponent {
                     }
                 }
             ],
-            stylesheets: includeStyles ? [Self.stylesheet()] : []
+            stylesheets: includeStyles ? [Self.stylesheet(), ReferenceReviewNotes.stylesheet()] : []
         )
     }
 

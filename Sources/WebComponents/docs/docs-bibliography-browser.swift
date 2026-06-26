@@ -142,7 +142,7 @@ public struct DocsBibliographyBrowser: ReusableComponent {
                     }
                 }
             ],
-            stylesheets: includeStyles ? [Self.stylesheet()] : [],
+            stylesheets: includeStyles ? [Self.stylesheet(), ReferenceReviewNotes.stylesheet()] : [],
             scripts: includeScript ? DocsBibliographyBrowserScript().nodes.scripts : []
         )
     }
