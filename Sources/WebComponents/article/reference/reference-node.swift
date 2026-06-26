@@ -134,6 +134,21 @@ public struct Reference: HTMLNode {
             )
         }
 
+        let searchText = (
+            ref.searchTerms
+                + pointers.flatMap { pointer in
+                    [
+                        "\(pointer)",
+                        "[\(pointer)]",
+                        "#\(pointer)",
+                        "bron \(pointer)",
+                        "source \(pointer)",
+                    ]
+                }
+        )
+        .joined(separator: " ")
+        .lowercased()
+
         return HTMLElement(
             "li",
             attrs: [
@@ -149,7 +164,7 @@ public struct Reference: HTMLNode {
                 "data-reference-kind": ref.kind.rawValue,
                 "data-reference-channel": ref.channel.rawValue,
                 "data-reference-tags": ref.tags.values.map(\.id).joined(separator: " "),
-                "data-reference-search": ref.searchTerms.joined(separator: " ").lowercased()
+                "data-reference-search": searchText
             ],
             children: children
         ).render(options: options, indent: indent)
