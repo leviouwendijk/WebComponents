@@ -25,6 +25,20 @@ public extension HTML {
             comment: comment
         )
     }
+
+    static func cite(
+        _ group: ReferenceGroup,
+        comment: String? = nil
+    ) -> any HTMLNode {
+        HTMLInlineGroup(
+            group.references.map { reference in
+                Citation(
+                    reference,
+                    comment: comment
+                )
+            }
+        )
+    }
 }
 
 public extension Referencable {
@@ -46,6 +60,17 @@ public extension Referencable {
         HTML.cite(
             self,
             at: locator,
+            comment: comment
+        )
+    }
+}
+
+public extension ReferenceGroup {
+    func cite(
+        comment: String? = nil
+    ) -> any HTMLNode {
+        HTML.cite(
+            self,
             comment: comment
         )
     }
