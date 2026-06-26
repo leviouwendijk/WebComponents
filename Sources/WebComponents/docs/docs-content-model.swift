@@ -5,6 +5,7 @@ import Primitives
 public enum DocsSectionPresentation: Sendable {
     case chapter
     case structural
+    case group
 }
 
 public struct DocsKnowledgeBase: Sendable {
@@ -124,7 +125,7 @@ public struct DocsCategory: Sendable {
         NavigationStructure(
             roots: sections.flatMap { section in
                 switch section.presentation {
-                case .chapter:
+                case .chapter, .group:
                     return [
                         NavigationNode(
                             label: section.title,
@@ -215,6 +216,23 @@ public extension DocsSection {
             visibility: visibility
         )
     }
+
+    static func group(
+        id: String,
+        title: String,
+        summary: String? = nil,
+        items: [DocsItem],
+        visibility: Set<BuildEnvironment> = DocsVisibility.live
+    ) -> DocsSection {
+        DocsSection(
+            id: id,
+            title: title,
+            summary: summary,
+            items: items,
+            presentation: .group,
+            visibility: visibility
+        )
+    }
 }
 
 public struct DocsItem: Sendable {
@@ -222,6 +240,7 @@ public struct DocsItem: Sendable {
     public let title: String
     public let summary: String
     public let href: String
+    public let header: Bool
     public let body: @Sendable () -> HTMLFragment
     public let visibility: Set<BuildEnvironment>
 
@@ -230,6 +249,7 @@ public struct DocsItem: Sendable {
         title: String,
         summary: String,
         href: String? = nil,
+        header: Bool = true,
         visibility: Set<BuildEnvironment> = DocsVisibility.live,
         body: @escaping @Sendable () -> HTMLFragment = { [] }
     ) {
@@ -237,6 +257,7 @@ public struct DocsItem: Sendable {
         self.title = title
         self.summary = summary
         self.href = href ?? "#\(id)"
+        self.header = header
         self.visibility = visibility
         self.body = body
     }

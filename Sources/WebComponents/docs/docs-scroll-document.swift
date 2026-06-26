@@ -210,6 +210,9 @@ public struct DocsScrollDocument: SelectableComponent {
 
         case .structural:
             return "\(Self.block)__section \(Self.block)__section--structural"
+
+        case .group:
+            return "\(Self.block)__section \(Self.block)__section--group"
         }
     }
 
@@ -220,7 +223,7 @@ public struct DocsScrollDocument: SelectableComponent {
         case .chapter:
             return 3
 
-        case .structural:
+        case .structural, .group:
             return 2
         }
     }
@@ -261,11 +264,18 @@ public struct DocsScrollDocument: SelectableComponent {
         _ item: DocsItem,
         headingLevel: Int
     ) -> any HTMLNode {
-        [
-            itemHeaderNode(
-                item,
-                headingLevel: headingLevel
-            ),
+        var children: [any HTMLNode] = []
+
+        if item.header {
+            children.append(
+                itemHeaderNode(
+                    item,
+                    headingLevel: headingLevel
+                )
+            )
+        }
+
+        children.append(
             HTMLElement(
                 "div",
                 attrs: [
@@ -273,7 +283,9 @@ public struct DocsScrollDocument: SelectableComponent {
                 ],
                 children: item.body()
             )
-        ].asArticle(
+        )
+
+        return children.asArticle(
             id: item.id,
             className: "\(Self.block)__item"
         )
