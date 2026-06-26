@@ -231,7 +231,7 @@ public struct Reference: HTMLNode {
                     "summary",
                     attrs: ["class": "ref-reviews__summary"],
                     children: [
-                        HTMLText("Onderzoeksnotities (\(reviews.count))")
+                        HTMLText("Aantekeningen (\(reviews.count))")
                     ]
                 ),
                 HTMLElement(
@@ -325,7 +325,7 @@ public struct Reference: HTMLNode {
                 "span",
                 attrs: ["class": "ref-review__entry-kind"],
                 children: [
-                    HTMLText(entry.kind.label)
+                    HTMLText(entry.kind.dutch)
                 ]
             )
         ]

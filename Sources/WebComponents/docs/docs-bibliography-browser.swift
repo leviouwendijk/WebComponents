@@ -623,18 +623,17 @@ public struct DocsBibliographyBrowser: ReusableComponent {
 
                 CSS.rule(
                     ".\(block) .ref-reviews",
-                    CSS.decl("margin-top", "12px"),
-                    CSS.decl("border", "1px solid var(--border-color)"),
-                    CSS.decl("border-radius", "12px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, var(--background-color)) 96%, var(--text-color) 4%)"),
-                    CSS.decl("overflow", "hidden")
+                    CSS.decl("max-width", "min(82ch, 100%)"),
+                    CSS.decl("margin-top", "14px"),
+                    CSS.decl("padding-top", "10px"),
+                    CSS.decl("border-top", "1px solid var(--border-color)")
                 ),
 
                 CSS.rule(
                     ".\(block) .ref-reviews__summary",
                     CSS.decl("cursor", "pointer"),
-                    CSS.decl("padding", "10px 12px"),
-                    CSS.decl("font-size", ".84rem"),
+                    CSS.decl("padding", "0 0 8px"),
+                    CSS.decl("font-size", ".86rem"),
                     CSS.decl("font-weight", "760"),
                     CSS.decl("color", "var(--text-color)")
                 ),
@@ -642,15 +641,20 @@ public struct DocsBibliographyBrowser: ReusableComponent {
                 CSS.rule(
                     ".\(block) .ref-reviews__body",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "10px"),
-                    CSS.decl("padding", "0 12px 12px")
+                    CSS.decl("gap", "14px"),
+                    CSS.decl("padding", "0")
                 ),
 
                 CSS.rule(
                     ".\(block) .ref-review",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "8px"),
-                    CSS.decl("padding", "10px 0 0"),
+                    CSS.decl("gap", "9px"),
+                    CSS.decl("padding", "2px 0 0")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review + .ref-review",
+                    CSS.decl("padding-top", "14px"),
                     CSS.decl("border-top", "1px solid var(--border-color)")
                 ),
 
@@ -676,54 +680,102 @@ public struct DocsBibliographyBrowser: ReusableComponent {
 
                 CSS.rule(
                     ".\(block) .ref-review__summary",
+                    CSS.decl("max-width", "76ch"),
                     CSS.decl("margin", "0"),
                     CSS.decl("color", "var(--muted-text-color)"),
                     CSS.decl("font-size", ".86rem"),
-                    CSS.decl("line-height", "1.45")
+                    CSS.decl("line-height", "1.5")
                 ),
 
                 CSS.rule(
                     ".\(block) .ref-review__entries",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "8px"),
-                    CSS.decl("margin", "0"),
+                    CSS.decl("gap", "0"),
+                    CSS.decl("margin", "2px 0 0"),
                     CSS.decl("padding", "0"),
                     CSS.decl("list-style", "none")
                 ),
 
                 CSS.rule(
                     ".\(block) .ref-review__entry",
+                    CSS.decl("--ref-review-accent", "var(--muted-text-color)"),
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "4px"),
-                    CSS.decl("padding", "9px 10px"),
-                    CSS.decl("border-radius", "10px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 5%, transparent)")
+                    CSS.decl("grid-template-columns", "minmax(96px, max-content) minmax(0, 1fr)"),
+                    CSS.decl("column-gap", "14px"),
+                    CSS.decl("row-gap", "4px"),
+                    CSS.decl("padding", "9px 0 9px 12px"),
+                    CSS.decl("border-left", "3px solid var(--ref-review-accent)")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__entry + .ref-review__entry",
+                    CSS.decl("border-top", "1px solid color-mix(in srgb, var(--border-color) 72%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__entry[data-ref-review-kind=\"overview\"]",
+                    CSS.decl("--ref-review-accent", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__entry[data-ref-review-kind=\"method\"]",
+                    CSS.decl("--ref-review-accent", "var(--link-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__entry[data-ref-review-kind=\"finding\"]",
+                    CSS.decl("--ref-review-accent", "var(--success, #2E8B57)")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__entry[data-ref-review-kind=\"limitation\"]",
+                    CSS.decl("--ref-review-accent", "var(--warning, #E7A94E)")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__entry[data-ref-review-kind=\"takeaway\"]",
+                    CSS.decl("--ref-review-accent", "var(--success, #2E8B57)")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__entry[data-ref-review-kind=\"interpretation\"]",
+                    CSS.decl("--ref-review-accent", "var(--link-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__entry[data-ref-review-kind=\"caution\"]",
+                    CSS.decl("--ref-review-accent", "var(--danger, #D64545)")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__entry[data-ref-review-kind=\"relevance\"]",
+                    CSS.decl("--ref-review-accent", "var(--success, #2E8B57)")
                 ),
 
                 CSS.rule(
                     ".\(block) .ref-review__entry-kind",
-                    CSS.decl("width", "fit-content"),
-                    CSS.decl("padding", "2px 7px"),
-                    CSS.decl("border-radius", "999px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 8%, transparent)"),
-                    CSS.decl("color", "var(--muted-text-color)"),
+                    CSS.decl("align-self", "start"),
+                    CSS.decl("padding-top", "1px"),
+                    CSS.decl("color", "var(--ref-review-accent)"),
                     CSS.decl("font-size", ".68rem"),
-                    CSS.decl("font-weight", "760"),
-                    CSS.decl("letter-spacing", ".04em"),
+                    CSS.decl("font-weight", "800"),
+                    CSS.decl("letter-spacing", ".045em"),
+                    CSS.decl("line-height", "1.25"),
                     CSS.decl("text-transform", "uppercase")
                 ),
 
                 CSS.rule(
                     ".\(block) .ref-review__entry-title",
                     CSS.decl("font-size", ".84rem"),
-                    CSS.decl("line-height", "1.3")
+                    CSS.decl("line-height", "1.35")
                 ),
 
                 CSS.rule(
                     ".\(block) .ref-review__entry-body",
+                    CSS.decl("max-width", "74ch"),
                     CSS.decl("color", "var(--muted-text-color)"),
                     CSS.decl("font-size", ".84rem"),
-                    CSS.decl("line-height", "1.45")
+                    CSS.decl("line-height", "1.5")
                 ),
 
                 CSS.rule(
