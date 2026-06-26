@@ -13,8 +13,8 @@ public enum CitationResolver {
         var refByID: [String: any Referencable] = [:]
         var pointersByID: [String: [Int]] = [:]
 
-        var commentOrderByID: [String: [String]] = [:]
-        var commentPointersByID: [String: [String: [Int]]] = [:]
+        var noteOrderByID: [String: [String]] = [:]
+        var noteByID: [String: [String: Reference.Comment]] = [:]
 
         @inline(__always)
         func record(
@@ -33,22 +33,78 @@ public enum CitationResolver {
 
             pointersByID[id, default: []].append(n)
 
-            if let c = cite.comment, !c.isEmpty {
-                if commentPointersByID[id]?[c] == nil {
-                    commentOrderByID[id, default: []].append(c)
-                }
+            let text = cite.comment ?? ""
 
-                var map = commentPointersByID[id, default: [:]]
-                var ptrs = map[c, default: []]
-
-                if ptrs.last != n {
-                    ptrs.append(n)
-                }
-
-                map[c] = ptrs
-                commentPointersByID[id] = map
+            guard !text.isEmpty || !cite.locators.isEmpty else {
+                return
             }
+
+            let locatorKey = cite.locators.map(\.stableKey).joined(separator: "|")
+            let key = locatorKey + "\u{001F}" + text
+
+            if noteByID[id]?[key] == nil {
+                noteOrderByID[id, default: []].append(key)
+            }
+
+            var map = noteByID[id, default: [:]]
+
+            let old = map[key] ?? Reference.Comment(
+                pointers: [],
+                locators: cite.locators,
+                text: text
+            )
+
+            var ptrs = old.pointers
+
+            if ptrs.last != n {
+                ptrs.append(n)
+            }
+
+            map[key] = Reference.Comment(
+                pointers: ptrs,
+                locators: old.locators,
+                text: old.text
+            )
+
+            noteByID[id] = map
         }
+
+        // var commentOrderByID: [String: [String]] = [:]
+        // var commentPointersByID: [String: [String: [Int]]] = [:]
+
+        // @inline(__always)
+        // func record(
+        //     _ cite: Citation
+        // ) {
+        //     let id = cite.reference.public_name_or_id
+        //     guard !id.isEmpty else { return }
+
+        //     occurrence += 1
+        //     let n = occurrence
+
+        //     if seen.insert(id).inserted {
+        //         order.append(id)
+        //         refByID[id] = cite.reference
+        //     }
+
+        //     pointersByID[id, default: []].append(n)
+
+        //     if let c = cite.comment, !c.isEmpty {
+        //         if commentPointersByID[id]?[c] == nil {
+        //             commentOrderByID[id, default: []].append(c)
+        //         }
+
+        //         var map = commentPointersByID[id, default: [:]]
+        //         var ptrs = map[c, default: []]
+
+        //         if ptrs.last != n {
+        //             ptrs.append(n)
+        //         }
+
+        //         map[c] = ptrs
+        //         commentPointersByID[id] = map
+        //     }
+        // }
 
         func walk(
             _ node: any HTMLNode
@@ -79,16 +135,27 @@ public enum CitationResolver {
         var commentsByID: [String: [Reference.Comment]] = [:]
 
         for id in order {
-            let commentOrder = commentOrderByID[id] ?? []
-            let commentMap = commentPointersByID[id] ?? [:]
+            let noteOrder = noteOrderByID[id] ?? []
+            let noteMap = noteByID[id] ?? [:]
 
-            commentsByID[id] = commentOrder.map { text in
-                Reference.Comment(
-                    pointers: commentMap[text] ?? [],
-                    text: text
-                )
+            commentsByID[id] = noteOrder.compactMap { key in
+                noteMap[key]
             }
         }
+
+        // var commentsByID: [String: [Reference.Comment]] = [:]
+
+        // for id in order {
+        //     let commentOrder = commentOrderByID[id] ?? []
+        //     let commentMap = commentPointersByID[id] ?? [:]
+
+        //     commentsByID[id] = commentOrder.map { text in
+        //         Reference.Comment(
+        //             pointers: commentMap[text] ?? [],
+        //             text: text
+        //         )
+        //     }
+        // }
 
         var renderOccurrence: Int = 0
 

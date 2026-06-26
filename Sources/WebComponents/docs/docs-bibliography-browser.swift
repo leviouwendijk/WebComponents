@@ -587,6 +587,146 @@ public struct DocsBibliographyBrowser: ReusableComponent {
                 ),
 
                 CSS.rule(
+                    ".\(block) .ref-comment",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "8px"),
+                    CSS.decl("margin-top", "10px"),
+                    CSS.decl("padding", "10px 12px"),
+                    CSS.decl("border", "1px solid var(--border-color)"),
+                    CSS.decl("border-radius", "10px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, var(--background-color)) 92%, var(--text-color) 8%)"),
+                    CSS.decl("color", "var(--muted-text-color)"),
+                    CSS.decl("font-size", ".88rem"),
+                    CSS.decl("line-height", "1.45")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-comment-sep",
+                    CSS.decl("height", "1px"),
+                    CSS.decl("background", "var(--border-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-comment-locator",
+                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("width", "fit-content"),
+                    CSS.decl("max-width", "100%"),
+                    CSS.decl("padding", "2px 7px"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--link-color) 11%, transparent)"),
+                    CSS.decl("color", "var(--link-color)"),
+                    CSS.decl("font-size", ".76rem"),
+                    CSS.decl("font-weight", "720"),
+                    CSS.decl("line-height", "1.25")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-reviews",
+                    CSS.decl("margin-top", "12px"),
+                    CSS.decl("border", "1px solid var(--border-color)"),
+                    CSS.decl("border-radius", "12px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, var(--background-color)) 96%, var(--text-color) 4%)"),
+                    CSS.decl("overflow", "hidden")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-reviews__summary",
+                    CSS.decl("cursor", "pointer"),
+                    CSS.decl("padding", "10px 12px"),
+                    CSS.decl("font-size", ".84rem"),
+                    CSS.decl("font-weight", "760"),
+                    CSS.decl("color", "var(--text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-reviews__body",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "10px"),
+                    CSS.decl("padding", "0 12px 12px")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "8px"),
+                    CSS.decl("padding", "10px 0 0"),
+                    CSS.decl("border-top", "1px solid var(--border-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__header",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("flex-wrap", "wrap"),
+                    CSS.decl("align-items", "baseline"),
+                    CSS.decl("gap", "8px")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__title",
+                    CSS.decl("font-size", ".9rem"),
+                    CSS.decl("line-height", "1.3")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__date",
+                    CSS.decl("color", "var(--muted-text-color)"),
+                    CSS.decl("font-size", ".78rem")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__summary",
+                    CSS.decl("margin", "0"),
+                    CSS.decl("color", "var(--muted-text-color)"),
+                    CSS.decl("font-size", ".86rem"),
+                    CSS.decl("line-height", "1.45")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__entries",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "8px"),
+                    CSS.decl("margin", "0"),
+                    CSS.decl("padding", "0"),
+                    CSS.decl("list-style", "none")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__entry",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "4px"),
+                    CSS.decl("padding", "9px 10px"),
+                    CSS.decl("border-radius", "10px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 5%, transparent)")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__entry-kind",
+                    CSS.decl("width", "fit-content"),
+                    CSS.decl("padding", "2px 7px"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 8%, transparent)"),
+                    CSS.decl("color", "var(--muted-text-color)"),
+                    CSS.decl("font-size", ".68rem"),
+                    CSS.decl("font-weight", "760"),
+                    CSS.decl("letter-spacing", ".04em"),
+                    CSS.decl("text-transform", "uppercase")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__entry-title",
+                    CSS.decl("font-size", ".84rem"),
+                    CSS.decl("line-height", "1.3")
+                ),
+
+                CSS.rule(
+                    ".\(block) .ref-review__entry-body",
+                    CSS.decl("color", "var(--muted-text-color)"),
+                    CSS.decl("font-size", ".84rem"),
+                    CSS.decl("line-height", "1.45")
+                ),
+
+                CSS.rule(
                     ".\(block)__empty",
                     CSS.decl("margin", "0"),
                     CSS.decl("padding", "16px"),

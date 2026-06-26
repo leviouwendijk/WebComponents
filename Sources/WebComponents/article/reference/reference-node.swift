@@ -4,13 +4,16 @@ import References
 public struct Reference: HTMLNode {
     public struct Comment: Sendable {
         public let pointers: [Int]
+        public let locators: [ReferenceLocator]
         public let text: String
 
         public init(
             pointers: [Int],
+            locators: [ReferenceLocator] = [],
             text: String
         ) {
             self.pointers = pointers
+            self.locators = locators
             self.text = text
         }
     }
@@ -112,40 +115,24 @@ public struct Reference: HTMLNode {
         }
 
         if !comments.isEmpty {
-            children.append(
-                HTMLElement(
-                    "div",
-                    attrs: ["class": "ref-comment"],
-                    children: comments.enumerated().flatMap { (i, item) -> [any HTMLNode] in
-                        if item.text.isEmpty { return [] }
+            let renderedComments = commentNodes()
 
-                        let prefix: String = {
-                            guard !item.pointers.isEmpty else { return "" }
-                            let joined = item.pointers.map(String.init).joined(separator: ", ")
-                            return "[\(joined)] "
-                        }()
-
-                        if i == 0 {
-                            return [HTMLText(prefix + item.text)]
-                        }
-
-                        return [
-                            HTMLElement("div", attrs: ["class": "ref-comment-sep"], children: []),
-                            HTMLText(prefix + item.text)
-                        ]
-                    }
+            if !renderedComments.isEmpty {
+                children.append(
+                    HTMLElement(
+                        "div",
+                        attrs: ["class": "ref-comment"],
+                        children: renderedComments
+                    )
                 )
-            )
+            }
         }
 
-        // return HTMLElement(
-        //     "li",
-        //     attrs: [
-        //         "class": "ref-item",
-        //         "id": "ref-\(ref.public_name_or_id)"
-        //     ],
-        //     children: children
-        // ).render(options: options, indent: indent)
+        if !ref.reviews.isEmpty {
+            children.append(
+                reviewsNode(ref.reviews)
+            )
+        }
 
         return HTMLElement(
             "li",
@@ -166,5 +153,212 @@ public struct Reference: HTMLNode {
             ],
             children: children
         ).render(options: options, indent: indent)
+    }
+
+    private func commentNodes() -> [any HTMLNode] {
+        var rendered: [any HTMLNode] = []
+
+        for item in comments {
+            let children = commentItemChildren(item)
+
+            guard !children.isEmpty else {
+                continue
+            }
+
+            if !rendered.isEmpty {
+                rendered.append(
+                    HTMLElement(
+                        "div",
+                        attrs: ["class": "ref-comment-sep"],
+                        children: []
+                    )
+                )
+            }
+
+            rendered.append(contentsOf: children)
+        }
+
+        return rendered
+    }
+
+    private func commentItemChildren(
+        _ item: Comment
+    ) -> [any HTMLNode] {
+        var children: [any HTMLNode] = []
+
+        if !item.pointers.isEmpty {
+            let joined = item.pointers.map(String.init).joined(separator: ", ")
+            children.append(
+                HTMLText("[\(joined)] ")
+            )
+        }
+
+        if !item.locators.isEmpty {
+            children.append(
+                HTMLElement(
+                    "span",
+                    attrs: ["class": "ref-comment-locator"],
+                    children: [
+                        HTMLText(item.locators.map(\.rendered).joined(separator: ", "))
+                    ]
+                )
+            )
+
+            if !item.text.isEmpty {
+                children.append(
+                    HTMLText(" — ")
+                )
+            }
+        }
+
+        if !item.text.isEmpty {
+            children.append(
+                HTMLText(item.text)
+            )
+        }
+
+        return children
+    }
+
+    private func reviewsNode(
+        _ reviews: [ReferenceReview]
+    ) -> any HTMLNode {
+        HTMLElement(
+            "details",
+            attrs: ["class": "ref-reviews"],
+            children: [
+                HTMLElement(
+                    "summary",
+                    attrs: ["class": "ref-reviews__summary"],
+                    children: [
+                        HTMLText("Onderzoeksnotities (\(reviews.count))")
+                    ]
+                ),
+                HTMLElement(
+                    "div",
+                    attrs: ["class": "ref-reviews__body"],
+                    children: reviews.map(reviewNode)
+                )
+            ]
+        )
+    }
+
+    private func reviewNode(
+        _ review: ReferenceReview
+    ) -> any HTMLNode {
+        var children: [any HTMLNode] = [
+            HTMLElement(
+                "div",
+                attrs: ["class": "ref-review__header"],
+                children: reviewHeaderChildren(review)
+            )
+        ]
+
+        if let summary = review.summary, !summary.text.isEmpty {
+            children.append(
+                HTMLElement(
+                    "p",
+                    attrs: ["class": "ref-review__summary"],
+                    children: [
+                        HTMLText(summary.text)
+                    ]
+                )
+            )
+        }
+
+        if !review.entries.isEmpty {
+            children.append(
+                HTMLElement(
+                    "ul",
+                    attrs: ["class": "ref-review__entries"],
+                    children: review.entries.map(reviewEntryNode)
+                )
+            )
+        }
+
+        return HTMLElement(
+            "article",
+            attrs: [
+                "class": "ref-review",
+                "data-ref-review-id": review.id
+            ],
+            children: children
+        )
+    }
+
+    private func reviewHeaderChildren(
+        _ review: ReferenceReview
+    ) -> [any HTMLNode] {
+        var children: [any HTMLNode] = [
+            HTMLElement(
+                "strong",
+                attrs: ["class": "ref-review__title"],
+                children: [
+                    HTMLText(review.title)
+                ]
+            )
+        ]
+
+        if let date = review.date?.iso8601String {
+            children.append(
+                HTMLElement(
+                    "time",
+                    attrs: [
+                        "class": "ref-review__date",
+                        "datetime": date
+                    ],
+                    children: [
+                        HTMLText(date)
+                    ]
+                )
+            )
+        }
+
+        return children
+    }
+
+    private func reviewEntryNode(
+        _ entry: ReferenceReviewEntry
+    ) -> any HTMLNode {
+        var children: [any HTMLNode] = [
+            HTMLElement(
+                "span",
+                attrs: ["class": "ref-review__entry-kind"],
+                children: [
+                    HTMLText(entry.kind.label)
+                ]
+            )
+        ]
+
+        if let title = entry.title, !title.isEmpty {
+            children.append(
+                HTMLElement(
+                    "strong",
+                    attrs: ["class": "ref-review__entry-title"],
+                    children: [
+                        HTMLText(title)
+                    ]
+                )
+            )
+        }
+
+        children.append(
+            HTMLElement(
+                "span",
+                attrs: ["class": "ref-review__entry-body"],
+                children: [
+                    HTMLText(entry.body.text)
+                ]
+            )
+        )
+
+        return HTMLElement(
+            "li",
+            attrs: [
+                "class": "ref-review__entry",
+                "data-ref-review-kind": entry.kind.rawValue
+            ],
+            children: children
+        )
     }
 }

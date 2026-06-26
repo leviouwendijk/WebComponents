@@ -150,7 +150,7 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
 
     private func commentNodes() -> any HTMLNode {
         HTML.span([ "class": ClassName.comments ]) {
-            for comment in comments where !comment.text.isEmpty {
+            for comment in comments where !comment.text.isEmpty || !comment.locators.isEmpty {
                 commentNode(comment)
             }
         }
@@ -166,7 +166,15 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                 }
             }
 
-            HTML.text(comment.text)
+            if !comment.locators.isEmpty {
+                HTML.span([ "class": ClassName.commentPointer ]) {
+                    HTML.text(comment.locators.map(\.rendered).joined(separator: ", "))
+                }
+            }
+
+            if !comment.text.isEmpty {
+                HTML.text(comment.text)
+            }
         }
     }
 
