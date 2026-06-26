@@ -200,6 +200,23 @@ public struct DocsSection: Sendable {
     }
 }
 
+public extension DocsSection {
+    static func structural(
+        id: String,
+        items: [DocsItem],
+        visibility: Set<BuildEnvironment> = DocsVisibility.live
+    ) -> DocsSection {
+        DocsSection(
+            id: id,
+            title: id,
+            summary: nil,
+            items: items,
+            presentation: .structural,
+            visibility: visibility
+        )
+    }
+}
+
 public struct DocsItem: Sendable {
     public let id: String
     public let title: String
