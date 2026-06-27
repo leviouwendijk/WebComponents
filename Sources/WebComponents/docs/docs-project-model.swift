@@ -190,23 +190,29 @@ public struct DocsNavigationContext: Sendable {
     public let surface: DocsNavigationSurface
     public let activeProjectID: String?
     public let activeCategoryID: String?
+    public let parentBreadcrumbs: [DocsNavigationCrumb]
     public let extraBreadcrumbs: [DocsNavigationCrumb]
 
     public init(
         surface: DocsNavigationSurface,
         activeProjectID: String? = nil,
         activeCategoryID: String? = nil,
+        parentBreadcrumbs: [DocsNavigationCrumb] = [],
         extraBreadcrumbs: [DocsNavigationCrumb] = []
     ) {
         self.surface = surface
         self.activeProjectID = activeProjectID
         self.activeCategoryID = activeCategoryID
+        self.parentBreadcrumbs = parentBreadcrumbs
         self.extraBreadcrumbs = extraBreadcrumbs
     }
 
-    public static func siteHub() -> Self {
+    public static func siteHub(
+        parentBreadcrumbs: [DocsNavigationCrumb] = []
+    ) -> Self {
         Self(
-            surface: .siteHub
+            surface: .siteHub,
+            parentBreadcrumbs: parentBreadcrumbs
         )
     }
 
@@ -217,7 +223,8 @@ public struct DocsNavigationContext: Sendable {
     ) -> Self {
         Self(
             surface: .siteHub,
-            extraBreadcrumbs: parentBreadcrumbs + [
+            parentBreadcrumbs: parentBreadcrumbs,
+            extraBreadcrumbs: [
                 DocsNavigationCrumb(
                     label: label,
                     href: href,
@@ -228,22 +235,26 @@ public struct DocsNavigationContext: Sendable {
     }
 
     public static func projectHub(
-        _ project: DocsProject
+        _ project: DocsProject,
+        parentBreadcrumbs: [DocsNavigationCrumb] = []
     ) -> Self {
         Self(
             surface: .projectHub,
-            activeProjectID: project.id
+            activeProjectID: project.id,
+            parentBreadcrumbs: parentBreadcrumbs
         )
     }
 
     public static func categoryPage(
         project: DocsProject,
-        category: DocsCategory
+        category: DocsCategory,
+        parentBreadcrumbs: [DocsNavigationCrumb] = []
     ) -> Self {
         Self(
             surface: .categoryPage,
             activeProjectID: project.id,
-            activeCategoryID: category.id
+            activeCategoryID: category.id,
+            parentBreadcrumbs: parentBreadcrumbs
         )
     }
 

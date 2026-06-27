@@ -12,6 +12,7 @@ public struct DocsMobileNavigationDrawer: SelectableComponent {
     public let context: DocsNavigationContext
     public let lexicon: DocsLexicon
     public let targetID: String
+    public let globalNavigation: NavigationStructure?
     public let includeStyles: Bool
 
     public init(
@@ -19,12 +20,14 @@ public struct DocsMobileNavigationDrawer: SelectableComponent {
         context: DocsNavigationContext,
         lexicon: DocsLexicon = .english,
         targetID: String? = nil,
+        globalNavigation: NavigationStructure? = nil,
         includeStyles: Bool = true
     ) {
         self.site = site
         self.context = context
         self.lexicon = lexicon
         self.targetID = targetID ?? Self.targetID(for: context)
+        self.globalNavigation = globalNavigation
         self.includeStyles = includeStyles
     }
 
@@ -36,7 +39,7 @@ public struct DocsMobileNavigationDrawer: SelectableComponent {
             return "toc"
 
         case .siteHub,
-            .projectHub:
+             .projectHub:
             return "docs-mobile-navigation"
         }
     }
@@ -74,11 +77,9 @@ public struct DocsMobileNavigationDrawer: SelectableComponent {
 
     private func eyebrow() -> String {
         switch context.surface {
-        case .siteHub:
+        case .siteHub,
+             .projectHub:
             return lexicon.projects
-
-        case .projectHub:
-            return lexicon.categoryNavAriaLabel
 
         case .categoryPage:
             return lexicon.tocTitle
@@ -87,11 +88,9 @@ public struct DocsMobileNavigationDrawer: SelectableComponent {
 
     private func title() -> String {
         switch context.surface {
-        case .siteHub:
+        case .siteHub,
+             .projectHub:
             return site.title
-
-        case .projectHub:
-            return context.activeProject(in: site)?.label ?? site.title
 
         case .categoryPage:
             return context.activeCategory(in: site)?.label ?? lexicon.tocTitle
@@ -100,7 +99,12 @@ public struct DocsMobileNavigationDrawer: SelectableComponent {
 
     private func navigation() -> NavigationStructure {
         switch context.surface {
-        case .siteHub:
+        case .siteHub,
+             .projectHub:
+            if let globalNavigation {
+                return globalNavigation
+            }
+
             return NavigationStructure(
                 roots: site.projects.map { project in
                     NavigationNode(
@@ -110,26 +114,6 @@ public struct DocsMobileNavigationDrawer: SelectableComponent {
                             NavigationNode(
                                 label: category.label,
                                 path: category.href
-                            )
-                        }
-                    )
-                }
-            )
-
-        case .projectHub:
-            guard let project = context.activeProject(in: site) else {
-                return NavigationStructure(roots: [])
-            }
-
-            return NavigationStructure(
-                roots: project.knowledgeBase.categories.map { category in
-                    NavigationNode(
-                        label: category.label,
-                        path: category.href,
-                        children: category.items.map { item in
-                            NavigationNode(
-                                label: item.title,
-                                path: item.href
                             )
                         }
                     )

@@ -11,17 +11,20 @@ public struct DocsProjectContextNav: SelectableComponent {
     public let site: DocsSite
     public let context: DocsNavigationContext
     public let lexicon: DocsLexicon
+    public let switcherLinks: [DocsNavigationCrumb]?
     public let includeStyles: Bool
 
     public init(
         site: DocsSite,
         context: DocsNavigationContext,
         lexicon: DocsLexicon = .english,
+        switcherLinks: [DocsNavigationCrumb]? = nil,
         includeStyles: Bool = true
     ) {
         self.site = site
         self.context = context
         self.lexicon = lexicon
+        self.switcherLinks = switcherLinks
         self.includeStyles = includeStyles
     }
 
@@ -37,7 +40,7 @@ public struct DocsProjectContextNav: SelectableComponent {
                     HTML.div(["class": "\(Self.block)__inner"]) {
                         breadcrumbs()
 
-                        if site.projects.count > 1 {
+                        if effectiveSwitcherLinks.count > 1 {
                             switcher()
                         } else if let project = context.activeProject(in: site) {
                             HTML.a(
@@ -54,6 +57,26 @@ public struct DocsProjectContextNav: SelectableComponent {
         )
     }
 
+    private var effectiveSwitcherLinks: [DocsNavigationCrumb] {
+        if let switcherLinks {
+            return switcherLinks
+        }
+
+        return site.projects.map { project in
+            DocsNavigationCrumb(
+                label: project.label,
+                href: project.href,
+                isCurrent: project.id == context.activeProjectID
+            )
+        }
+    }
+
+    private var activeSwitcherLink: DocsNavigationCrumb? {
+        effectiveSwitcherLinks.first { link in
+            link.isCurrent
+        }
+    }
+
     private func breadcrumbs() -> any HTMLNode {
         let project = context.activeProject(in: site)
         let category = context.activeCategory(in: site)
@@ -63,6 +86,16 @@ public struct DocsProjectContextNav: SelectableComponent {
                 label: lexicon.allDocs,
                 href: site.homeHref
             )
+
+            for crumb in context.parentBreadcrumbs {
+                separator()
+
+                breadcrumbCrumb(
+                    label: crumb.label,
+                    href: crumb.href,
+                    isCurrent: crumb.isCurrent
+                )
+            }
 
             if let project {
                 separator()
@@ -135,34 +168,32 @@ public struct DocsProjectContextNav: SelectableComponent {
     }
 
     private func switcher() -> any HTMLNode {
-        let activeProject = context.activeProject(in: site)
-
-        return HTML.div(["class": "\(Self.block)__switcher"]) {
+        HTML.div(["class": "\(Self.block)__switcher"]) {
             HTML.details(["class": "\(Self.block)__details"]) {
                 HTML.summary(["class": "\(Self.block)__summary"]) {
                     HTML.span(["class": "\(Self.block)__summary-label"]) {
-                        HTML.text(activeProject?.label ?? lexicon.projects)
+                        HTML.text(
+                            activeSwitcherLink?.label
+                                ?? context.activeProject(in: site)?.label
+                                ?? lexicon.projects
+                        )
                     }
                 }
 
                 HTML.div(["class": "\(Self.block)__menu"]) {
-                    for project in site.projects {
-                        projectLink(
-                            project: project,
-                            activeProjectID: activeProject?.id
-                        )
+                    for link in effectiveSwitcherLinks {
+                        switcherLink(link)
                     }
                 }
             }
         }
     }
 
-    private func projectLink(
-        project: DocsProject,
-        activeProjectID: String?
+    private func switcherLink(
+        _ link: DocsNavigationCrumb
     ) -> any HTMLNode {
         let attrs: HTMLAttribute = {
-            if project.id == activeProjectID {
+            if link.isCurrent {
                 return [
                     "class": "\(Self.block)__project-link \(Self.block)__project-link--active",
                     "aria-current": "page"
@@ -175,15 +206,11 @@ public struct DocsProjectContextNav: SelectableComponent {
         }()
 
         return HTML.a(
-            project.href,
+            link.href ?? "#",
             attrs
         ) {
             HTML.span(["class": "\(Self.block)__project-label"]) {
-                HTML.text(project.label)
-            }
-
-            HTML.span(["class": "\(Self.block)__project-description"]) {
-                HTML.text(project.description)
+                HTML.text(link.label)
             }
         }
     }

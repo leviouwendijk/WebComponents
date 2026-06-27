@@ -11,7 +11,110 @@ public enum DocsCategoryContentMode: Sendable {
 public struct DocsCategoryPage: ReusableComponent {
     public let knowledgeBase: DocsKnowledgeBase
     public let category: DocsCategory
+    public let categoryNavCategories: [DocsCategory]?
     public let mode: DocsCategoryContentMode
+    public let header: @Sendable () -> HTMLFragment
+    public let currentHref: String?
+    public let lexicon: DocsLexicon
+    public let definitionRelatedLinks: DocsDefinitionRelatedLinkProvider
+
+    public init(
+        knowledgeBase: DocsKnowledgeBase,
+        category: DocsCategory,
+        categoryNavCategories: [DocsCategory]? = nil,
+        mode: DocsCategoryContentMode = .scrollDocument,
+        currentHref: String? = nil,
+        lexicon: DocsLexicon = .english,
+        definitionRelatedLinks: @escaping DocsDefinitionRelatedLinkProvider = { _, _ in [] },
+        header: @escaping @Sendable () -> HTMLFragment
+    ) {
+        self.knowledgeBase = knowledgeBase
+        self.category = category
+        self.categoryNavCategories = categoryNavCategories
+        self.mode = mode
+        self.currentHref = currentHref
+        self.lexicon = lexicon
+        self.definitionRelatedLinks = definitionRelatedLinks
+        self.header = header
+    }
+
+    private func navigation() -> NavigationStructure {
+        switch mode {
+        case .scrollDocument:
+            return DocsScrollDocument(
+                category: category,
+                lexicon: lexicon,
+                includeStyles: false,
+                includeScript: false
+            ).navigation(
+                includeReferencesTitle: lexicon.referencesTitle
+            )
+
+        case .definitionsIndex:
+            return category.navigation
+        }
+    }
+
+    public var nodes: ReusableComponentNodes {
+        let nav = DocsCategoryNav(
+            categories: categoryNavCategories ?? knowledgeBase.categories,
+            activeID: category.id,
+            ariaLabel: lexicon.categoryNavAriaLabel,
+            includeStyles: false
+        )
+
+        let toc = DocsScopedTOC(
+            navigation: navigation(),
+            title: lexicon.tocTitle,
+            currentHref: currentHref,
+            includeStyles: false
+        )
+
+        let contentNodes = content()
+
+        let body: HTMLFragment = [
+            HTML.div(
+                [
+                    "class": "layout docs-category-layout wc-docs-category-page",
+                    "data-wc-docs-category-page": category.id
+                ]
+            ) {
+                header()
+                nav.nodes.body
+
+                HTML.div(["class": "container"]) {
+                    toc.nodes.body
+                    contentNodes.body
+                }
+            }
+        ]
+
+        return .body(
+            body,
+            stylesheets: stylesheets(contentNodes),
+            scripts: scripts(contentNodes)
+        )
+    }
+
+    private func content() -> ReusableComponentNodes {
+        switch mode {
+        case .scrollDocument:
+            return DocsScrollDocument(
+                category: category,
+                lexicon: lexicon,
+                includeStyles: false,
+                includeScript: false
+            ).nodes
+
+        case .definitionsIndex:
+            return DocsDefinitionIndex(
+                category: category,
+                lexicon: lexicon,
+                relatedLinks: definitionRelatedLinks,
+                includeStyles: false
+            ).nodes
+        }
+    }
     public let header: @Sendable () -> HTMLFragment
     public let currentHref: String?
     public let lexicon: DocsLexicon
