@@ -38,7 +38,7 @@ public struct DocsReadingControls: SelectableComponent {
                         ]
                     ) {
                         controlButton(
-                            label: "−",
+                            label: "a−",
                             attrs: [
                                 "data-docs-reading-scale": "small",
                                 "aria-label": "Tekst kleiner"
@@ -54,7 +54,7 @@ public struct DocsReadingControls: SelectableComponent {
                         )
 
                         controlButton(
-                            label: "+",
+                            label: "A+",
                             attrs: [
                                 "data-docs-reading-scale": "large",
                                 "aria-label": "Tekst groter"
