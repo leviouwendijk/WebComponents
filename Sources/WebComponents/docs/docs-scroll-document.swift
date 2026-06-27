@@ -583,7 +583,13 @@ public struct DocsScrollDocument: SelectableComponent {
                 CSS.rule(
                     ".\(block)[data-docs-paragraph-mode=\"book\"] .\(block)__item-body p",
                     CSS.decl("margin-block", "0"),
-                    CSS.decl("text-indent", "0")
+                    CSS.decl("text-indent", "0"),
+                    CSS.decl("text-align", "justify"),
+                    CSS.decl("text-align-last", "left"),
+                    CSS.decl("hyphens", "auto"),
+                    CSS.decl("-webkit-hyphens", "auto"),
+                    CSS.decl("overflow-wrap", "normal"),
+                    CSS.decl("word-break", "normal")
                 ),
 
                 CSS.rule(
@@ -603,13 +609,25 @@ public struct DocsScrollDocument: SelectableComponent {
                 ),
 
                 CSS.rule(
+                    ".\(block)[data-docs-paragraph-mode=\"book\"] .\(block)__item-body p .wc-reference-preview, .\(block)[data-docs-paragraph-mode=\"book\"] .\(block)__item-body p .wc-inline-preview, .\(block)[data-docs-paragraph-mode=\"book\"] .\(block)__item-body p .cite, .\(block)[data-docs-paragraph-mode=\"book\"] .\(block)__item-body p .footnote",
+                    CSS.decl("display", "inline"),
+                    CSS.decl("position", "relative"),
+                    CSS.decl("top", "-.45em"),
+                    CSS.decl("vertical-align", "baseline"),
+                    CSS.decl("font-size", ".72em"),
+                    CSS.decl("line-height", "0"),
+                    CSS.decl("white-space", "nowrap")
+                ),
+
+                CSS.rule(
                     ".\(block)[data-docs-drop-cap=\"first\"] [data-docs-readable-first-paragraph=\"true\"]::first-letter",
                     CSS.decl("float", "left"),
-                    CSS.decl("font-size", "4.2em"),
-                    CSS.decl("line-height", ".82"),
-                    CSS.decl("padding-right", ".08em"),
-                    CSS.decl("font-weight", "760"),
-                    CSS.decl("letter-spacing", "-.04em")
+                    CSS.decl("font-size", "3.55em"),
+                    CSS.decl("line-height", ".76"),
+                    CSS.decl("margin", ".07em .13em -.08em 0"),
+                    CSS.decl("padding-right", "0"),
+                    CSS.decl("font-weight", "780"),
+                    CSS.decl("letter-spacing", "-.045em")
                 ),
 
                 CSS.rule(
