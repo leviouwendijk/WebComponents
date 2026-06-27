@@ -180,7 +180,7 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
 
     public static func stylesheet() -> CSSStyleSheet {
         CSSStyleSheet(
-            rules: [
+            rules: CitationCluster.rules() + [
                 CSS.rule(
                     ".wc-reference-preview, .wc-inline-preview, .cite, .footnote",
                     CSS.decl(
@@ -212,18 +212,6 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
-                    ".\(CitationCluster.className)",
-                    CSS.decl("display", "inline-flex"),
-                    CSS.decl("align-items", "baseline"),
-                    CSS.decl("gap", ".35em"),
-                    CSS.decl("white-space", "nowrap"),
-                    CSS.decl("vertical-align", "super"),
-                    CSS.decl("line-height", "1"),
-                    CSS.decl("text-align", "left"),
-                    CSS.decl("text-indent", "0")
-                ),
-
-                CSS.rule(
                     ".\(CitationCluster.className) .\(ClassName.root)",
                     CSS.decl("vertical-align", "baseline"),
                     CSS.decl("text-indent", "0")
@@ -233,6 +221,11 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                     ".\(CitationCluster.className) .\(ClassName.card)",
                     CSS.decl("text-align", "left"),
                     CSS.decl("text-indent", "0")
+                ),
+
+                CSS.rule(
+                    ".\(CitationCluster.className) + .\(ClassName.root), .\(CitationCluster.className) + .wc-inline-preview",
+                    CSS.decl("margin-inline-start", ".35em")
                 ),
 
                 CSS.rule(
