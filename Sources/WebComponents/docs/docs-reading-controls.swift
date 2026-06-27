@@ -38,7 +38,7 @@ public struct DocsReadingControls: SelectableComponent {
                         ]
                     ) {
                         controlButton(
-                            label: "A-",
+                            label: "−",
                             attrs: [
                                 "data-docs-reading-scale": "small",
                                 "aria-label": "Tekst kleiner"
@@ -46,7 +46,7 @@ public struct DocsReadingControls: SelectableComponent {
                         )
 
                         controlButton(
-                            label: "A",
+                            label: "Aa",
                             attrs: [
                                 "data-docs-reading-scale": "normal",
                                 "aria-label": "Normale tekstgrootte"
@@ -54,7 +54,7 @@ public struct DocsReadingControls: SelectableComponent {
                         )
 
                         controlButton(
-                            label: "A+",
+                            label: "+",
                             attrs: [
                                 "data-docs-reading-scale": "large",
                                 "aria-label": "Tekst groter"
@@ -66,20 +66,22 @@ public struct DocsReadingControls: SelectableComponent {
                         [
                             "class": "\(Self.block)__group",
                             "role": "group",
-                            "aria-label": "Alineaweergave"
+                            "aria-label": "Tekstweergave"
                         ]
                     ) {
                         controlButton(
-                            label: "Ruimte",
+                            label: "Modern",
                             attrs: [
-                                "data-docs-reading-paragraph": "spaced"
+                                "data-docs-reading-paragraph": "spaced",
+                                "aria-label": "Ruime tekstweergave"
                             ]
                         )
 
                         controlButton(
-                            label: "Boek",
+                            label: "Klassiek",
                             attrs: [
-                                "data-docs-reading-paragraph": "book"
+                                "data-docs-reading-paragraph": "book",
+                                "aria-label": "Boekzetting"
                             ]
                         )
                     }

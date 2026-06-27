@@ -609,17 +609,6 @@ public struct DocsScrollDocument: SelectableComponent {
                 ),
 
                 CSS.rule(
-                    ".\(block)[data-docs-paragraph-mode=\"book\"] .\(block)__item-body p .wc-reference-preview, .\(block)[data-docs-paragraph-mode=\"book\"] .\(block)__item-body p .wc-inline-preview, .\(block)[data-docs-paragraph-mode=\"book\"] .\(block)__item-body p .cite, .\(block)[data-docs-paragraph-mode=\"book\"] .\(block)__item-body p .footnote",
-                    CSS.decl("display", "inline"),
-                    CSS.decl("position", "relative"),
-                    CSS.decl("top", "-.45em"),
-                    CSS.decl("vertical-align", "baseline"),
-                    CSS.decl("font-size", ".72em"),
-                    CSS.decl("line-height", "0"),
-                    CSS.decl("white-space", "nowrap")
-                ),
-
-                CSS.rule(
                     ".\(block)[data-docs-drop-cap=\"first\"] [data-docs-readable-first-paragraph=\"true\"]::first-letter",
                     CSS.decl("float", "left"),
                     CSS.decl("font-size", "3.55em"),
