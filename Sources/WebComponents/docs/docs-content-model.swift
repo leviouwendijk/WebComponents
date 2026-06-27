@@ -70,6 +70,7 @@ public struct DocsCategory: Sendable {
     public let href: String
     public let sections: [DocsSection]
     public let reading: DocsReadingConfiguration
+    public let articleMeta: DocsArticleMeta?
     public let visibility: Set<BuildEnvironment>
 
     public init(
@@ -80,6 +81,7 @@ public struct DocsCategory: Sendable {
         href: String,
         sections: [DocsSection],
         reading: DocsReadingConfiguration = .disabled,
+        articleMeta: DocsArticleMeta? = nil,
         visibility: Set<BuildEnvironment> = DocsVisibility.live
     ) {
         self.id = id
@@ -89,6 +91,7 @@ public struct DocsCategory: Sendable {
         self.href = href
         self.sections = sections
         self.reading = reading
+        self.articleMeta = articleMeta
         self.visibility = visibility
     }
 
@@ -115,6 +118,7 @@ public struct DocsCategory: Sendable {
                 section.visible(in: environment)
             },
             reading: reading,
+            articleMeta: articleMeta,
             visibility: visibility
         )
     }
