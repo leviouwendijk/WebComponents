@@ -23,14 +23,14 @@ public struct FootnotePreviewLink: ReusableComponent, Sendable {
         InlinePreviewLink(
             kind: .footnote,
             number: number,
-            accessibilityLabel: "Toon noot \(number)",
+            accessibilityLabel: "Toon voetnoot \(number)",
             rootID: "footnote-ref-\(number)",
             cardID: "footnote-preview-\(number)",
             includeStyles: includeStyles
         ) {
             var body: HTMLFragment = [
                 HTML.span([ "class": "wc-reference-preview__eyebrow wc-inline-preview__eyebrow" ]) {
-                    HTML.text("Noot \(number)")
+                    HTML.text("Voetnoot \(number)")
                 },
 
                 HTML.span([ "class": "wc-reference-preview__comments wc-inline-preview__body" ]) {
@@ -47,7 +47,7 @@ public struct FootnotePreviewLink: ReusableComponent, Sendable {
                             anchorHref,
                             [ "class": "wc-reference-preview__anchor-link wc-inline-preview__anchor-link" ]
                         ) {
-                            HTML.text("Naar noot")
+                            HTML.text("Naar voetnoot")
                         }
                     }
                 )

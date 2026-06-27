@@ -32,14 +32,11 @@ public struct Reference: HTMLNode {
         self.comments = comments
     }
 
-    public func render(options: HTMLRenderOptions, indent: Int) -> String {
+    public func render(
+        options: HTMLRenderOptions,
+        indent: Int
+    ) -> String {
         let ref = reference
-
-        let label: String = {
-            guard !pointers.isEmpty else { return "[] " }
-            let joined = pointers.map(String.init).joined(separator: ", ")
-            return "[\(joined)] "
-        }()
 
         var meta: [any HTMLNode] = []
 
@@ -69,7 +66,6 @@ public struct Reference: HTMLNode {
                     "div",
                     attrs: ["class": "ref-doi"],
                     children: [
-                        // HTMLText("DOI: \(doi)")
                         HTMLText(doi)
                     ]
                 )
@@ -80,17 +76,10 @@ public struct Reference: HTMLNode {
             HTMLElement(
                 "div",
                 attrs: ["class": "ref-title"],
-                children: [
-                    HTMLElement(
-                        "span",
-                        attrs: ["class": "ref-index"],
-                        children: [HTMLText(label)]
-                    ),
-                    // HTMLElement(
-                    //     "a",
-                    //     attrs: ["href": ref.url],
-                    //     children: [HTMLText(ref.title)]
-                    // )
+                children: pointerBacklinks(
+                    pointers,
+                    indexClass: "ref-index"
+                ) + [
                     HTMLElement(
                         "a",
                         attrs: [
@@ -170,18 +159,62 @@ public struct Reference: HTMLNode {
         ).render(options: options, indent: indent)
     }
 
-    private func commentNodes() -> [any HTMLNode] {
-        var rendered: [any HTMLNode] = []
+    private func pointerBacklinks(
+        _ values: [Int],
+        indexClass: String
+    ) -> [any HTMLNode] {
+        guard !values.isEmpty else {
+            return [
+                HTMLElement(
+                    "span",
+                    attrs: [
+                        "class": "\(indexClass) ref-backlink ref-backlink--empty"
+                    ],
+                    children: [
+                        HTMLText("[]")
+                    ]
+                ),
+                HTMLText(" ")
+            ]
+        }
 
-        for item in comments {
-            let children = commentItemChildren(item)
+        var children: [any HTMLNode] = []
 
-            guard !children.isEmpty else {
-                continue
+        for (index, pointer) in values.enumerated() {
+            if index > 0 {
+                children.append(
+                    HTMLText(" ")
+                )
             }
 
-            if !rendered.isEmpty {
-                rendered.append(
+            children.append(
+                HTMLElement(
+                    "a",
+                    attrs: [
+                        "class": "\(indexClass) ref-backlink",
+                        "href": "#cite-\(pointer)",
+                        "aria-label": "Terug naar bron \(pointer)"
+                    ],
+                    children: [
+                        HTMLText("[\(pointer)]")
+                    ]
+                )
+            )
+        }
+
+        children.append(
+            HTMLText(" ")
+        )
+
+        return children
+    }
+
+    private func commentNodes() -> [any HTMLNode] {
+        comments.enumerated().flatMap { index, item -> [any HTMLNode] in
+            var nodes: [any HTMLNode] = []
+
+            if index > 0 {
+                nodes.append(
                     HTMLElement(
                         "div",
                         attrs: ["class": "ref-comment-sep"],
@@ -190,10 +223,10 @@ public struct Reference: HTMLNode {
                 )
             }
 
-            rendered.append(contentsOf: children)
-        }
+            nodes += commentItemChildren(item)
 
-        return rendered
+            return nodes
+        }
     }
 
     private func commentItemChildren(
@@ -202,27 +235,39 @@ public struct Reference: HTMLNode {
         var children: [any HTMLNode] = []
 
         if !item.pointers.isEmpty {
-            let joined = item.pointers.map(String.init).joined(separator: ", ")
             children.append(
-                HTMLText("[\(joined)] ")
+                HTMLElement(
+                    "span",
+                    attrs: ["class": "ref-comment-pointers"],
+                    children: pointerBacklinks(
+                        item.pointers,
+                        indexClass: "ref-comment-pointer"
+                    )
+                )
             )
         }
 
         if !item.locators.isEmpty {
-            children.append(
-                HTMLElement(
-                    "span",
-                    attrs: ["class": "ref-comment-locator"],
-                    children: [
-                        HTMLText(item.locators.map(\.rendered).joined(separator: ", "))
-                    ]
-                )
-            )
+            let locatorText = item.locators
+                .map(\.rendered)
+                .joined(separator: ", ")
 
-            if !item.text.isEmpty {
+            if !locatorText.isEmpty {
                 children.append(
-                    HTMLText(" — ")
+                    HTMLElement(
+                        "span",
+                        attrs: ["class": "ref-comment-locator"],
+                        children: [
+                            HTMLText(locatorText)
+                        ]
+                    )
                 )
+
+                if !item.text.isEmpty {
+                    children.append(
+                        HTMLText(" ")
+                    )
+                }
             }
         }
 

@@ -116,14 +116,16 @@ public struct DocsReferenceSection: SelectableComponent {
                 ),
 
                 CSS.rule(
-                    ".\(block) .footnote-backlink",
+                    // ".\(block) .footnote-backlink",
+                    ".\(block) .footnote-backlink, .\(block) .ref-backlink",
                     CSS.decl("font-weight", "760"),
                     CSS.decl("color", "var(--link-color)"),
                     CSS.decl("text-decoration", "none")
                 ),
 
                 CSS.rule(
-                    ".\(block) .footnote-backlink:hover, .\(block) .footnote-backlink:focus-visible",
+                    // ".\(block) .footnote-backlink:hover, .\(block) .footnote-backlink:focus-visible",
+                    ".\(block) .footnote-backlink:hover, .\(block) .footnote-backlink:focus-visible, .\(block) .ref-backlink:hover, .\(block) .ref-backlink:focus-visible",
                     CSS.decl("text-decoration", "underline"),
                     CSS.decl("text-decoration-thickness", ".08em"),
                     CSS.decl("text-underline-offset", ".16em")

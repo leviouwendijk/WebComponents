@@ -182,6 +182,12 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
         CSSStyleSheet(
             rules: [
                 CSS.rule(
+                    ".wc-reference-preview, .wc-inline-preview, .cite, .footnote",
+                    CSS.decl(
+                        "scroll-margin-top", "calc(var(--wc-docs-sticky-offset, 112px) + 24px)")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.root)",
                     CSS.decl("position", "relative"),
                     CSS.decl("display", "inline-block"),

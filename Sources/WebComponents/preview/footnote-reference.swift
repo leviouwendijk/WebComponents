@@ -28,7 +28,7 @@ public struct FootnoteReference: HTMLNode, Sendable {
                     attrs: [
                         "class": "footnote-backlink",
                         "href": "#footnote-ref-\(number)",
-                        "aria-label": "Terug naar noot \(number)"
+                        "aria-label": "Terug naar voetnoot \(number)"
                     ],
                     children: [
                         HTMLText("[\(number)]")
