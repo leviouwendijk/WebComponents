@@ -9,21 +9,27 @@ public struct DocsReferenceSection: SelectableComponent {
     public static let block = "wc-docs-reference-section"
 
     public let references: [Reference]
+    public let footnotes: [FootnoteReference]
     public let title: String
+    public let footnotesTitle: String
     public let includeStyles: Bool
 
     public init(
         references: [Reference],
+        footnotes: [FootnoteReference] = [],
         title: String,
+        footnotesTitle: String = "Notes",
         includeStyles: Bool = true
     ) {
         self.references = references
+        self.footnotes = footnotes
         self.title = title
+        self.footnotesTitle = footnotesTitle
         self.includeStyles = includeStyles
     }
 
     public var nodes: ReusableComponentNodes {
-        guard !references.isEmpty else {
+        guard !references.isEmpty || !footnotes.isEmpty else {
             return .init()
         }
 
@@ -37,13 +43,31 @@ public struct DocsReferenceSection: SelectableComponent {
                         "data-scroll-section": "references"
                     ]
                 ) {
-                    HTML.h2 {
-                        HTML.text(title)
+                    if !footnotes.isEmpty {
+                        HTML.div([ "class": "\(Self.block)__group \(Self.block)__group--footnotes" ]) {
+                            HTML.h2 {
+                                HTML.text(footnotesTitle)
+                            }
+
+                            HTML.ol([ "class": "footnotes-list \(Self.block)__list \(Self.block)__notes-list" ]) {
+                                for footnote in footnotes {
+                                    footnote
+                                }
+                            }
+                        }
                     }
 
-                    HTML.ol(["class": "refs-list \(Self.block)__list"]) {
-                        for reference in references {
-                            reference
+                    if !references.isEmpty {
+                        HTML.div([ "class": "\(Self.block)__group \(Self.block)__group--references" ]) {
+                            HTML.h2 {
+                                HTML.text(title)
+                            }
+
+                            HTML.ol([ "class": "refs-list \(Self.block)__list \(Self.block)__refs-list" ]) {
+                                for reference in references {
+                                    reference
+                                }
+                            }
                         }
                     }
                 }
@@ -64,6 +88,11 @@ public struct DocsReferenceSection: SelectableComponent {
                 ),
 
                 CSS.rule(
+                    ".\(block)__group + .\(block)__group",
+                    CSS.decl("margin-top", "32px")
+                ),
+
+                CSS.rule(
                     ".\(block) h2",
                     CSS.decl("margin", "0 0 18px"),
                     CSS.decl("font-size", "1.35rem"),
@@ -78,12 +107,31 @@ public struct DocsReferenceSection: SelectableComponent {
                 ),
 
                 CSS.rule(
-                    ".\(block) .ref-item",
+                    ".\(block) .ref-item, .\(block) .footnote-item",
                     CSS.decl("margin", "0 0 14px"),
                     CSS.decl("padding", "12px 14px"),
                     CSS.decl("border", "1px solid var(--border-color)"),
                     CSS.decl("border-radius", "10px"),
                     CSS.decl("background", "var(--surface-color, var(--background-color))")
+                ),
+
+                CSS.rule(
+                    ".\(block) .footnote-backlink",
+                    CSS.decl("font-weight", "760"),
+                    CSS.decl("color", "var(--link-color)"),
+                    CSS.decl("text-decoration", "none")
+                ),
+
+                CSS.rule(
+                    ".\(block) .footnote-backlink:hover, .\(block) .footnote-backlink:focus-visible",
+                    CSS.decl("text-decoration", "underline"),
+                    CSS.decl("text-decoration-thickness", ".08em"),
+                    CSS.decl("text-underline-offset", ".16em")
+                ),
+
+                CSS.rule(
+                    ".\(block) .footnote-text",
+                    CSS.decl("line-height", "1.55")
                 ),
 
                 CSS.rule(

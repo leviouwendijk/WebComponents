@@ -44,13 +44,15 @@ public struct DocsScrollDocument: SelectableComponent {
         includeReferencesTitle referencesTitle: String? = nil
     ) -> NavigationStructure {
         var roots = category.navigation.roots
+        let resolved = resolvedContent
 
         if includeReferences,
-           let referencesTitle,
-           !resolvedContent.references.isEmpty {
+            let referencesTitle,
+            resolved.hasBackmatter
+        {
             roots.append(
                 NavigationNode(
-                    label: referencesTitle,
+                    label: resolved.references.isEmpty ? lexicon.footnotesTitle : referencesTitle,
                     path: "#references"
                 )
             )
@@ -66,11 +68,14 @@ public struct DocsScrollDocument: SelectableComponent {
         var contentChildren = resolved.body
 
         if includeReferences {
-            contentChildren += DocsReferenceSection(
-                references: resolved.references,
-                title: lexicon.referencesTitle,
-                includeStyles: false
-            ).nodes.body
+            contentChildren +=
+                DocsReferenceSection(
+                    references: resolved.references,
+                    footnotes: resolved.footnotes,
+                    title: lexicon.referencesTitle,
+                    footnotesTitle: lexicon.footnotesTitle,
+                    includeStyles: false
+                ).nodes.body
         }
 
         let body: HTMLFragment = [

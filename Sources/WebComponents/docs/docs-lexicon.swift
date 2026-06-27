@@ -10,6 +10,7 @@ public struct DocsLexicon: Sendable {
     public let contentKicker: String
 
     public let referencesTitle: String
+    public let footnotesTitle: String
 
     public let searchProjectsPlaceholder: String
     public let searchProjectsAriaLabel: String
@@ -38,6 +39,7 @@ public struct DocsLexicon: Sendable {
         tocTitle: String,
         contentKicker: String,
         referencesTitle: String,
+        footnotesTitle: String,
         searchProjectsPlaceholder: String,
         searchProjectsAriaLabel: String,
         searchKnowledgeBasePlaceholder: String,
@@ -62,6 +64,7 @@ public struct DocsLexicon: Sendable {
         self.tocTitle = tocTitle
         self.contentKicker = contentKicker
         self.referencesTitle = referencesTitle
+        self.footnotesTitle = footnotesTitle
         self.searchProjectsPlaceholder = searchProjectsPlaceholder
         self.searchProjectsAriaLabel = searchProjectsAriaLabel
         self.searchKnowledgeBasePlaceholder = searchKnowledgeBasePlaceholder
@@ -116,6 +119,7 @@ public struct DocsLexicon: Sendable {
         tocTitle: "Contents",
         contentKicker: "Knowledge base",
         referencesTitle: "References",
+        footnotesTitle: "Notes",
         searchProjectsPlaceholder: "Search projects...",
         searchProjectsAriaLabel: "Search docs projects",
         searchKnowledgeBasePlaceholder: "Search knowledge base...",
@@ -142,6 +146,7 @@ public struct DocsLexicon: Sendable {
         tocTitle: "Inhoud",
         contentKicker: "Kennisbank",
         referencesTitle: "Referenties",
+        footnotesTitle: "Noten",
         searchProjectsPlaceholder: "Zoek onderdelen...",
         searchProjectsAriaLabel: "Zoek in documentatieonderdelen",
         searchKnowledgeBasePlaceholder: "Zoek in de kennisbank...",
