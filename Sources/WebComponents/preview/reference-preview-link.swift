@@ -192,10 +192,7 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                     CSS.decl("position", "relative"),
                     CSS.decl("display", "inline-block"),
                     CSS.decl("vertical-align", "super"),
-                    CSS.decl("font-size", ".72em"),
                     CSS.decl("line-height", "1"),
-                    CSS.decl("white-space", "nowrap"),
-                    CSS.decl("text-align", "left"),
                     CSS.decl("--wc-reference-preview-surface", "var(--surface-color, #fff)"),
                     CSS.decl("--wc-reference-preview-soft", "var(--surface-soft-color, #f1f5f9)"),
                     CSS.decl("--wc-reference-preview-border", "var(--border-color, rgba(15, 23, 42, .12))"),
@@ -203,26 +200,6 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                     CSS.decl("--wc-reference-preview-muted", "var(--muted-text-color, rgba(32, 33, 36, .66))"),
                     CSS.decl("--wc-reference-preview-accent", "var(--link-color, #2563eb)")
                 ),
-                // CSS.rule(
-                //     ".\(ClassName.root)",
-                //     CSS.decl("position", "relative"),
-                //     CSS.decl("z-index", "0"),
-                //     CSS.decl("display", "inline-block"),
-                //     CSS.decl("vertical-align", "super"),
-                //     CSS.decl("line-height", "1"),
-                //     CSS.decl("isolation", "isolate"),
-                //     CSS.decl("--wc-reference-preview-surface", "var(--surface-color, #fff)"),
-                //     CSS.decl("--wc-reference-preview-soft", "var(--surface-soft-color, #f1f5f9)"),
-                //     CSS.decl("--wc-reference-preview-border", "var(--border-color, rgba(15, 23, 42, .12))"),
-                //     CSS.decl("--wc-reference-preview-ink", "var(--text-color, #202124)"),
-                //     CSS.decl("--wc-reference-preview-muted", "var(--muted-text-color, rgba(32, 33, 36, .66))"),
-                //     CSS.decl("--wc-reference-preview-accent", "var(--link-color, #2563eb)")
-                // ),
-
-                // CSS.rule(
-                //     ".\(ClassName.root):hover, .\(ClassName.root):focus-within",
-                //     CSS.decl("z-index", "1000")
-                // ),
 
                 CSS.rule(
                     ".dark-mode .\(ClassName.root)",
@@ -242,7 +219,7 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                     CSS.decl("margin", "0"),
                     CSS.decl("background", "transparent"),
                     CSS.decl("font", "inherit"),
-                    CSS.decl("font-size", "1em"),
+                    CSS.decl("font-size", ".72em"),
                     CSS.decl("line-height", "1"),
                     CSS.decl("color", "var(--wc-reference-preview-accent)"),
                     CSS.decl("text-decoration", "none"),
@@ -346,14 +323,17 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(ClassName.title)",
-                    CSS.decl("display", "inline-flex"),
-                    CSS.decl("width", "fit-content"),
+                    CSS.decl("display", "block"),
+                    CSS.decl("width", "auto"),
+                    CSS.decl("max-width", "100%"),
                     CSS.decl("font-size", ".98rem"),
                     CSS.decl("font-weight", "820"),
                     CSS.decl("letter-spacing", "-.01em"),
                     CSS.decl("line-height", "1.15"),
                     CSS.decl("color", "var(--wc-reference-preview-ink)"),
-                    CSS.decl("text-decoration", "none")
+                    CSS.decl("text-decoration", "none"),
+                    CSS.decl("overflow-wrap", "anywhere"),
+                    CSS.decl("word-break", "normal")
                 ),
 
                 CSS.rule(

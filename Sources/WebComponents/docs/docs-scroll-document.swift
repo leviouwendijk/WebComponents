@@ -586,6 +586,7 @@ public struct DocsScrollDocument: SelectableComponent {
                     CSS.decl("text-indent", "0"),
                     CSS.decl("text-align", "justify"),
                     CSS.decl("text-align-last", "left"),
+                    CSS.decl("-webkit-text-align-last", "left"),
                     CSS.decl("hyphens", "auto"),
                     CSS.decl("-webkit-hyphens", "auto"),
                     CSS.decl("overflow-wrap", "normal"),
@@ -600,7 +601,14 @@ public struct DocsScrollDocument: SelectableComponent {
                 CSS.rule(
                     ".\(block)[data-docs-paragraph-mode=\"book\"] [data-docs-readable-paragraph]",
                     CSS.decl("margin-block", "0"),
-                    CSS.decl("text-indent", "0")
+                    CSS.decl("text-indent", "0"),
+                    CSS.decl("text-align", "justify"),
+                    CSS.decl("text-align-last", "left"),
+                    CSS.decl("-webkit-text-align-last", "left"),
+                    CSS.decl("hyphens", "auto"),
+                    CSS.decl("-webkit-hyphens", "auto"),
+                    CSS.decl("overflow-wrap", "normal"),
+                    CSS.decl("word-break", "normal")
                 ),
 
                 CSS.rule(
