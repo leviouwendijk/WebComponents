@@ -220,7 +220,9 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(CitationCluster.className) .\(ClassName.card)",
                     CSS.decl("text-align", "left"),
-                    CSS.decl("text-indent", "0")
+                    CSS.decl("text-indent", "0"),
+                    CSS.decl("white-space", "normal"),
+                    CSS.decl("overflow-wrap", "normal")
                 ),
 
                 CSS.rule(
@@ -257,8 +259,8 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                     CSS.decl("left", "var(--wc-preview-left, 50vw)"),
                     CSS.decl("top", "var(--wc-preview-top, 20vh)"),
                     CSS.decl("bottom", "auto"),
-                    // CSS.decl("z-index", "1000"),
                     CSS.decl("z-index", "var(--z-overlay, 10000)"),
+                    CSS.decl("box-sizing", "border-box"),
                     CSS.decl("display", "grid"),
                     CSS.decl("gap", "7px"),
                     CSS.decl("width", "min(420px, calc(100vw - 32px))"),
@@ -278,6 +280,8 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                     CSS.decl("line-height", "1.35"),
                     CSS.decl("text-align", "left"),
                     CSS.decl("text-indent", "0"),
+                    CSS.decl("white-space", "normal"),
+                    CSS.decl("overflow-wrap", "normal"),
                     CSS.decl("opacity", "0"),
                     CSS.decl("visibility", "hidden"),
                     CSS.decl("pointer-events", "none"),
@@ -344,6 +348,7 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                     ".\(ClassName.title)",
                     CSS.decl("display", "block"),
                     CSS.decl("width", "auto"),
+                    CSS.decl("min-width", "0"),
                     CSS.decl("max-width", "100%"),
                     CSS.decl("font-size", ".98rem"),
                     CSS.decl("font-weight", "820"),
@@ -351,6 +356,7 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                     CSS.decl("line-height", "1.15"),
                     CSS.decl("color", "var(--wc-reference-preview-ink)"),
                     CSS.decl("text-decoration", "none"),
+                    CSS.decl("white-space", "normal"),
                     CSS.decl("overflow-wrap", "anywhere"),
                     CSS.decl("word-break", "normal")
                 ),
@@ -367,18 +373,26 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                     ".\(ClassName.meta)",
                     CSS.decl("display", "flex"),
                     CSS.decl("flex-wrap", "wrap"),
-                    CSS.decl("gap", "5px")
+                    CSS.decl("gap", "5px"),
+                    CSS.decl("min-width", "0"),
+                    CSS.decl("max-width", "100%"),
+                    CSS.decl("white-space", "normal")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.metaItem)",
-                    CSS.decl("display", "inline-flex"),
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("display", "inline-block"),
                     CSS.decl("width", "fit-content"),
+                    CSS.decl("max-width", "100%"),
                     CSS.decl("padding", "3px 7px"),
                     CSS.decl("border-radius", "999px"),
                     CSS.decl("font-size", ".68rem"),
                     CSS.decl("font-weight", "720"),
                     CSS.decl("line-height", "1.1"),
+                    CSS.decl("white-space", "normal"),
+                    CSS.decl("overflow-wrap", "anywhere"),
+                    CSS.decl("word-break", "normal"),
                     CSS.decl("color", "var(--wc-reference-preview-accent)"),
                     CSS.decl("background", "color-mix(in srgb, var(--wc-reference-preview-accent) 10%, transparent)")
                 ),
