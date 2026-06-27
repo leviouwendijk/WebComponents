@@ -69,6 +69,7 @@ public struct DocsCategory: Sendable {
     public let description: String
     public let href: String
     public let sections: [DocsSection]
+    public let reading: DocsReadingConfiguration
     public let visibility: Set<BuildEnvironment>
 
     public init(
@@ -78,6 +79,7 @@ public struct DocsCategory: Sendable {
         description: String,
         href: String,
         sections: [DocsSection],
+        reading: DocsReadingConfiguration = .disabled,
         visibility: Set<BuildEnvironment> = DocsVisibility.live
     ) {
         self.id = id
@@ -86,6 +88,7 @@ public struct DocsCategory: Sendable {
         self.description = description
         self.href = href
         self.sections = sections
+        self.reading = reading
         self.visibility = visibility
     }
 
@@ -111,6 +114,7 @@ public struct DocsCategory: Sendable {
             sections: sections.compactMap { section in
                 section.visible(in: environment)
             },
+            reading: reading,
             visibility: visibility
         )
     }
@@ -235,14 +239,35 @@ public extension DocsSection {
     }
 }
 
+public enum DocsItemContent: Sendable {
+    case fragment(@Sendable () -> HTMLFragment)
+    case article(DocsArticleBody)
+
+    public var body: @Sendable () -> HTMLFragment {
+        switch self {
+        case .fragment(let body):
+            return body
+
+        case .article(let body):
+            return {
+                DocsReadableBodyRenderer.plain(body)
+            }
+        }
+    }
+}
+
 public struct DocsItem: Sendable {
     public let id: String
     public let title: String
     public let summary: String
     public let href: String
     public let header: Bool
-    public let body: @Sendable () -> HTMLFragment
+    public let content: DocsItemContent
     public let visibility: Set<BuildEnvironment>
+
+    public var body: @Sendable () -> HTMLFragment {
+        content.body
+    }
 
     public init(
         id: String,
@@ -253,13 +278,53 @@ public struct DocsItem: Sendable {
         visibility: Set<BuildEnvironment> = DocsVisibility.live,
         body: @escaping @Sendable () -> HTMLFragment = { [] }
     ) {
+        self.init(
+            id: id,
+            title: title,
+            summary: summary,
+            href: href,
+            header: header,
+            visibility: visibility,
+            content: .fragment(body)
+        )
+    }
+
+    public init(
+        id: String,
+        title: String,
+        summary: String,
+        href: String? = nil,
+        header: Bool = true,
+        visibility: Set<BuildEnvironment> = DocsVisibility.live,
+        content: DocsItemContent
+    ) {
         self.id = id
         self.title = title
         self.summary = summary
         self.href = href ?? "#\(id)"
         self.header = header
         self.visibility = visibility
-        self.body = body
+        self.content = content
+    }
+
+    public static func article(
+        id: String,
+        title: String,
+        summary: String,
+        href: String? = nil,
+        header: Bool = true,
+        visibility: Set<BuildEnvironment> = DocsVisibility.live,
+        body: DocsArticleBody
+    ) -> DocsItem {
+        DocsItem(
+            id: id,
+            title: title,
+            summary: summary,
+            href: href,
+            header: header,
+            visibility: visibility,
+            content: .article(body)
+        )
     }
 
     public func isVisible(

@@ -110,16 +110,26 @@ public struct DocsScrollDocument: SelectableComponent {
     }
 
     private func unresolvedContentContainerChildren() -> HTMLFragment {
-        [
+        var renderer = DocsReadableBodyRenderer()
+        var sectionNodes: HTMLFragment = []
+
+        for section in category.sections {
+            sectionNodes.append(
+                sectionNode(
+                    section,
+                    renderer: &renderer
+                )
+            )
+        }
+
+        return [
             heroNode(),
             HTMLElement(
                 "div",
                 attrs: [
                     "class": "docs-scroll-sections \(Self.block)__body"
                 ],
-                children: category.sections.map { section in
-                    sectionNode(section)
-                }
+                children: sectionNodes
             )
         ]
     }
@@ -160,7 +170,8 @@ public struct DocsScrollDocument: SelectableComponent {
     }
 
     private func sectionNode(
-        _ section: DocsSection
+        _ section: DocsSection,
+        renderer: inout DocsReadableBodyRenderer
     ) -> any HTMLNode {
         let headingLevel = itemHeadingLevel(
             for: section
@@ -174,10 +185,13 @@ public struct DocsScrollDocument: SelectableComponent {
             )
         }
 
-        children += section.items.map { item in
-            itemNode(
-                item,
-                headingLevel: headingLevel
+        for item in section.items {
+            children.append(
+                itemNode(
+                    item,
+                    headingLevel: headingLevel,
+                    renderer: &renderer
+                )
             )
         }
 
@@ -267,7 +281,8 @@ public struct DocsScrollDocument: SelectableComponent {
 
     private func itemNode(
         _ item: DocsItem,
-        headingLevel: Int
+        headingLevel: Int,
+        renderer: inout DocsReadableBodyRenderer
     ) -> any HTMLNode {
         var children: [any HTMLNode] = []
 
@@ -286,7 +301,10 @@ public struct DocsScrollDocument: SelectableComponent {
                 attrs: [
                     "class": "\(Self.block)__item-body"
                 ],
-                children: item.body()
+                children: itemContent(
+                    item,
+                    renderer: &renderer
+                )
             )
         )
 
@@ -294,6 +312,19 @@ public struct DocsScrollDocument: SelectableComponent {
             id: item.id,
             className: "\(Self.block)__item"
         )
+    }
+
+    private func itemContent(
+        _ item: DocsItem,
+        renderer: inout DocsReadableBodyRenderer
+    ) -> HTMLFragment {
+        switch item.content {
+        case .fragment(let body):
+            return body()
+
+        case .article(let body):
+            return renderer.render(body)
+        }
     }
 
     private func itemHeaderNode(
@@ -333,7 +364,30 @@ public struct DocsScrollDocument: SelectableComponent {
                     CSS.decl("width", "min(780px, calc(100% - 48px))"),
                     CSS.decl("margin", "0 auto"),
                     CSS.decl("padding", "52px 0 96px"),
-                    CSS.decl("box-sizing", "border-box")
+                    CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("--wc-docs-reading-scale", "1"),
+                    CSS.decl("--wc-docs-reading-font-size", "calc(1rem * var(--wc-docs-reading-scale))"),
+                    CSS.decl("--wc-docs-reading-line-height", "1.68")
+                ),
+
+                CSS.rule(
+                    ".\(block)[data-docs-reading=\"enabled\"]",
+                    CSS.decl("width", "min(820px, calc(100% - 48px))")
+                ),
+
+                CSS.rule(
+                    ".\(block)[data-docs-text-scale=\"small\"]",
+                    CSS.decl("--wc-docs-reading-scale", ".94")
+                ),
+
+                CSS.rule(
+                    ".\(block)[data-docs-text-scale=\"normal\"]",
+                    CSS.decl("--wc-docs-reading-scale", "1")
+                ),
+
+                CSS.rule(
+                    ".\(block)[data-docs-text-scale=\"large\"]",
+                    CSS.decl("--wc-docs-reading-scale", "1.12")
                 ),
 
                 CSS.rule(
@@ -445,7 +499,40 @@ public struct DocsScrollDocument: SelectableComponent {
 
                 CSS.rule(
                     ".\(block)__item-body p",
-                    CSS.decl("line-height", "1.68")
+                    CSS.decl("font-size", "var(--wc-docs-reading-font-size)"),
+                    CSS.decl("line-height", "var(--wc-docs-reading-line-height)")
+                ),
+
+                CSS.rule(
+                    ".\(block)[data-docs-paragraph-mode=\"book\"] .\(block)__item-body p",
+                    CSS.decl("margin-block", "0"),
+                    CSS.decl("text-indent", "0")
+                ),
+
+                CSS.rule(
+                    ".\(block)[data-docs-paragraph-mode=\"book\"] .\(block)__item-body p + p",
+                    CSS.decl("text-indent", "1.55em")
+                ),
+
+                CSS.rule(
+                    ".\(block)[data-docs-paragraph-mode=\"book\"] [data-docs-readable-paragraph]",
+                    CSS.decl("margin-block", "0"),
+                    CSS.decl("text-indent", "0")
+                ),
+
+                CSS.rule(
+                    ".\(block)[data-docs-paragraph-mode=\"book\"] [data-docs-readable-after-paragraph=\"true\"]",
+                    CSS.decl("text-indent", "1.55em")
+                ),
+
+                CSS.rule(
+                    ".\(block)[data-docs-drop-cap=\"first\"] [data-docs-readable-first-paragraph=\"true\"]::first-letter",
+                    CSS.decl("float", "left"),
+                    CSS.decl("font-size", "4.2em"),
+                    CSS.decl("line-height", ".82"),
+                    CSS.decl("padding-right", ".08em"),
+                    CSS.decl("font-weight", "760"),
+                    CSS.decl("letter-spacing", "-.04em")
                 ),
 
                 CSS.rule(

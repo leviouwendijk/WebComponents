@@ -126,6 +126,7 @@ public struct DocsCategoryPage: ReusableComponent {
         switch mode {
         case .scrollDocument:
             sheets.append(DocsScrollDocument.stylesheet())
+            sheets.append(DocsReadingControls.stylesheet())
             sheets.append(DocsReferenceSection.stylesheet())
 
         case .definitionsIndex:
