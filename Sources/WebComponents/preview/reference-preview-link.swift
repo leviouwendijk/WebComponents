@@ -193,6 +193,7 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                     CSS.decl("display", "inline-block"),
                     CSS.decl("vertical-align", "super"),
                     CSS.decl("line-height", "1"),
+                    CSS.decl("text-indent", "0"),
                     CSS.decl("--wc-reference-preview-surface", "var(--surface-color, #fff)"),
                     CSS.decl("--wc-reference-preview-soft", "var(--surface-soft-color, #f1f5f9)"),
                     CSS.decl("--wc-reference-preview-border", "var(--border-color, rgba(15, 23, 42, .12))"),
@@ -224,7 +225,14 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(CitationCluster.className) .\(ClassName.root)",
-                    CSS.decl("vertical-align", "baseline")
+                    CSS.decl("vertical-align", "baseline"),
+                    CSS.decl("text-indent", "0")
+                ),
+
+                CSS.rule(
+                    ".\(CitationCluster.className) .\(ClassName.card)",
+                    CSS.decl("text-align", "left"),
+                    CSS.decl("text-indent", "0")
                 ),
 
                 CSS.rule(
@@ -276,6 +284,7 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                     CSS.decl("font-weight", "400"),
                     CSS.decl("line-height", "1.35"),
                     CSS.decl("text-align", "left"),
+                    CSS.decl("text-indent", "0"),
                     CSS.decl("opacity", "0"),
                     CSS.decl("visibility", "hidden"),
                     CSS.decl("pointer-events", "none"),
