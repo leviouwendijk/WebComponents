@@ -162,6 +162,7 @@ public struct DocsScrollDocument: SelectableComponent {
 
         return [
             Self.stylesheet(),
+            DocsArticleMetaSummary.stylesheet(),
             DocsReferenceSection.stylesheet()
         ] + readingControls.stylesheets
     }
@@ -212,37 +213,47 @@ public struct DocsScrollDocument: SelectableComponent {
     }
 
     private func heroNode() -> any HTMLNode {
-        HTMLElement(
+        var children: HTMLFragment = [
+            HTMLElement(
+                "p",
+                attrs: [
+                    "class": "docs-scroll-kicker \(Self.block)__kicker"
+                ],
+                children: [
+                    HTMLText(kicker)
+                ]
+            ),
+            HTMLElement(
+                "h1",
+                children: [
+                    HTMLText(category.label)
+                ]
+            ),
+            HTMLElement(
+                "p",
+                attrs: [
+                    "class": "docs-scroll-lead \(Self.block)__lead"
+                ],
+                children: [
+                    HTMLText(category.description)
+                ]
+            )
+        ]
+
+        if let articleMeta = category.articleMeta {
+            children += DocsArticleMetaSummary(
+                meta: articleMeta,
+                labels: lexicon.articleMetaLabels,
+                includeStyles: false
+            ).nodes.body
+        }
+
+        return HTMLElement(
             "header",
             attrs: [
                 "class": "docs-scroll-hero \(Self.block)__hero"
             ],
-            children: [
-                HTMLElement(
-                    "p",
-                    attrs: [
-                        "class": "docs-scroll-kicker \(Self.block)__kicker"
-                    ],
-                    children: [
-                        HTMLText(kicker)
-                    ]
-                ),
-                HTMLElement(
-                    "h1",
-                    children: [
-                        HTMLText(category.label)
-                    ]
-                ),
-                HTMLElement(
-                    "p",
-                    attrs: [
-                        "class": "docs-scroll-lead \(Self.block)__lead"
-                    ],
-                    children: [
-                        HTMLText(category.description)
-                    ]
-                )
-            ]
+            children: children
         )
     }
 
