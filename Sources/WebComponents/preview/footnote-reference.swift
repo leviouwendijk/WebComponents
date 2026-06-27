@@ -2,14 +2,28 @@ import HTML
 
 public struct FootnoteReference: HTMLNode, Sendable {
     public let number: Int
-    public let text: String
+    public let content: HTMLFragment
+
+    public var text: String {
+        content.plaintext()
+    }
 
     public init(
         number: Int,
         text: String
     ) {
         self.number = number
-        self.text = text
+        self.content = [
+            HTMLText(text)
+        ]
+    }
+
+    public init(
+        number: Int,
+        content: HTMLFragment
+    ) {
+        self.number = number
+        self.content = content
     }
 
     public func render(
@@ -40,9 +54,7 @@ public struct FootnoteReference: HTMLNode, Sendable {
                     attrs: [
                         "class": "footnote-text"
                     ],
-                    children: [
-                        HTMLText(text)
-                    ]
+                    children: content
                 )
             ]
         ).render(options: options, indent: indent)

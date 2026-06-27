@@ -83,7 +83,7 @@ public enum CitationResolver {
             footnotes.append(
                 FootnoteReference(
                     number: occurrence,
-                    text: footnote.text
+                    content: footnote.content
                 )
             )
         }
@@ -153,7 +153,7 @@ public enum CitationResolver {
         ) -> any HTMLNode {
             FootnotePreviewLink(
                 number: number,
-                text: footnote.text,
+                content: footnote.content,
                 anchorHref: "#footnote-\(number)",
                 includeStyles: false
             ).node()

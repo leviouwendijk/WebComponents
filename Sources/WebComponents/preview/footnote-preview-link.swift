@@ -3,9 +3,13 @@ import HTML
 
 public struct FootnotePreviewLink: ReusableComponent, Sendable {
     public let number: Int
-    public let text: String
+    public let content: HTMLFragment
     public let anchorHref: String?
     public let includeStyles: Bool
+
+    public var text: String {
+        content.plaintext()
+    }
 
     public init(
         number: Int,
@@ -14,7 +18,33 @@ public struct FootnotePreviewLink: ReusableComponent, Sendable {
         includeStyles: Bool = true
     ) {
         self.number = number
-        self.text = text
+        self.content = [
+            HTMLText(text)
+        ]
+        self.anchorHref = anchorHref
+        self.includeStyles = includeStyles
+    }
+
+    public init(
+        number: Int,
+        content: HTMLFragment,
+        anchorHref: String? = nil,
+        includeStyles: Bool = true
+    ) {
+        self.number = number
+        self.content = content
+        self.anchorHref = anchorHref
+        self.includeStyles = includeStyles
+    }
+
+    public init(
+        number: Int,
+        anchorHref: String? = nil,
+        includeStyles: Bool = true,
+        @HTMLBuilder content: () -> HTMLFragment
+    ) {
+        self.number = number
+        self.content = content()
         self.anchorHref = anchorHref
         self.includeStyles = includeStyles
     }
@@ -35,7 +65,7 @@ public struct FootnotePreviewLink: ReusableComponent, Sendable {
 
                 HTML.span([ "class": "wc-reference-preview__comments wc-inline-preview__body" ]) {
                     HTML.span([ "class": "wc-reference-preview__comment wc-inline-preview__text" ]) {
-                        HTML.text(text)
+                        content
                     }
                 }
             ]
