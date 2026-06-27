@@ -1,6 +1,7 @@
 import Constructors
 import CSS
 import HTML
+import JS
 
 public struct DocsScrollDocument: SelectableComponent {
     public enum Namespace {}
@@ -78,15 +79,13 @@ public struct DocsScrollDocument: SelectableComponent {
                 ).nodes.body
         }
 
+        let readingControls = readingControlNodes()
+
         let body: HTMLFragment = [
             HTML.comment("Docs Scroll Document"),
             HTMLElement(
                 "main",
-                attrs: [
-                    "id": "content-area",
-                    "class": "docs-scroll-content \(Self.block)",
-                    "data-wc-docs-scroll-document": category.id
-                ],
+                attrs: rootAttributes(),
                 children: [
                     HTMLElement(
                         "div",
@@ -101,12 +100,81 @@ public struct DocsScrollDocument: SelectableComponent {
 
         return .body(
             body,
-            stylesheets: includeStyles ? [
-                Self.stylesheet(),
-                DocsReferenceSection.stylesheet()
-            ] : [],
-            scripts: includeScript ? DocsScrollSpyScript().nodes.scripts : []
+            stylesheets: stylesheets(
+                readingControls: readingControls
+            ),
+            scripts: scripts(
+                readingControls: readingControls
+            )
         )
+    }
+
+    private func readingControlNodes() -> ReusableComponentNodes {
+        guard showsReadingControls else {
+            return .init()
+        }
+
+        return DocsReadingControls(
+            includeStyles: includeStyles,
+            includeScript: includeScript
+        ).nodes
+    }
+
+    private var showsReadingControls: Bool {
+        switch category.reading.controls {
+        case .enabled:
+            return true
+
+        case .disabled:
+            return false
+        }
+    }
+
+    private func rootAttributes() -> HTMLAttribute {
+        var attrs: HTMLAttribute = [
+            "id": "content-area",
+            "class": "docs-scroll-content \(Self.block)",
+            "data-wc-docs-scroll-document": category.id
+        ]
+
+        guard category.reading.enabled else {
+            return attrs
+        }
+
+        attrs.merge([
+            "data-docs-reading": "enabled",
+            "data-docs-default-text-scale": category.reading.textScale.rawValue,
+            "data-docs-default-paragraph-mode": category.reading.paragraph.rawValue,
+            "data-docs-text-scale": category.reading.textScale.rawValue,
+            "data-docs-paragraph-mode": category.reading.paragraph.rawValue,
+            "data-docs-drop-cap": category.reading.dropCap.rawValue
+        ])
+
+        return attrs
+    }
+
+    private func stylesheets(
+        readingControls: ReusableComponentNodes
+    ) -> [CSSStyleSheet] {
+        guard includeStyles else {
+            return []
+        }
+
+        return [
+            Self.stylesheet(),
+            DocsReferenceSection.stylesheet()
+        ] + readingControls.stylesheets
+    }
+
+    private func scripts(
+        readingControls: ReusableComponentNodes
+    ) -> [JSScript] {
+        guard includeScript else {
+            return []
+        }
+
+        return DocsScrollSpyScript().nodes.scripts
+            + readingControls.scripts
     }
 
     private func unresolvedContentContainerChildren() -> HTMLFragment {
@@ -122,8 +190,15 @@ public struct DocsScrollDocument: SelectableComponent {
             )
         }
 
-        return [
-            heroNode(),
+        let readingControls = readingControlNodes()
+
+        var children: HTMLFragment = [
+            heroNode()
+        ]
+
+        children += readingControls.body
+
+        children.append(
             HTMLElement(
                 "div",
                 attrs: [
@@ -131,7 +206,9 @@ public struct DocsScrollDocument: SelectableComponent {
                 ],
                 children: sectionNodes
             )
-        ]
+        )
+
+        return children
     }
 
     private func heroNode() -> any HTMLNode {

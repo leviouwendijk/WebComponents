@@ -147,6 +147,15 @@ public struct DocsCategoryPage: ReusableComponent {
         out += DocsMobileTOCMenuScript().nodes.scripts
         out += DocsScrollSpyScript().nodes.scripts
         out += DocsCategoryNavScript().nodes.scripts
+
+        switch mode {
+        case .scrollDocument:
+            out += DocsReadingPreferencesScript().nodes.scripts
+
+        case .definitionsIndex:
+            break
+        }
+
         out += content.scripts
         return out
     }
