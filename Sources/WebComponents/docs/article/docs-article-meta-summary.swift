@@ -5,10 +5,29 @@ import Primitives
 
 public struct DocsArticleMetaLabels: Sendable, Hashable {
     public let article: String
+    public let essay: String
+    public let opinion: String
+    public let position: String
+    public let explainer: String
+    public let guide: String
+    public let research: String
+    public let research_note: String
+    public let literature_review: String
+    public let study_review: String
+    public let review: String
+    public let case_note: String
     public let commentary: String
     public let correction: String
     public let note: String
     public let background: String
+
+    public let book: String
+    public let course: String
+    public let program: String
+    public let service: String
+    public let product: String
+    public let tool: String
+    public let method: String
 
     public let published: String
     public let revised: String
@@ -23,10 +42,28 @@ public struct DocsArticleMetaLabels: Sendable, Hashable {
 
     public init(
         article: String,
+        essay: String,
+        opinion: String,
+        position: String,
+        explainer: String,
+        guide: String,
+        research: String,
+        research_note: String,
+        literature_review: String,
+        study_review: String,
+        review: String,
+        case_note: String,
         commentary: String,
         correction: String,
         note: String,
         background: String,
+        book: String,
+        course: String,
+        program: String,
+        service: String,
+        product: String,
+        tool: String,
+        method: String,
         published: String,
         revised: String,
         updated: String,
@@ -38,10 +75,28 @@ public struct DocsArticleMetaLabels: Sendable, Hashable {
         months: [String]
     ) {
         self.article = article
+        self.essay = essay
+        self.opinion = opinion
+        self.position = position
+        self.explainer = explainer
+        self.guide = guide
+        self.research = research
+        self.research_note = research_note
+        self.literature_review = literature_review
+        self.study_review = study_review
+        self.review = review
+        self.case_note = case_note
         self.commentary = commentary
         self.correction = correction
         self.note = note
         self.background = background
+        self.book = book
+        self.course = course
+        self.program = program
+        self.service = service
+        self.product = product
+        self.tool = tool
+        self.method = method
         self.published = published
         self.revised = revised
         self.updated = updated
@@ -60,6 +115,39 @@ public struct DocsArticleMetaLabels: Sendable, Hashable {
         case .article:
             return article
 
+        case .essay:
+            return essay
+
+        case .opinion:
+            return opinion
+
+        case .position:
+            return position
+
+        case .explainer:
+            return explainer
+
+        case .guide:
+            return guide
+
+        case .research:
+            return research
+
+        case .research_note:
+            return research_note
+
+        case .literature_review:
+            return literature_review
+
+        case .study_review:
+            return study_review
+
+        case .review(let target):
+            return "\(review) · \(reviewTargetLabel(target))"
+
+        case .case_note:
+            return case_note
+
         case .commentary:
             return commentary
 
@@ -71,6 +159,33 @@ public struct DocsArticleMetaLabels: Sendable, Hashable {
 
         case .background:
             return background
+        }
+    }
+
+    public func reviewTargetLabel(
+        _ target: DocsReviewTarget
+    ) -> String {
+        switch target {
+        case .book:
+            return book
+
+        case .course:
+            return course
+
+        case .program:
+            return program
+
+        case .service:
+            return service
+
+        case .product:
+            return product
+
+        case .tool:
+            return tool
+
+        case .method:
+            return method
         }
     }
 
@@ -110,10 +225,28 @@ public struct DocsArticleMetaLabels: Sendable, Hashable {
 
     public static let english = DocsArticleMetaLabels(
         article: "Article",
+        essay: "Essay",
+        opinion: "Opinion",
+        position: "Position",
+        explainer: "Explainer",
+        guide: "Guide",
+        research: "Research",
+        research_note: "Research note",
+        literature_review: "Literature review",
+        study_review: "Study review",
+        review: "Review",
+        case_note: "Case note",
         commentary: "Commentary",
         correction: "Correction",
         note: "Note",
         background: "Background",
+        book: "Book",
+        course: "Course",
+        program: "Program",
+        service: "Service",
+        product: "Product",
+        tool: "Tool",
+        method: "Method",
         published: "Published",
         revised: "Revised",
         updated: "Updated",
@@ -140,10 +273,28 @@ public struct DocsArticleMetaLabels: Sendable, Hashable {
 
     public static let dutch = DocsArticleMetaLabels(
         article: "Artikel",
+        essay: "Essay",
+        opinion: "Opinie",
+        position: "Standpunt",
+        explainer: "Uitleg",
+        guide: "Gids",
+        research: "Onderzoek",
+        research_note: "Onderzoeksnotitie",
+        literature_review: "Literatuurreview",
+        study_review: "Studiebespreking",
+        review: "Recensie",
+        case_note: "Casusnotitie",
         commentary: "Commentaar",
         correction: "Correctie",
         note: "Aantekening",
         background: "Achtergrond",
+        book: "Boek",
+        course: "Cursus",
+        program: "Programma",
+        service: "Dienst",
+        product: "Product",
+        tool: "Hulpmiddel",
+        method: "Methode",
         published: "Gepubliceerd",
         revised: "Herzien",
         updated: "Bijgewerkt",
@@ -220,7 +371,7 @@ public struct DocsArticleMetaSummary: ReusableComponent, Sendable {
     }
 
     private var isMeaningful: Bool {
-        meta.kind != .article
+        !meta.kind.isPlainArticle
             || !meta.history.isEmpty
             || !meta.subjects.isEmpty
             || !meta.relations.isEmpty
@@ -237,9 +388,13 @@ public struct DocsArticleMetaSummary: ReusableComponent, Sendable {
             return []
         }
 
-        var out: HTMLFragment = [
-            kindNode()
-        ]
+        var out: HTMLFragment = []
+
+        if !meta.kind.isPlainArticle {
+            out.append(
+                kindNode()
+            )
+        }
 
         if let publishedEvent = meta.publishedEvent {
             out.append(
