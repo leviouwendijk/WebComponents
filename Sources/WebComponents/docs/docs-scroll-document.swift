@@ -455,7 +455,9 @@ public struct DocsScrollDocument: SelectableComponent {
                     CSS.decl("box-sizing", "border-box"),
                     CSS.decl("--wc-docs-reading-scale", "1"),
                     CSS.decl("--wc-docs-reading-font-size", "calc(1rem * var(--wc-docs-reading-scale))"),
-                    CSS.decl("--wc-docs-reading-line-height", "1.68")
+                    CSS.decl("--wc-docs-reading-line-height", "1.68"),
+                    CSS.decl("--wc-docs-reading-font-family", "inherit"),
+                    CSS.decl("--wc-docs-reading-serif-font-family", "ui-serif, Charter, \"Iowan Old Style\", \"Palatino Linotype\", Palatino, Georgia, \"Times New Roman\", serif")
                 ),
 
                 CSS.rule(
@@ -582,13 +584,19 @@ public struct DocsScrollDocument: SelectableComponent {
 
                 CSS.rule(
                     ".\(block)__item-body",
-                    CSS.decl("margin-top", "16px")
+                    CSS.decl("margin-top", "16px"),
+                    CSS.decl("font-family", "var(--wc-docs-reading-font-family)")
                 ),
 
                 CSS.rule(
                     ".\(block)__item-body p",
                     CSS.decl("font-size", "var(--wc-docs-reading-font-size)"),
                     CSS.decl("line-height", "var(--wc-docs-reading-line-height)")
+                ),
+
+                CSS.rule(
+                    ".\(block)[data-docs-paragraph-mode=\"book\"]",
+                    CSS.decl("--wc-docs-reading-font-family", "var(--wc-docs-reading-serif-font-family)")
                 ),
 
                 CSS.rule(
