@@ -288,10 +288,10 @@ public struct HoverPreviewLink: SelectableComponent {
                     CSS.decl("text-decoration", "none"),
                     CSS.decl("opacity", "0"),
                     CSS.decl("visibility", "hidden"),
-                    CSS.decl("pointer-events", "none"),
+                    CSS.decl("pointer-events", "auto"),
                     CSS.decl("transform", "translateX(-50%) translateY(8px) scale(.985)"),
                     CSS.decl("transform-origin", "center bottom"),
-                    CSS.decl("transition", "opacity .16s ease, transform .16s ease, visibility 0s linear .16s")
+                    CSS.decl("transition", "opacity .18s ease .24s, transform .18s ease .24s, visibility 0s linear .42s")
                 ),
 
                 CSS.rule(
@@ -311,7 +311,7 @@ public struct HoverPreviewLink: SelectableComponent {
                     CSS.decl("visibility", "visible"),
                     CSS.decl("pointer-events", "auto"),
                     CSS.decl("transform", "translateX(-50%) translateY(0) scale(1)"),
-                    CSS.decl("transition-delay", "0s")
+                    CSS.decl("transition", "opacity .12s ease, transform .12s ease, visibility 0s linear 0s")
                 ),
 
                 CSS.rule(
