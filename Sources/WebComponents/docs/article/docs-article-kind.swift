@@ -6,6 +6,10 @@ public enum DocsReviewTarget: String, Sendable, Hashable, CaseIterable {
     case product
     case tool
     case method
+    case video
+    case channel
+    case series
+    case platform
 }
 
 public enum DocsArticleKind: Sendable, Hashable {
