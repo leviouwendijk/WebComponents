@@ -28,6 +28,10 @@ public struct DocsArticleMetaLabels: Sendable, Hashable {
     public let product: String
     public let tool: String
     public let method: String
+    public let video: String
+    public let channel: String
+    public let series: String
+    public let platform: String
 
     public let published: String
     public let revised: String
@@ -64,6 +68,10 @@ public struct DocsArticleMetaLabels: Sendable, Hashable {
         product: String,
         tool: String,
         method: String,
+        video: String,
+        channel: String,
+        series: String,
+        platform: String,
         published: String,
         revised: String,
         updated: String,
@@ -97,6 +105,10 @@ public struct DocsArticleMetaLabels: Sendable, Hashable {
         self.product = product
         self.tool = tool
         self.method = method
+        self.video = video
+        self.channel = channel
+        self.series = series
+        self.platform = platform
         self.published = published
         self.revised = revised
         self.updated = updated
@@ -186,6 +198,18 @@ public struct DocsArticleMetaLabels: Sendable, Hashable {
 
         case .method:
             return method
+
+        case .video:
+            return video
+
+        case .channel:
+            return channel
+
+        case .series:
+            return series
+
+        case .platform:
+            return platform
         }
     }
 
@@ -247,6 +271,10 @@ public struct DocsArticleMetaLabels: Sendable, Hashable {
         product: "Product",
         tool: "Tool",
         method: "Method",
+        video: "Video",
+        channel: "Channel",
+        series: "Series",
+        platform: "Platform",
         published: "Published",
         revised: "Revised",
         updated: "Updated",
@@ -295,6 +323,10 @@ public struct DocsArticleMetaLabels: Sendable, Hashable {
         product: "Product",
         tool: "Hulpmiddel",
         method: "Methode",
+        video: "Video",
+        channel: "Kanaal",
+        series: "Reeks",
+        platform: "Platform",
         published: "Gepubliceerd",
         revised: "Herzien",
         updated: "Bijgewerkt",
