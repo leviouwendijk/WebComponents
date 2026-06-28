@@ -199,7 +199,9 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                     CSS.decl("--wc-reference-preview-border", "var(--border-color, rgba(15, 23, 42, .12))"),
                     CSS.decl("--wc-reference-preview-ink", "var(--text-color, #202124)"),
                     CSS.decl("--wc-reference-preview-muted", "var(--muted-text-color, rgba(32, 33, 36, .66))"),
-                    CSS.decl("--wc-reference-preview-accent", "var(--link-color, #2563eb)")
+                    CSS.decl("--wc-reference-preview-accent", "var(--link-color, #2563eb)"),
+                    CSS.decl("--wc-reference-preview-font-family", "\"Instrument Sans\", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif"),
+                    CSS.decl("font-family", "var(--wc-reference-preview-font-family)")
                 ),
 
                 CSS.rule(
@@ -209,6 +211,29 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                     CSS.decl("--wc-reference-preview-border", "var(--border-color, rgba(255, 255, 255, .13))"),
                     CSS.decl("--wc-reference-preview-ink", "var(--text-color, #f4f4f5)"),
                     CSS.decl("--wc-reference-preview-muted", "var(--muted-text-color, rgba(244, 244, 245, .68))")
+                ),
+
+                CSS.rule(
+                    "[data-docs-paragraph-mode=\"book\"] .\(ClassName.card), [data-docs-paragraph-mode=\"book\"] .wc-inline-preview__card",
+                    CSS.decl("font-family", "var(--wc-reference-preview-font-family)")
+                ),
+
+                CSS.rule(
+                    "[data-docs-paragraph-mode=\"book\"] .\(ClassName.card) p, [data-docs-paragraph-mode=\"book\"] .\(ClassName.card) [data-docs-readable-paragraph], [data-docs-paragraph-mode=\"book\"] .wc-inline-preview__card p, [data-docs-paragraph-mode=\"book\"] .wc-inline-preview__card [data-docs-readable-paragraph]",
+                    CSS.decl("margin-block", "0"),
+                    CSS.decl("text-indent", "0"),
+                    CSS.decl("text-align", "left"),
+                    CSS.decl("text-align-last", "auto"),
+                    CSS.decl("-webkit-text-align-last", "auto"),
+                    CSS.decl("hyphens", "manual"),
+                    CSS.decl("-webkit-hyphens", "manual"),
+                    CSS.decl("overflow-wrap", "normal"),
+                    CSS.decl("word-break", "normal")
+                ),
+
+                CSS.rule(
+                    "[data-docs-paragraph-mode=\"book\"] .wc-inline-preview--footnote .wc-inline-preview__body, [data-docs-paragraph-mode=\"book\"] .wc-inline-preview--footnote .wc-inline-preview__text",
+                    CSS.decl("font-family", "var(--wc-docs-reading-serif-font-family, ui-serif, Charter, \"Iowan Old Style\", \"Palatino Linotype\", Palatino, Georgia, \"Times New Roman\", serif)")
                 ),
 
                 CSS.rule(
