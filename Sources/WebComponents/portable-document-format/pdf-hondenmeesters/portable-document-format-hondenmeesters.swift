@@ -1,14 +1,6 @@
-import Assets
-
 public enum HondenmeestersPortableDocumentFormat {}
 
 public extension HondenmeestersPortableDocumentFormat {
-    static let logo = PortableDocumentFormatImage.rgb8(
-        HondenmeestersAssets.h_logomark,
-        width: 64,
-        height: 64
-    )
-
     static let layout = PortableDocumentFormatLayout(
         margin: 52,
         headerHeight: 46,
@@ -36,7 +28,7 @@ public extension HondenmeestersPortableDocumentFormat {
 
     static var chrome: PortableDocumentFormatChrome {
         .init(
-            logo: logo,
+            logo: nil,
             headerText: "Hondenmeesters",
             footerItems: [
                 "hondenmeesters.nl",
