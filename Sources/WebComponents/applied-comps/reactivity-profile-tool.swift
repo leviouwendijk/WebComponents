@@ -62,11 +62,11 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                     ]
                 ) {
                     HTML.h2 {
-                        HTML.text("PDF maken")
+                        HTML.text("Profielrapport")
                     }
 
                     HTML.p(["class": "\(Self.block)__hint"]) {
-                        HTML.text("Maak een PDF van het huidige profiel zonder het browser-printvenster te gebruiken.")
+                        HTML.text("Download een compacte PDF-samenvatting van dit profiel.")
                     }
 
                     HTML.div(["class": "\(Self.block)__inline-actions"]) {
@@ -77,7 +77,7 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                                 "data-reactivity-pdf": ""
                             ]
                         ) {
-                            HTML.text("PDF maken")
+                            HTML.text("Download PDF")
                         }
                     }
 
@@ -1748,7 +1748,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             if (!button) return;
 
             button.disabled = pending;
-            button.textContent = pending ? 'PDF maken...' : 'PDF maken';
+            button.textContent = pending ? 'PDF wordt gemaakt...' : 'Download PDF';
         }
 
         function pdfText(value, fallback = '—') {
@@ -1958,15 +1958,15 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             if (!root) return;
 
             setPdfPending(root, true);
-            setPdfStatus(root, 'loading', 'PDF maken...');
+            setPdfStatus(root, 'loading', 'PDF wordt gemaakt...');
 
             try {
                 downloadReactivityPdf(root);
-                setPdfStatus(root, 'success', 'PDF is gemaakt.');
+                setPdfStatus(root, 'success', 'PDF is klaar.');
             } catch (error) {
                 const message = error?.message === 'pdf_runtime_missing'
                     ? 'PDF-runtime is niet geladen.'
-                    : 'PDF maken is niet gelukt.';
+                    : 'PDF downloaden is niet gelukt.';
 
                 setPdfStatus(root, 'error', message);
                 console.error('[ReactivityProfileTool PDF]', error);

@@ -7,8 +7,6 @@ public extension HondenmeestersPortableDocumentFormat {
         HondenmeestersAssets.h_logomark,
         width: 192,
         height: 192
-        // width: 64,
-        // height: 64
     )
 
     static let layout = PortableDocumentFormatLayout(
@@ -27,19 +25,19 @@ public extension HondenmeestersPortableDocumentFormat {
 
     static let style = PortableDocumentFormatStyle(
         cornerRadius: 8,
-        borderGray: 0.82,
+        borderGray: 0.72,
         ruleGray: 0.84,
-        softGray: 0.975,
-        calloutGray: 0.955,
-        textGray: 0,
-        mutedGray: 0.42,
-        footerGray: 0.55
+        softGray: 0.965,
+        calloutGray: 0.945,
+        textGray: 0.05,
+        mutedGray: 0.38,
+        footerGray: 0.56
     )
 
     static var chrome: PortableDocumentFormatChrome {
         .init(
             logo: logo,
-            headerText: "Hondenmeesters",
+            headerText: nil,
             footerItems: [
                 "hondenmeesters.nl",
                 "docs.hondenmeesters.nl"

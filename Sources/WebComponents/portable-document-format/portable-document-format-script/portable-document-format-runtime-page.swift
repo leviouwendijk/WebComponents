@@ -92,6 +92,12 @@ enum PortableDocumentFormatRuntimePage {
                     pdfNum(value) + " g " + pdfNum(value) + " G"
                 );
             }
+
+            lineWidth(value) {
+                this.content.push(
+                    pdfNum(Math.max(Number(value || 0), 0.1)) + " w"
+                );
+            }
         }
     """#
 }

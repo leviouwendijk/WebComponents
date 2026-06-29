@@ -7,6 +7,7 @@ enum PortableDocumentFormatRuntimeSource {
         PortableDocumentFormatRuntimePage.source,
         PortableDocumentFormatRuntimeTypography.source,
         PortableDocumentFormatRuntimeLayout.source,
+        PortableDocumentFormatRuntimeLayoutGrayscale.source,
         PortableDocumentFormatRuntimeAPI.source,
         PortableDocumentFormatRuntimeShell.close
     ].joined(separator: "\n\n")
