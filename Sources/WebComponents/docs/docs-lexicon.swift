@@ -111,7 +111,7 @@ public struct DocsLexicon: Sendable {
 
     public static let english = DocsLexicon(
         docs: "Docs",
-        allDocs: "All docs",
+        allDocs: "~",
         projectHome: "Project home",
         projects: "Projects",
         docsContextAriaLabel: "Docs context",
@@ -138,7 +138,7 @@ public struct DocsLexicon: Sendable {
 
     public static let dutch = DocsLexicon(
         docs: "Documentatie",
-        allDocs: "Alle documentatie",
+        allDocs: "~",
         projectHome: "Projectoverzicht",
         projects: "Onderdelen",
         docsContextAriaLabel: "Documentatiecontext",
