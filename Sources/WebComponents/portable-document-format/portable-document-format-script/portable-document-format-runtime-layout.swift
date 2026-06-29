@@ -18,6 +18,37 @@ enum PortableDocumentFormatRuntimeLayout {
                 return Boolean(this.logoName || chrome.headerText);
             }
 
+            headerRuleY() {
+                return this.theme.margin
+                    + Number(this.theme.headerHeight || 0)
+                    - 11;
+            }
+
+            headerGap() {
+                return Math.max(
+                    14,
+                    Number(this.theme.gap || 0) * 2
+                );
+            }
+
+            contentTop() {
+                if (!this.hasHeader()) {
+                    return this.theme.margin;
+                }
+
+                return this.headerRuleY() + this.headerGap();
+            }
+
+            contentBottom() {
+                return this.page.height
+                    - this.theme.margin
+                    - Number(this.theme.footerHeight || 34);
+            }
+
+            contentWidth() {
+                return this.page.width - this.theme.margin * 2;
+            }
+
             newPage() {
                 if (this.page) {
                     this.footer();
@@ -32,10 +63,9 @@ enum PortableDocumentFormatRuntimeLayout {
 
                 if (this.hasHeader()) {
                     this.header();
-                    this.cursor = this.theme.margin + Number(this.theme.headerHeight || 0);
-                } else {
-                    this.cursor = this.theme.margin;
                 }
+
+                this.cursor = this.contentTop();
             }
 
             header() {
@@ -68,7 +98,7 @@ enum PortableDocumentFormatRuntimeLayout {
                     this.page.gray(this.style.textGray);
                 }
 
-                const ruleY = this.theme.margin + Number(this.theme.headerHeight || 0) - 11;
+                const ruleY = this.headerRuleY();
 
                 this.page.gray(this.style.ruleGray);
                 this.page.line(
@@ -124,17 +154,45 @@ enum PortableDocumentFormatRuntimeLayout {
             }
 
             ensure(height) {
-                const bottom = this.page.height
-                    - this.theme.margin
-                    - Number(this.theme.footerHeight || 34);
-
-                if (this.cursor + height > bottom) {
+                if (this.cursor + height > this.contentBottom()) {
                     this.newPage();
                 }
             }
 
             advance(amount) {
                 this.cursor += amount;
+            }
+
+            textLine(x, top, value, options = {}) {
+                return drawTextLine(
+                    this.page,
+                    x,
+                    top,
+                    value,
+                    options
+                );
+            }
+
+            textBlock(x, top, measurement, options = {}) {
+                return drawTextBlock(
+                    this.page,
+                    x,
+                    top,
+                    measurement,
+                    options
+                );
+            }
+
+            measureText(value, size, width, options = {}) {
+                return measureTextBlock(
+                    value,
+                    size,
+                    width,
+                    {
+                        lineHeight: options.lineHeight || this.theme.lineHeight,
+                        minLines: options.minLines || 0
+                    }
+                );
             }
 
             render() {
@@ -155,42 +213,79 @@ enum PortableDocumentFormatRuntimeLayout {
             }
 
             title() {
-                this.ensure(58);
+                const x = this.theme.margin;
+                const width = this.contentWidth();
+                const title = this.payload.title || "Document";
+                const titleMeasurement = this.measureText(
+                    title,
+                    this.theme.titleSize,
+                    width,
+                    {
+                        lineHeight: this.theme.titleSize * 1.28
+                    }
+                );
+
+                const hasSubtitle = Boolean(this.payload.subtitle);
+                const subtitleMeasurement = hasSubtitle
+                    ? this.measureText(
+                        this.payload.subtitle,
+                        this.theme.subtitleSize,
+                        width,
+                        {
+                            lineHeight: this.theme.lineHeight
+                        }
+                    )
+                    : null;
+
+                const subtitleGap = hasSubtitle ? 7 : 0;
+                const ruleGap = 10;
+                const afterGap = 16;
+                const totalHeight = titleMeasurement.height
+                    + subtitleGap
+                    + (subtitleMeasurement ? subtitleMeasurement.height : 0)
+                    + ruleGap
+                    + afterGap;
+
+                this.ensure(totalHeight);
+
+                let y = this.cursor;
 
                 this.page.gray(this.style.textGray);
-                this.page.text(
-                    this.theme.margin,
-                    this.cursor,
-                    this.payload.title || "Document",
+                this.textBlock(
+                    x,
+                    y,
+                    titleMeasurement,
                     {
-                        size: this.theme.titleSize,
                         bold: true
                     }
                 );
 
-                this.advance(this.theme.titleSize + 10);
+                y += titleMeasurement.height;
 
-                if (this.payload.subtitle) {
+                if (subtitleMeasurement) {
+                    y += subtitleGap;
                     this.page.gray(this.style.mutedGray);
-                    this.wrapped(
-                        this.payload.subtitle,
-                        this.theme.subtitleSize,
-                        false
+                    this.textBlock(
+                        x,
+                        y,
+                        subtitleMeasurement
                     );
                     this.page.gray(this.style.textGray);
-                    this.advance(3);
+                    y += subtitleMeasurement.height;
                 }
+
+                const ruleY = y + ruleGap;
 
                 this.page.gray(this.style.ruleGray);
                 this.page.line(
-                    this.theme.margin,
-                    this.cursor,
+                    x,
+                    ruleY,
                     this.page.width - this.theme.margin,
-                    this.cursor
+                    ruleY
                 );
                 this.page.gray(this.style.textGray);
 
-                this.advance(16);
+                this.cursor = ruleY + afterGap;
             }
 
             sheetTemplate(sheet) {
@@ -207,59 +302,107 @@ enum PortableDocumentFormatRuntimeLayout {
             }
 
             sheetHeader(sheet) {
-                this.ensure(80);
-
-                this.page.gray(this.style.mutedGray);
-                this.page.text(
-                    this.theme.margin,
-                    this.cursor,
-                    sheet.kicker || "PDF",
+                const x = this.theme.margin;
+                const width = this.contentWidth();
+                const kicker = sheet.kicker || "PDF";
+                const kickerMeasurement = this.measureText(
+                    kicker,
+                    this.theme.smallSize,
+                    width,
                     {
-                        size: this.theme.smallSize,
-                        bold: true
+                        lineHeight: this.theme.smallSize * 1.35
                     }
                 );
 
-                this.advance(14);
-
-                this.page.gray(this.style.textGray);
-                this.page.text(
-                    this.theme.margin,
-                    this.cursor,
+                const titleMeasurement = this.measureText(
                     this.payload.title || "Document",
+                    this.theme.titleSize,
+                    width,
                     {
-                        size: this.theme.titleSize,
-                        bold: true
+                        lineHeight: this.theme.titleSize * 1.28
                     }
                 );
-
-                this.advance(this.theme.titleSize + 10);
 
                 const lead = this.payload.subtitle
                     ? this.payload.subtitle + ". " + (sheet.lead || "")
                     : sheet.lead || "";
 
-                if (lead) {
-                    this.page.gray(this.style.mutedGray);
-                    this.wrapped(
+                const hasLead = Boolean(lead);
+                const leadMeasurement = hasLead
+                    ? this.measureText(
                         lead,
                         this.theme.subtitleSize,
-                        false
+                        width,
+                        {
+                            lineHeight: this.theme.lineHeight
+                        }
+                    )
+                    : null;
+
+                const kickerGap = 8;
+                const leadGap = hasLead ? 7 : 0;
+                const ruleGap = 10;
+                const afterGap = 16;
+                const totalHeight = kickerMeasurement.height
+                    + kickerGap
+                    + titleMeasurement.height
+                    + leadGap
+                    + (leadMeasurement ? leadMeasurement.height : 0)
+                    + ruleGap
+                    + afterGap;
+
+                this.ensure(totalHeight);
+
+                let y = this.cursor;
+
+                this.page.gray(this.style.mutedGray);
+                this.textBlock(
+                    x,
+                    y,
+                    kickerMeasurement,
+                    {
+                        bold: true
+                    }
+                );
+
+                y += kickerMeasurement.height + kickerGap;
+
+                this.page.gray(this.style.textGray);
+                this.textBlock(
+                    x,
+                    y,
+                    titleMeasurement,
+                    {
+                        bold: true
+                    }
+                );
+
+                y += titleMeasurement.height;
+
+                if (leadMeasurement) {
+                    y += leadGap;
+                    this.page.gray(this.style.mutedGray);
+                    this.textBlock(
+                        x,
+                        y,
+                        leadMeasurement
                     );
                     this.page.gray(this.style.textGray);
-                    this.advance(3);
+                    y += leadMeasurement.height;
                 }
+
+                const ruleY = y + ruleGap;
 
                 this.page.gray(this.style.ruleGray);
                 this.page.line(
-                    this.theme.margin,
-                    this.cursor,
+                    x,
+                    ruleY,
                     this.page.width - this.theme.margin,
-                    this.cursor
+                    ruleY
                 );
                 this.page.gray(this.style.textGray);
 
-                this.advance(16);
+                this.cursor = ruleY + afterGap;
             }
 
             fieldList(fields) {
@@ -270,18 +413,39 @@ enum PortableDocumentFormatRuntimeLayout {
 
             fieldBox(field) {
                 const x = this.theme.margin;
-                const width = this.page.width - this.theme.margin * 2;
+                const width = this.contentWidth();
+                const paddingX = 12;
+                const paddingTop = 13;
+                const paddingBottom = 13;
+                const labelGap = 12;
+                const afterGap = 10;
                 const lines = Math.max(Number(field.lines || 3), 1);
                 const lineGap = Number(field.lineGap || 16);
-                const height = 30 + lines * lineGap;
                 const radius = Number(this.style.cornerRadius || 0);
+                const labelMeasurement = this.measureText(
+                    field.title || "",
+                    this.theme.bodySize,
+                    width - paddingX * 2,
+                    {
+                        lineHeight: this.theme.lineHeight
+                    }
+                );
 
-                this.ensure(height + 10);
+                const writingHeight = lines * lineGap;
+                const height = paddingTop
+                    + labelMeasurement.height
+                    + labelGap
+                    + writingHeight
+                    + paddingBottom;
+
+                this.ensure(height + afterGap);
+
+                const top = this.cursor;
 
                 this.page.gray(this.style.softGray);
                 this.page.roundRect(
                     x,
-                    this.cursor - 10,
+                    top,
                     width,
                     height,
                     radius,
@@ -291,7 +455,7 @@ enum PortableDocumentFormatRuntimeLayout {
                 this.page.gray(this.style.borderGray);
                 this.page.roundRect(
                     x,
-                    this.cursor - 10,
+                    top,
                     width,
                     height,
                     radius,
@@ -299,32 +463,37 @@ enum PortableDocumentFormatRuntimeLayout {
                 );
 
                 this.page.gray(this.style.textGray);
-                this.page.text(
-                    x + 12,
-                    this.cursor,
-                    field.title || "",
+                this.textBlock(
+                    x + paddingX,
+                    top + paddingTop,
+                    labelMeasurement,
                     {
-                        size: this.theme.bodySize,
                         bold: true
                     }
                 );
 
-                this.advance(18);
                 this.page.gray(0.72);
+
+                let lineY = top
+                    + paddingTop
+                    + labelMeasurement.height
+                    + labelGap
+                    + 5;
 
                 for (let index = 0; index < lines; index += 1) {
                     this.page.line(
-                        x + 12,
-                        this.cursor + 5,
-                        x + width - 12,
-                        this.cursor + 5
+                        x + paddingX,
+                        lineY,
+                        x + width - paddingX,
+                        lineY
                     );
 
-                    this.advance(lineGap);
+                    lineY += lineGap;
                 }
 
                 this.page.gray(this.style.textGray);
-                this.advance(7);
+
+                this.cursor = top + height + afterGap;
             }
 
             block(block) {
@@ -360,70 +529,121 @@ enum PortableDocumentFormatRuntimeLayout {
 
             heading(block) {
                 const level = Number(block.level || 2);
-                const size = level <= 1 ? this.theme.headingSize + 1.5 : this.theme.headingSize;
+                const size = level <= 1
+                    ? this.theme.headingSize + 1.5
+                    : this.theme.headingSize;
+                const beforeGap = this.cursor > this.contentTop() + 2
+                    ? 5
+                    : 0;
+                const afterGap = level <= 1 ? 8 : 6;
+                const measurement = this.measureText(
+                    block.text || "",
+                    size,
+                    this.contentWidth(),
+                    {
+                        lineHeight: size * 1.25
+                    }
+                );
+                const totalHeight = beforeGap
+                    + measurement.height
+                    + afterGap;
 
-                this.ensure(size + 14);
+                this.ensure(totalHeight);
 
-                if (this.cursor > this.theme.margin + Number(this.theme.headerHeight || 0) + 18) {
-                    this.advance(3);
-                }
+                const top = this.cursor + beforeGap;
 
                 this.page.gray(this.style.textGray);
-                this.page.text(
+                this.textBlock(
                     this.theme.margin,
-                    this.cursor,
-                    block.text || "",
+                    top,
+                    measurement,
                     {
-                        size: size,
                         bold: true
                     }
                 );
 
-                this.advance(size + 6);
+                this.cursor += totalHeight;
             }
 
             paragraph(value) {
                 this.page.gray(this.style.textGray);
-                this.wrapped(value, this.theme.bodySize, false);
-                this.advance(2);
+                this.wrapped(
+                    value,
+                    this.theme.bodySize,
+                    false,
+                    this.theme.margin,
+                    null,
+                    2
+                );
             }
 
-            wrapped(value, size, bold, x = this.theme.margin, width = null) {
-                const maxWidth = width || (this.page.width - this.theme.margin * 2);
-                const lines = wrapText(value, size, maxWidth);
-                const height = Math.max(lines.length, 1) * this.theme.lineHeight;
+            wrapped(
+                value,
+                size,
+                bold,
+                x = this.theme.margin,
+                width = null,
+                afterGap = 0
+            ) {
+                const maxWidth = width || this.contentWidth();
+                const measurement = this.measureText(
+                    value,
+                    size,
+                    maxWidth,
+                    {
+                        lineHeight: this.theme.lineHeight
+                    }
+                );
+                const totalHeight = measurement.height + afterGap;
 
-                this.ensure(height + this.theme.gap);
+                this.ensure(totalHeight);
 
-                for (const line of lines) {
-                    this.page.text(
-                        x,
-                        this.cursor,
-                        line,
-                        {
-                            size: size,
-                            bold: bold
-                        }
-                    );
-                    this.advance(this.theme.lineHeight);
-                }
+                const top = this.cursor;
+
+                this.textBlock(
+                    x,
+                    top,
+                    measurement,
+                    {
+                        bold
+                    }
+                );
+
+                this.cursor = top + totalHeight;
+
+                return measurement.height;
             }
 
             checklist(items) {
-                for (const item of items) {
-                    const x = this.theme.margin;
-                    const box = 7;
-                    const textX = x + 15;
-                    const maxWidth = this.page.width - this.theme.margin - textX;
-                    const lines = wrapText(item, this.theme.bodySize, maxWidth);
-                    const height = Math.max(lines.length, 1) * this.theme.lineHeight;
+                const x = this.theme.margin;
+                const box = 7;
+                const textX = x + 15;
+                const maxWidth = this.page.width - this.theme.margin - textX;
+                const itemGap = 3;
+                const listAfterGap = 3;
 
-                    this.ensure(height + 5);
+                for (const item of items) {
+                    const measurement = this.measureText(
+                        item,
+                        this.theme.bodySize,
+                        maxWidth,
+                        {
+                            lineHeight: this.theme.lineHeight
+                        }
+                    );
+                    const height = Math.max(
+                        measurement.height,
+                        box + 2
+                    );
+
+                    this.ensure(height + itemGap);
+
+                    const top = this.cursor;
 
                     this.page.gray(this.style.borderGray);
                     this.page.roundRect(
                         x,
-                        this.cursor - 8,
+                        top + 3,
                         box,
                         box,
                         2,
@@ -431,60 +651,69 @@ enum PortableDocumentFormatRuntimeLayout {
                     );
 
                     this.page.gray(this.style.textGray);
+                    this.textBlock(
+                        textX,
+                        top,
+                        measurement
+                    );
 
-                    for (const line of lines) {
-                        this.page.text(
-                            textX,
-                            this.cursor,
-                            line,
-                            {
-                                size: this.theme.bodySize
-                            }
-                        );
-                        this.advance(this.theme.lineHeight);
-                    }
-
-                    this.advance(2);
+                    this.cursor = top + height + itemGap;
                 }
 
-                this.advance(3);
+                this.advance(listAfterGap);
             }
 
             callout(block) {
                 const x = this.theme.margin;
-                const width = this.page.width - this.theme.margin * 2;
+                const width = this.contentWidth();
                 const paddingX = 14;
-                const paddingTop = 16;
+                const paddingTop = 14;
                 const paddingBottom = 14;
                 const titleGap = 5;
                 const afterGap = 10;
                 const title = block.title || "";
                 const text = block.text || "";
                 const bodyWidth = width - paddingX * 2;
-                const lines = wrapText(
-                    text,
-                    this.theme.bodySize,
-                    bodyWidth
-                );
-
+                const radius = Number(this.style.cornerRadius || 0);
                 const hasTitle = Boolean(title);
-                const hasBody = lines.length > 0;
-                const titleHeight = hasTitle ? this.theme.lineHeight : 0;
-                const bodyHeight = hasBody
-                    ? lines.length * this.theme.lineHeight
+                const hasBody = Boolean(text);
+
+                const titleMeasurement = hasTitle
+                    ? this.measureText(
+                        title,
+                        this.theme.bodySize,
+                        bodyWidth,
+                        {
+                            lineHeight: this.theme.lineHeight
+                        }
+                    )
+                    : null;
+
+                const bodyMeasurement = hasBody
+                    ? this.measureText(
+                        text,
+                        this.theme.bodySize,
+                        bodyWidth,
+                        {
+                            lineHeight: this.theme.lineHeight
+                        }
+                    )
+                    : null;
+
+                const contentGap = titleMeasurement && bodyMeasurement
+                    ? titleGap
                     : 0;
 
                 const height = paddingTop
-                    + titleHeight
-                    + (hasTitle && hasBody ? titleGap : 0)
-                    + bodyHeight
+                    + (titleMeasurement ? titleMeasurement.height : 0)
+                    + contentGap
+                    + (bodyMeasurement ? bodyMeasurement.height : 0)
                     + paddingBottom;
 
-                const radius = Number(this.style.cornerRadius || 0);
-                const top = this.cursor - paddingTop;
-                const textX = x + paddingX;
-
                 this.ensure(height + afterGap);
+
+                const top = this.cursor;
+                const textX = x + paddingX;
 
                 this.page.gray(this.style.calloutGray);
                 this.page.roundRect(
@@ -506,57 +735,53 @@ enum PortableDocumentFormatRuntimeLayout {
                     "S"
                 );
 
+                let y = top + paddingTop;
+
                 this.page.gray(this.style.textGray);
 
-                let textY = this.cursor;
-
-                if (hasTitle) {
-                    this.page.text(
+                if (titleMeasurement) {
+                    this.textBlock(
                         textX,
-                        textY,
-                        title,
+                        y,
+                        titleMeasurement,
                         {
-                            size: this.theme.bodySize,
                             bold: true
                         }
                     );
 
-                    textY += this.theme.lineHeight;
-
-                    if (hasBody) {
-                        textY += titleGap;
-                    }
+                    y += titleMeasurement.height + contentGap;
                 }
 
-                for (const line of lines) {
-                    this.page.text(
+                if (bodyMeasurement) {
+                    this.textBlock(
                         textX,
-                        textY,
-                        line,
-                        {
-                            size: this.theme.bodySize
-                        }
+                        y,
+                        bodyMeasurement
                     );
-
-                    textY += this.theme.lineHeight;
                 }
 
                 this.cursor = top + height + afterGap;
             }
 
             rule() {
-                this.ensure(14);
+                const beforeGap = 3;
+                const afterGap = 14;
+                const totalHeight = beforeGap + afterGap;
+
+                this.ensure(totalHeight);
+
+                const y = this.cursor + beforeGap;
 
                 this.page.gray(this.style.ruleGray);
                 this.page.line(
                     this.theme.margin,
-                    this.cursor,
+                    y,
                     this.page.width - this.theme.margin,
-                    this.cursor
+                    y
                 );
                 this.page.gray(this.style.textGray);
 
-                this.advance(14);
+                this.cursor += totalHeight;
             }
         }
     """#
