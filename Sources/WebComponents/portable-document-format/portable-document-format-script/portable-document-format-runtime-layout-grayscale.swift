@@ -586,7 +586,20 @@ enum PortableDocumentFormatRuntimeLayoutGrayscale {
                 const afterGap = 15;
                 const totalHeight = beforeGap + afterGap;
 
+                const beforePage = this.pageNumber;
+
                 this.ensure(totalHeight);
+
+                const isTopOfPage = this.cursor <= this.contentTop() + 0.5;
+                const crossedPage = this.pageNumber !== beforePage;
+
+                if (isTopOfPage || crossedPage) {
+                    this.cursor = Math.max(
+                        this.cursor,
+                        this.contentTop()
+                    );
+                    return;
+                }
 
                 const y = this.cursor + beforeGap;
 
