@@ -470,15 +470,17 @@ enum PortableDocumentFormatRuntimeLayoutGrayscale {
             callout(block) {
                 const x = this.theme.margin;
                 const width = this.contentWidth();
-                const paddingX = 14;
+                const paddingX = 18;
                 const paddingTop = 14;
                 const paddingBottom = 14;
                 const titleGap = 5;
                 const afterGap = 10;
-                const stripWidth = 3;
+                const railInsetX = 10;
+                const railInsetY = 12;
+                const railWidth = 2.4;
                 const title = block.title || "";
                 const text = block.text || "";
-                const bodyWidth = width - paddingX * 2;
+                const bodyWidth = width - paddingX * 2 - 4;
                 const radius = Number(this.style.cornerRadius || 0);
                 const hasTitle = Boolean(title);
                 const hasBody = Boolean(text);
@@ -518,7 +520,7 @@ enum PortableDocumentFormatRuntimeLayoutGrayscale {
                 this.ensure(height + afterGap);
 
                 const top = this.cursor;
-                const textX = x + paddingX;
+                const textX = x + paddingX + 4;
 
                 this.page.gray(this.style.calloutGray);
                 this.page.roundRect(
@@ -527,15 +529,6 @@ enum PortableDocumentFormatRuntimeLayoutGrayscale {
                     width,
                     height,
                     radius,
-                    "f"
-                );
-
-                this.page.gray(this.emphasisGray());
-                this.page.rect(
-                    x + 0.5,
-                    top + 1,
-                    stripWidth,
-                    Math.max(height - 2, 1),
                     "f"
                 );
 
@@ -550,8 +543,18 @@ enum PortableDocumentFormatRuntimeLayoutGrayscale {
                     "S"
                 );
 
+                this.page.lineWidth(railWidth);
+                this.page.gray(this.emphasisGray());
+                this.page.line(
+                    x + railInsetX,
+                    top + railInsetY,
+                    x + railInsetX,
+                    top + Math.max(height - railInsetY, railInsetY)
+                );
+
                 let y = top + paddingTop;
 
+                this.page.lineWidth(1);
                 this.page.gray(this.style.textGray);
 
                 if (titleMeasurement) {
@@ -575,7 +578,6 @@ enum PortableDocumentFormatRuntimeLayoutGrayscale {
                     );
                 }
 
-                this.page.lineWidth(1);
                 this.cursor = top + height + afterGap;
             },
 
