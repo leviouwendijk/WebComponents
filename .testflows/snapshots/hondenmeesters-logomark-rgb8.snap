@@ -22,8 +22,8 @@ png.chunks:
 
 rgb8.result: ok
 rgb8.encoding: rgb8
-rgb8.width: 64
-rgb8.height: 64
-rgb8.base64.count: 16384
-rgb8.bytes.expected: 12288
-rgb8.bytes.actual: 12288
+rgb8.width: 192
+rgb8.height: 192
+rgb8.base64.count: 147456
+rgb8.bytes.expected: 110592
+rgb8.bytes.actual: 110592

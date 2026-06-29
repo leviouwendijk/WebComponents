@@ -30,8 +30,10 @@ enum WebComponentsPDFImageFlowSuite: TestFlowRegistry {
 
             let image = PortableDocumentFormatImage.rgb8(
                 asset,
-                width: 64,
-                height: 64
+                // width: 64,
+                // height: 64
+                width: 192,
+                height: 192
             )
 
             let snapshot = RGB8AssetSnapshot.describe(
@@ -67,13 +69,15 @@ enum WebComponentsPDFImageFlowSuite: TestFlowRegistry {
 
             try Expect.equal(
                 image.width,
-                64,
+                // 64,
+                192,
                 "width"
             )
 
             try Expect.equal(
                 image.height,
-                64,
+                // 64,
+                192,
                 "height"
             )
 
@@ -86,7 +90,8 @@ enum WebComponentsPDFImageFlowSuite: TestFlowRegistry {
 
             try Expect.equal(
                 decoded.count,
-                64 * 64 * 3,
+                // 64 * 64 * 3,
+                192 * 192 * 3,
                 "rgb8 byte count"
             )
 
@@ -148,7 +153,8 @@ private enum RGB8AssetSnapshot {
             "rgb8.width: \(image?.width.description ?? "nil")",
             "rgb8.height: \(image?.height.description ?? "nil")",
             "rgb8.base64.count: \(image?.base64.count.description ?? "nil")",
-            "rgb8.bytes.expected: \(64 * 64 * 3)",
+            // "rgb8.bytes.expected: \(64 * 64 * 3)",
+            "rgb8.bytes.expected: \(192 * 192 * 3)",
             "rgb8.bytes.actual: \(image.flatMap { Data(base64Encoded: $0.base64)?.count }.map(String.init) ?? "nil")"
         ].joined(separator: "\n")
     }

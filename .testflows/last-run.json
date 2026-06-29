@@ -3,12 +3,12 @@
   "failed_names" : [
 
   ],
-  "generated_at" : "2026-06-29T17:46:15Z",
+  "generated_at" : "2026-06-29T18:12:07Z",
   "passed" : 1,
   "results" : [
     {
       "display_name" : "Hondenmeesters logomark converts to PDF RGB8",
-      "duration_seconds" : 5.6433000564575195,
+      "duration_seconds" : 4.633325934410095,
       "name" : "hondenmeesters-logomark-rgb8",
       "status" : "passed",
       "tags" : [

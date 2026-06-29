@@ -5,8 +5,10 @@ public enum HondenmeestersPortableDocumentFormat {}
 public extension HondenmeestersPortableDocumentFormat {
     static let logo = PortableDocumentFormatImage.rgb8(
         HondenmeestersAssets.h_logomark,
-        width: 64,
-        height: 64
+        width: 192,
+        height: 192
+        // width: 64,
+        // height: 64
     )
 
     static let layout = PortableDocumentFormatLayout(

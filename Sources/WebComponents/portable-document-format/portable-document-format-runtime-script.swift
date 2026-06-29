@@ -928,18 +928,43 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
             callout(block) {
                 const x = this.theme.margin;
                 const width = this.page.width - this.theme.margin * 2;
+                const paddingX = 14;
+                const paddingTop = 16;
+                const paddingBottom = 14;
+                const titleGap = 5;
+                const afterGap = 10;
                 const title = block.title || "";
-                const lines = wrapText(block.text || "", this.theme.bodySize, width - 24);
-                const titleHeight = title ? 16 : 0;
-                const height = titleHeight + lines.length * this.theme.lineHeight + 18;
-                const radius = Number(this.style.cornerRadius || 0);
+                const text = block.text || "";
+                const bodyWidth = width - paddingX * 2;
+                const lines = wrapText(
+                    text,
+                    this.theme.bodySize,
+                    bodyWidth
+                );
 
-                this.ensure(height + 8);
+                const hasTitle = Boolean(title);
+                const hasBody = lines.length > 0;
+                const titleHeight = hasTitle ? this.theme.lineHeight : 0;
+                const bodyHeight = hasBody
+                    ? lines.length * this.theme.lineHeight
+                    : 0;
+
+                const height = paddingTop
+                    + titleHeight
+                    + (hasTitle && hasBody ? titleGap : 0)
+                    + bodyHeight
+                    + paddingBottom;
+
+                const radius = Number(this.style.cornerRadius || 0);
+                const top = this.cursor - paddingTop;
+                const textX = x + paddingX;
+
+                this.ensure(height + afterGap);
 
                 this.page.gray(this.style.calloutGray);
                 this.page.roundRect(
                     x,
-                    this.cursor - 10,
+                    top,
                     width,
                     height,
                     radius,
@@ -949,7 +974,7 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                 this.page.gray(this.style.borderGray);
                 this.page.roundRect(
                     x,
-                    this.cursor - 10,
+                    top,
                     width,
                     height,
                     radius,
@@ -958,32 +983,40 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
 
                 this.page.gray(this.style.textGray);
 
-                if (title) {
+                let textY = this.cursor;
+
+                if (hasTitle) {
                     this.page.text(
-                        x + 12,
-                        this.cursor,
+                        textX,
+                        textY,
                         title,
                         {
                             size: this.theme.bodySize,
                             bold: true
                         }
                     );
-                    this.advance(16);
+
+                    textY += this.theme.lineHeight;
+
+                    if (hasBody) {
+                        textY += titleGap;
+                    }
                 }
 
                 for (const line of lines) {
                     this.page.text(
-                        x + 12,
-                        this.cursor,
+                        textX,
+                        textY,
                         line,
                         {
                             size: this.theme.bodySize
                         }
                     );
-                    this.advance(this.theme.lineHeight);
+
+                    textY += this.theme.lineHeight;
                 }
 
-                this.cursor += 12;
+                this.cursor = top + height + afterGap;
             }
 
             rule() {
