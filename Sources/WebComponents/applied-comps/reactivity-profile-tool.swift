@@ -21,7 +21,7 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
     }
 
     public var nodes: ReusableComponentNodes {
-        let report = report_nodes()
+        let pdf = pdf_nodes()
 
         return .body(
             [
@@ -39,11 +39,53 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                         HTML.div(["class": "\(Self.block)__mount", "data-reactivity-mount": ""]) {}
                     }
 
-                    report.body
+                    pdf.body
                 }
             ],
-            stylesheets: (includeStyles ? [Self.stylesheet()] : []) + report.stylesheets,
-            scripts: (includeScript ? ReactivityProfileToolScript().nodes.scripts : []) + report.scripts
+            stylesheets: (includeStyles ? [Self.stylesheet()] : []) + pdf.stylesheets,
+            scripts: (includeScript ? ReactivityProfileToolScript().nodes.scripts : [])
+                + PortableDocumentFormatRuntimeScript().nodes.scripts
+                + pdf.scripts
+        )
+    }
+
+    private func pdf_nodes() -> ReusableComponentNodes {
+        .body(
+            [
+                HTML.section(
+                    [
+                        "class": "\(Self.block)__submit-card",
+                        "data-reactivity-pdf-card": ""
+                    ]
+                ) {
+                    HTML.h2 {
+                        HTML.text("PDF maken")
+                    }
+
+                    HTML.p(["class": "\(Self.block)__hint"]) {
+                        HTML.text("Maak een PDF van het huidige profiel zonder het browser-printvenster te gebruiken.")
+                    }
+
+                    HTML.div(["class": "\(Self.block)__inline-actions"]) {
+                        HTML.button(
+                            [
+                                "class": "\(Self.block)__action",
+                                "type": "button",
+                                "data-reactivity-pdf": ""
+                            ]
+                        ) {
+                            HTML.text("PDF maken")
+                        }
+                    }
+
+                    HTML.p(
+                        [
+                            "class": "\(Self.block)__submit-status",
+                            "data-reactivity-pdf-status": ""
+                        ]
+                    ) {}
+                }
+            ]
         )
     }
 
@@ -51,69 +93,69 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
         nodes.body[0]
     }
 
-    private func report_nodes() -> ReusableComponentNodes {
-        PrintableReportView(
-            report: report(
-                id: "reactivity-profile-report",
-                title: "Reactiviteitsprofiel",
-                subtitle: "Samenvatting van cluster, gedragsassen, behandelmodifiers en trainingsprioriteit.",
-                meta: [
-                    meta("Hulpmiddel", "Reactiviteitsprofiel"),
-                    meta("Hond", slot("dogName", fallback: "—")),
-                    meta("Datum", slot("date")),
-                    meta("Status", slot("status", fallback: "Nog niet berekend"))
-                ],
-                options: .init(
-                    styles: includeStyles,
-                    script: includeScript
-                )
-            ) {
-                summary(
-                    "Deze uitdraai vat de huidige inschatting van het reactiviteitsprofiel samen. Gebruik dit als werkdocument voor analyse en trainingsplanning."
-                )
+    // private func report_nodes() -> ReusableComponentNodes {
+    //     PrintableReportView(
+    //         report: report(
+    //             id: "reactivity-profile-report",
+    //             title: "Reactiviteitsprofiel",
+    //             subtitle: "Samenvatting van cluster, gedragsassen, behandelmodifiers en trainingsprioriteit.",
+    //             meta: [
+    //                 meta("Hulpmiddel", "Reactiviteitsprofiel"),
+    //                 meta("Hond", slot("dogName", fallback: "—")),
+    //                 meta("Datum", slot("date")),
+    //                 meta("Status", slot("status", fallback: "Nog niet berekend"))
+    //             ],
+    //             options: .init(
+    //                 styles: includeStyles,
+    //                 script: includeScript
+    //             )
+    //         ) {
+    //             summary(
+    //                 "Deze uitdraai vat de huidige inschatting van het reactiviteitsprofiel samen. Gebruik dit als werkdocument voor analyse en trainingsplanning."
+    //             )
 
-                fields("Profiel") {
-                    field("Hoofdcluster", slot("primary", fallback: "Nog niet compleet"))
-                    field("Ernst", slot("severity", fallback: "Open"))
-                    field("Clusterduiding", slot("summary", fallback: "Vul eerst alle gedragingen in."))
-                    field("Ingevulde gedragingen", slot("completeness", fallback: "0/9"))
-                    field("Ingevulde modifiers", slot("modifierCompleteness", fallback: "0/0"))
-                }
+    //             fields("Profiel") {
+    //                 field("Hoofdcluster", slot("primary", fallback: "Nog niet compleet"))
+    //                 field("Ernst", slot("severity", fallback: "Open"))
+    //                 field("Clusterduiding", slot("summary", fallback: "Vul eerst alle gedragingen in."))
+    //                 field("Ingevulde gedragingen", slot("completeness", fallback: "0/9"))
+    //                 field("Ingevulde modifiers", slot("modifierCompleteness", fallback: "0/0"))
+    //             }
 
-                metrics("Gedragsassen") {
-                    metric("Orale aanval", slot("oralAttack", fallback: "—"))
-                    metric("Frustratie", slot("frustrationAxis", fallback: "—"))
-                    metric("Posturing", slot("posturing", fallback: "—"))
-                }
+    //             metrics("Gedragsassen") {
+    //                 metric("Orale aanval", slot("oralAttack", fallback: "—"))
+    //                 metric("Frustratie", slot("frustrationAxis", fallback: "—"))
+    //                 metric("Posturing", slot("posturing", fallback: "—"))
+    //             }
 
-                metrics("Behandelmodifiers") {
-                    metric("Frustratiedruk", slot("frustrationPressure", fallback: "—"))
-                    metric("Escalatierisico", slot("escalationRisk", fallback: "—"))
-                    metric("Managementbehoefte", slot("managementNeed", fallback: "—"))
-                }
+    //             metrics("Behandelmodifiers") {
+    //                 metric("Frustratiedruk", slot("frustrationPressure", fallback: "—"))
+    //                 metric("Escalatierisico", slot("escalationRisk", fallback: "—"))
+    //                 metric("Managementbehoefte", slot("managementNeed", fallback: "—"))
+    //             }
 
-                fields("Training") {
-                    field("Prioriteit", slot("priorities", fallback: "Nog geen prioriteit berekend."))
-                    field("Cluster-overeenkomst", slot("matches", fallback: "Nog geen matches berekend."))
-                }
+    //             fields("Training") {
+    //                 field("Prioriteit", slot("priorities", fallback: "Nog geen prioriteit berekend."))
+    //                 field("Cluster-overeenkomst", slot("matches", fallback: "Nog geen matches berekend."))
+    //             }
 
-                notice(
-                    "Gebruik",
-                    "Dit profiel is een hulpmiddel voor analyse en planning. Het vervangt geen professionele beoordeling van veiligheid, context en leerhistorie.",
-                    tone: .info
-                )
+    //             notice(
+    //                 "Gebruik",
+    //                 "Dit profiel is een hulpmiddel voor analyse en planning. Het vervangt geen professionele beoordeling van veiligheid, context en leerhistorie.",
+    //                 tone: .info
+    //             )
 
-                notes(
-                    "Aantekeningen",
-                    placeholder: "Ruimte voor context, observaties, veiligheidsmarge en vervolgstappen."
-                )
-            },
-            bind: .client(
-                source: "#content-area",
-                collector: "wcReactivityProfileTool.collectReport"
-            )
-        ).nodes
-    }
+    //             notes(
+    //                 "Aantekeningen",
+    //                 placeholder: "Ruimte voor context, observaties, veiligheidsmarge en vervolgstappen."
+    //             )
+    //         },
+    //         bind: .client(
+    //             source: "#content-area",
+    //             collector: "wcReactivityProfileTool.collectReport"
+    //         )
+    //     ).nodes
+    // }
 
     private func hero() -> any HTMLNode {
         HTML.section(["class": "\(Self.block)__hero"]) {
@@ -1652,6 +1694,175 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             }
         }
 
+        function setPdfStatus(root, state, message) {
+            const node = root.querySelector('[data-reactivity-pdf-status]');
+            if (!node) return;
+
+            node.dataset.state = state || '';
+            node.textContent = message || '';
+        }
+
+        function setPdfPending(root, pending) {
+            const button = root.querySelector('[data-reactivity-pdf]');
+            if (!button) return;
+
+            button.disabled = pending;
+            button.textContent = pending ? 'PDF maken...' : 'PDF maken';
+        }
+
+        function pdfText(value, fallback = '—') {
+            const text = String(value ?? '').trim();
+            return text || fallback;
+        }
+
+        function pdfParagraph(value) {
+            return {
+                kind: 'paragraph',
+                text: pdfText(value)
+            };
+        }
+
+        function pdfHeading(value, level = 2) {
+            return {
+                kind: 'heading',
+                text: pdfText(value),
+                level
+            };
+        }
+
+        function pdfCallout(title, text) {
+            return {
+                kind: 'callout',
+                title: pdfText(title, ''),
+                text: pdfText(text)
+            };
+        }
+
+        function pdfChecklist(items) {
+            return {
+                kind: 'checklist',
+                items: items.map(item => pdfText(item)).filter(Boolean)
+            };
+        }
+
+        function pdfRule() {
+            return {
+                kind: 'rule'
+            };
+        }
+
+        function splitList(value) {
+            if (Array.isArray(value)) {
+                return value
+                    .map(item => String(item ?? '').trim())
+                    .filter(Boolean);
+            }
+
+            return String(value ?? '')
+                .split(/\n|;|·/)
+                .map(item => item.trim())
+                .filter(Boolean);
+        }
+
+        function pdfFilename(report) {
+            const dog = String(report?.dogName || report?.slots?.dogName || '')
+                .trim()
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+
+            return dog
+                ? `reactiviteitsprofiel-${dog}.pdf`
+                : 'reactiviteitsprofiel.pdf';
+        }
+
+        function reactivityPdfPayload(report) {
+            const slots = report?.slots || {};
+            const complete = report?.status === 'Berekend';
+
+            const blocks = [
+                pdfHeading('Profiel', 2),
+                pdfCallout(
+                    slots.primary || 'Hoofdcluster',
+                    slots.summary || 'Vul eerst alle gedragingen in.'
+                ),
+                pdfParagraph(`Status: ${pdfText(slots.status || report?.status)}`),
+                pdfParagraph(`Ernst: ${pdfText(slots.severity, 'Open')}`),
+                pdfParagraph(`Ingevulde gedragingen: ${pdfText(slots.completeness, '0/9')}`),
+                pdfParagraph(`Ingevulde modifiers: ${pdfText(slots.modifierCompleteness, '0/0')}`),
+
+                pdfRule(),
+
+                pdfHeading('Gedragsassen', 2),
+                pdfParagraph(`Orale aanval: ${pdfText(slots.oralAttack)}`),
+                pdfParagraph(`Frustratie: ${pdfText(slots.frustrationAxis)}`),
+                pdfParagraph(`Posturing: ${pdfText(slots.posturing)}`),
+
+                pdfHeading('Behandelmodifiers', 2),
+                pdfParagraph(`Frustratiedruk: ${pdfText(slots.frustrationPressure)}`),
+                pdfParagraph(`Escalatierisico: ${pdfText(slots.escalationRisk)}`),
+                pdfParagraph(`Managementbehoefte: ${pdfText(slots.managementNeed)}`),
+
+                pdfHeading('Training', 2)
+            ];
+
+            const priorities = splitList(slots.priorities);
+            if (priorities.length) {
+                blocks.push(pdfChecklist(priorities));
+            } else {
+                blocks.push(pdfParagraph('Nog geen prioriteit berekend.'));
+            }
+
+            blocks.push(
+                pdfHeading('Cluster-overeenkomst', 2),
+                pdfParagraph(slots.matches || 'Nog geen matches berekend.')
+            );
+
+            if (complete && Array.isArray(report.matchRows) && report.matchRows.length) {
+                blocks.push(pdfHeading('Matchrijen', 2));
+                blocks.push(
+                    pdfChecklist(
+                        report.matchRows.map(row => {
+                            return `${row.cluster}: ${row.match}% match, afstand ${row.distance}`;
+                        })
+                    )
+                );
+            }
+
+            blocks.push(
+                pdfRule(),
+                pdfCallout(
+                    'Gebruik',
+                    'Dit profiel is een hulpmiddel voor analyse en planning. Het vervangt geen professionele beoordeling van veiligheid, context en leerhistorie.'
+                )
+            );
+
+            return {
+                template: 'plain_a4',
+                theme: 'hondenmeesters',
+                title: 'Reactiviteitsprofiel',
+                subtitle: pdfText(slots.dogName, 'Werkdocument') + ' · ' + pdfText(slots.date, ''),
+                blocks,
+                sheet: null
+            };
+        }
+
+        function downloadReactivityPdf(root) {
+            const runtime = window.PortableDocumentFormatRuntime;
+
+            if (!runtime || typeof runtime.download !== 'function') {
+                throw new Error('pdf_runtime_missing');
+            }
+
+            const report = collectReport(root);
+            const payload = reactivityPdfPayload(report);
+
+            runtime.download(
+                payload,
+                pdfFilename(report)
+            );
+        }
+
         document.addEventListener('click', event => {
             const open = event.target?.closest?.('[data-reactivity-submit-open]');
             if (!open) return;
@@ -1680,6 +1891,31 @@ public struct ReactivityProfileToolScript: ReusableComponent {
 
             event.preventDefault();
             submitProfile(root);
+        }, true);
+
+        document.addEventListener('click', event => {
+            const button = event.target?.closest?.('[data-reactivity-pdf]');
+            if (!button) return;
+
+            const root = button.closest(rootSelector);
+            if (!root) return;
+
+            setPdfPending(root, true);
+            setPdfStatus(root, 'loading', 'PDF maken...');
+
+            try {
+                downloadReactivityPdf(root);
+                setPdfStatus(root, 'success', 'PDF is gemaakt.');
+            } catch (error) {
+                const message = error?.message === 'pdf_runtime_missing'
+                    ? 'PDF-runtime is niet geladen.'
+                    : 'PDF maken is niet gelukt.';
+
+                setPdfStatus(root, 'error', message);
+                console.error('[ReactivityProfileTool PDF]', error);
+            } finally {
+                setPdfPending(root, false);
+            }
         }, true);
 
         document.addEventListener('input', event => {
