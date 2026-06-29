@@ -1,0 +1,25 @@
+{
+  "failed" : 0,
+  "failed_names" : [
+
+  ],
+  "generated_at" : "2026-06-29T17:46:15Z",
+  "passed" : 1,
+  "results" : [
+    {
+      "display_name" : "Hondenmeesters logomark converts to PDF RGB8",
+      "duration_seconds" : 5.6433000564575195,
+      "name" : "hondenmeesters-logomark-rgb8",
+      "status" : "passed",
+      "tags" : [
+        "assets",
+        "image",
+        "pdf",
+        "rgb8"
+      ]
+    }
+  ],
+  "skipped" : 0,
+  "title" : "WebComponents PDF image flows",
+  "total" : 1
+}
