@@ -29,6 +29,7 @@ let package = Package(
 
         .package(url: "https://github.com/leviouwendijk/Difference.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/References.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Assets.git", branch: "master"),
 
         // .package(url: "https://github.com/leviouwendijk/Milieu.git", branch: "master"),
         // .package(url: "https://github.com/leviouwendijk/Writers.git", branch: "master"),
@@ -54,6 +55,7 @@ let package = Package(
 
                 .product(name: "Difference", package: "Difference"),
                 .product(name: "References", package: "References"),
+                .product(name: "Assets", package: "Assets"),
 
                 // .product(name: "Milieu", package: "Milieu"),
                 // .product(name: "Writers", package: "Writers"),

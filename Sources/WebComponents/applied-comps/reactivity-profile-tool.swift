@@ -1,5 +1,6 @@
 import Constructors
 import CSS
+import Foundation
 import HTML
 import JS
 
@@ -50,7 +51,9 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
     }
 
     private func pdf_nodes() -> ReusableComponentNodes {
-        .body(
+        let payload = pdf_base_payload
+
+        return .body(
             [
                 HTML.section(
                     [
@@ -84,9 +87,47 @@ public struct ReactivityProfileTool: ReusableComponent, Sendable {
                             "data-reactivity-pdf-status": ""
                         ]
                     ) {}
+                },
+
+                HTML.el(
+                    "script",
+                    [
+                        "type": "application/json",
+                        "data-reactivity-pdf-base": ""
+                    ]
+                ) {
+                    HTML.raw(Self.json(payload))
                 }
             ]
         )
+    }
+
+    private var pdf_base_payload: PortableDocumentFormatPayload {
+        HondenmeestersPortableDocumentFormat.payload(
+            template: .plain_a4,
+            title: "Reactiviteitsprofiel",
+            subtitle: "Werkdocument",
+            blocks: []
+        )
+    }
+
+    private static func json(
+        _ payload: PortableDocumentFormatPayload
+    ) -> String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+
+        do {
+            let data = try encoder.encode(payload)
+
+            guard let string = String(data: data, encoding: .utf8) else {
+                preconditionFailure("PortableDocumentFormatPayload encoded to non-UTF8 data.")
+            }
+
+            return string
+        } catch {
+            preconditionFailure("PortableDocumentFormatPayload failed to encode: \(error)")
+        }
     }
 
     public func node() -> any HTMLNode {
@@ -1776,7 +1817,22 @@ public struct ReactivityProfileToolScript: ReusableComponent {
                 : 'reactiviteitsprofiel.pdf';
         }
 
-        function reactivityPdfPayload(report) {
+        function reactivityPdfBase(root) {
+            const script = root.querySelector('[data-reactivity-pdf-base]');
+
+            if (!script) {
+                return {};
+            }
+
+            try {
+                return JSON.parse(script.textContent || '{}');
+            } catch {
+                return {};
+            }
+        }
+
+        function reactivityPdfPayload(root, report) {
+            const base = reactivityPdfBase(root);
             const slots = report?.slots || {};
             const complete = report?.status === 'Berekend';
 
@@ -1838,8 +1894,9 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             );
 
             return {
+                ...base,
                 template: 'plain_a4',
-                theme: 'hondenmeesters',
+                theme: base.theme || 'hondenmeesters',
                 title: 'Reactiviteitsprofiel',
                 subtitle: pdfText(slots.dogName, 'Werkdocument') + ' · ' + pdfText(slots.date, ''),
                 blocks,
@@ -1855,7 +1912,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
             }
 
             const report = collectReport(root);
-            const payload = reactivityPdfPayload(report);
+            const payload = reactivityPdfPayload(root, report);
 
             runtime.download(
                 payload,

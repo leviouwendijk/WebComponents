@@ -1,5 +1,5 @@
 {
-  "originHash" : "b3a0eb0828cd42a96546a48e6d89b3223950dbdf89a3ebf362e165cfb25c8686",
+  "originHash" : "f5ce92d846332fc7a0b4fd1b3b0c57b46bb4edb42ad3defcd2807bfb8cdf44f8",
   "pins" : [
     {
       "identity" : "ansi",
@@ -8,6 +8,15 @@
       "state" : {
         "branch" : "master",
         "revision" : "073d9ca7870b688a312608acf14eae6ba052c0d6"
+      }
+    },
+    {
+      "identity" : "assets",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/Assets.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "04f067fbbc1a6f26657d11485adebda381d60edc"
       }
     },
     {
@@ -52,7 +61,7 @@
       "location" : "https://github.com/leviouwendijk/FileTypes.git",
       "state" : {
         "branch" : "master",
-        "revision" : "77d9b8387e7df863e66dd4665a6f5181365ffe0d"
+        "revision" : "f0c1d8bf5beda0de51c9e95b687fbdec9e4ce7b0"
       }
     },
     {

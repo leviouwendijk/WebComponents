@@ -25,24 +25,53 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
             standard: {
                 page: A4,
                 margin: 54,
-                titleSize: 22,
-                subtitleSize: 12,
-                headingSize: 15,
-                bodySize: 11,
-                smallSize: 9,
-                lineHeight: 15,
-                gap: 10
+                headerHeight: 0,
+                footerHeight: 34,
+                logoSize: 24,
+                titleSize: 21,
+                subtitleSize: 11,
+                headingSize: 13.5,
+                bodySize: 10.5,
+                smallSize: 8.5,
+                lineHeight: 13.5,
+                gap: 6
             },
             hondenmeesters: {
                 page: A4,
-                margin: 54,
-                titleSize: 22,
-                subtitleSize: 12,
-                headingSize: 15,
-                bodySize: 11,
-                smallSize: 9,
-                lineHeight: 15,
-                gap: 10
+                margin: 52,
+                headerHeight: 46,
+                footerHeight: 34,
+                logoSize: 24,
+                titleSize: 20,
+                subtitleSize: 11,
+                headingSize: 13,
+                bodySize: 10.5,
+                smallSize: 8.5,
+                lineHeight: 13.5,
+                gap: 6
+            }
+        };
+
+        const styles = {
+            standard: {
+                cornerRadius: 8,
+                borderGray: 0.82,
+                ruleGray: 0.84,
+                softGray: 0.975,
+                calloutGray: 0.955,
+                textGray: 0,
+                mutedGray: 0.42,
+                footerGray: 0.55
+            },
+            hondenmeesters: {
+                cornerRadius: 8,
+                borderGray: 0.82,
+                ruleGray: 0.84,
+                softGray: 0.975,
+                calloutGray: 0.955,
+                textGray: 0,
+                mutedGray: 0.42,
+                footerGray: 0.55
             }
         };
 
@@ -85,6 +114,17 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
             return bytes;
         }
 
+        function base64ToBinaryString(value) {
+            try {
+                return atob(
+                    String(value || "")
+                        .replace(/\s+/g, "")
+                );
+            } catch {
+                return "";
+            }
+        }
+
         function download(bytes, filename) {
             const blob = new Blob(
                 [bytes],
@@ -107,17 +147,25 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
             }, 1000);
         }
 
-        function mergeTheme(base, override) {
-            if (!override || typeof override !== "object") {
-                return base;
+        function compactObject(value) {
+            if (!value || typeof value !== "object") {
+                return {};
             }
+
+            return Object.fromEntries(
+                Object.entries(value).filter(([, entry]) => entry !== null && entry !== undefined)
+            );
+        }
+
+        function mergeTheme(base, override) {
+            const clean = compactObject(override);
 
             return {
                 ...base,
-                ...override,
+                ...clean,
                 page: {
                     ...base.page,
-                    ...(override.page || {})
+                    ...compactObject(clean.page)
                 }
             };
         }
@@ -131,13 +179,64 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
             );
         }
 
+        function resolvedStyle(payload) {
+            return {
+                ...(styles[payload.theme] || styles.standard),
+                ...compactObject(payload.style)
+            };
+        }
+
         class PDFDocument {
             constructor() {
                 this.pages = [];
+                this.images = [];
             }
 
             addPage(page) {
                 this.pages.push(page);
+            }
+
+            addImage(image) {
+                if (!image || image.encoding !== "rgb8") {
+                    return null;
+                }
+
+                const width = Math.max(Math.floor(Number(image.width || 0)), 1);
+                const height = Math.max(Math.floor(Number(image.height || 0)), 1);
+                const expectedLength = width * height * 3;
+                const data = base64ToBinaryString(image.base64).slice(0, expectedLength);
+
+                if (data.length !== expectedLength) {
+                    return null;
+                }
+
+                const name = "Im" + String(this.images.length + 1);
+
+                this.images.push({
+                    name,
+                    width,
+                    height,
+                    data
+                });
+
+                return name;
+            }
+
+            imageObject(image) {
+                return [
+                    "<<",
+                    "/Type /XObject",
+                    "/Subtype /Image",
+                    "/Width " + image.width,
+                    "/Height " + image.height,
+                    "/ColorSpace /DeviceRGB",
+                    "/BitsPerComponent 8",
+                    "/Length " + image.data.length,
+                    ">>",
+                    "stream",
+                    image.data,
+                    "endstream"
+                ].join("\n");
             }
 
             build() {
@@ -154,6 +253,31 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                 const fontRegular = take("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>");
                 const fontBold = take("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>");
                 const pagesIdentifier = take("");
+
+                const imageIdentifiers = new Map();
+
+                for (const image of this.images) {
+                    imageIdentifiers.set(
+                        image.name,
+                        take(this.imageObject(image))
+                    );
+                }
+
+                const xobjectEntries = Array
+                    .from(imageIdentifiers.entries())
+                    .map(([name, identifier]) => "/" + name + " " + identifier + " 0 R")
+                    .join(" ");
+
+                const resources = [
+                    "<<",
+                    "/Font << /F1 " + fontRegular + " 0 R /F2 " + fontBold + " 0 R >>"
+                ];
+
+                if (xobjectEntries) {
+                    resources.push("/XObject << " + xobjectEntries + " >>");
+                }
+
+                resources.push(">>");
 
                 const pageIdentifiers = [];
 
@@ -174,9 +298,7 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                             "/Type /Page",
                             "/Parent " + pagesIdentifier + " 0 R",
                             "/MediaBox [0 0 " + pdfNum(page.width) + " " + pdfNum(page.height) + "]",
-                            "/Resources <<",
-                            "    /Font << /F1 " + fontRegular + " 0 R /F2 " + fontBold + " 0 R >>",
-                            ">>",
+                            "/Resources " + resources.join("\n"),
                             "/Contents " + contentIdentifier + " 0 R",
                             ">>"
                         ].join("\n")
@@ -255,6 +377,17 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                 );
             }
 
+            image(name, x, y, width, height) {
+                if (!name) return;
+
+                this.content.push(
+                    "q " +
+                    pdfNum(width) + " 0 0 " + pdfNum(height) + " " +
+                    pdfNum(x) + " " + pdfNum(this.y(y + height)) + " cm " +
+                    "/" + name + " Do Q"
+                );
+            }
+
             line(x1, y1, x2, y2) {
                 this.content.push(
                     pdfNum(x1) + " " + pdfNum(this.y(y1)) + " m " +
@@ -266,6 +399,45 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                 this.content.push(
                     pdfNum(x) + " " + pdfNum(this.y(y + height)) + " " +
                     pdfNum(width) + " " + pdfNum(height) + " re " + mode
+                );
+            }
+
+            roundRect(x, y, width, height, radius, mode = "S") {
+                const r = Math.max(0, Math.min(radius, width / 2, height / 2));
+
+                if (r <= 0) {
+                    this.rect(x, y, width, height, mode);
+                    return;
+                }
+
+                const k = 0.5522847498;
+                const left = x;
+                const right = x + width;
+                const bottom = this.y(y + height);
+                const top = this.y(y);
+
+                this.content.push(
+                    [
+                        pdfNum(left + r), pdfNum(bottom), "m",
+                        pdfNum(right - r), pdfNum(bottom), "l",
+                        pdfNum(right - r + k * r), pdfNum(bottom),
+                        pdfNum(right), pdfNum(bottom + r - k * r),
+                        pdfNum(right), pdfNum(bottom + r), "c",
+                        pdfNum(right), pdfNum(top - r), "l",
+                        pdfNum(right), pdfNum(top - r + k * r),
+                        pdfNum(right - r + k * r), pdfNum(top),
+                        pdfNum(right - r), pdfNum(top), "c",
+                        pdfNum(left + r), pdfNum(top), "l",
+                        pdfNum(left + r - k * r), pdfNum(top),
+                        pdfNum(left), pdfNum(top - r + k * r),
+                        pdfNum(left), pdfNum(top - r), "c",
+                        pdfNum(left), pdfNum(bottom + r), "l",
+                        pdfNum(left), pdfNum(bottom + r - k * r),
+                        pdfNum(left + r - k * r), pdfNum(bottom),
+                        pdfNum(left + r), pdfNum(bottom), "c",
+                        "h",
+                        mode
+                    ].join(" ")
                 );
             }
 
@@ -307,11 +479,18 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
             constructor(payload) {
                 this.payload = payload || {};
                 this.theme = resolvedTheme(this.payload);
+                this.style = resolvedStyle(this.payload);
                 this.document = new PDFDocument();
+                this.logoName = this.document.addImage(this.payload.chrome?.logo);
                 this.page = null;
                 this.pageNumber = 0;
                 this.cursor = this.theme.margin;
                 this.newPage();
+            }
+
+            hasHeader() {
+                const chrome = this.payload.chrome || {};
+                return Boolean(this.logoName || chrome.headerText);
             }
 
             newPage() {
@@ -325,32 +504,104 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                     this.theme.page.width,
                     this.theme.page.height
                 );
-                this.cursor = this.theme.margin;
+
+                if (this.hasHeader()) {
+                    this.header();
+                    this.cursor = this.theme.margin + Number(this.theme.headerHeight || 0);
+                } else {
+                    this.cursor = this.theme.margin;
+                }
+            }
+
+            header() {
+                const chrome = this.payload.chrome || {};
+                const logoSize = Number(this.theme.logoSize || 24);
+                const x = this.theme.margin;
+                const y = Math.max(18, this.theme.margin - 7);
+
+                if (this.logoName) {
+                    this.page.image(
+                        this.logoName,
+                        x,
+                        y,
+                        logoSize,
+                        logoSize
+                    );
+                }
+
+                if (chrome.headerText) {
+                    this.page.gray(this.style.mutedGray);
+                    this.page.text(
+                        this.logoName ? x + logoSize + 10 : x,
+                        this.theme.margin + 9,
+                        chrome.headerText,
+                        {
+                            size: this.theme.smallSize,
+                            bold: true
+                        }
+                    );
+                    this.page.gray(this.style.textGray);
+                }
+
+                const ruleY = this.theme.margin + Number(this.theme.headerHeight || 0) - 11;
+
+                this.page.gray(this.style.ruleGray);
+                this.page.line(
+                    this.theme.margin,
+                    ruleY,
+                    this.page.width - this.theme.margin,
+                    ruleY
+                );
+                this.page.gray(this.style.textGray);
             }
 
             footer() {
+                const chrome = this.payload.chrome || {};
                 const y = this.page.height - this.theme.margin + 18;
+                const footer = (chrome.footerItems || [])
+                    .filter(Boolean)
+                    .join(" · ");
 
-                this.page.gray(0.75);
+                this.page.gray(this.style.ruleGray);
                 this.page.line(
                     this.theme.margin,
                     y - 16,
                     this.page.width - this.theme.margin,
                     y - 16
                 );
+
+                this.page.gray(this.style.footerGray);
+
+                if (footer) {
+                    this.page.text(
+                        this.theme.margin,
+                        y,
+                        footer,
+                        {
+                            size: this.theme.smallSize
+                        }
+                    );
+                }
+
+                const number = String(this.pageNumber);
+                const numberWidth = textWidth(number, this.theme.smallSize);
+
                 this.page.text(
-                    this.theme.margin,
+                    this.page.width - this.theme.margin - numberWidth,
                     y,
-                    "Page " + this.pageNumber,
+                    number,
                     {
                         size: this.theme.smallSize
                     }
                 );
-                this.page.gray(0);
+
+                this.page.gray(this.style.textGray);
             }
 
             ensure(height) {
-                const bottom = this.page.height - this.theme.margin - 34;
+                const bottom = this.page.height
+                    - this.theme.margin
+                    - Number(this.theme.footerHeight || 34);
 
                 if (this.cursor + height > bottom) {
                     this.newPage();
@@ -379,8 +630,9 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
             }
 
             title() {
-                this.ensure(70);
+                this.ensure(58);
 
+                this.page.gray(this.style.textGray);
                 this.page.text(
                     this.theme.margin,
                     this.cursor,
@@ -391,48 +643,48 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                     }
                 );
 
-                this.advance(this.theme.titleSize + 14);
+                this.advance(this.theme.titleSize + 10);
 
                 if (this.payload.subtitle) {
+                    this.page.gray(this.style.mutedGray);
                     this.wrapped(
                         this.payload.subtitle,
                         this.theme.subtitleSize,
                         false
                     );
-                    this.advance(6);
+                    this.page.gray(this.style.textGray);
+                    this.advance(3);
                 }
 
-                this.page.gray(0.82);
+                this.page.gray(this.style.ruleGray);
                 this.page.line(
                     this.theme.margin,
                     this.cursor,
                     this.page.width - this.theme.margin,
                     this.cursor
                 );
-                this.page.gray(0);
+                this.page.gray(this.style.textGray);
 
-                this.advance(22);
+                this.advance(16);
             }
 
             sheetTemplate(sheet) {
                 this.sheetHeader(sheet);
+                this.fieldList(sheet.fields || []);
 
                 if (this.payload.blocks?.length) {
-                    this.advance(4);
+                    this.rule();
 
                     for (const block of this.payload.blocks) {
                         this.block(block);
                     }
-
-                    this.rule();
                 }
-
-                this.fieldList(sheet.fields || []);
             }
 
             sheetHeader(sheet) {
-                this.ensure(92);
+                this.ensure(80);
 
+                this.page.gray(this.style.mutedGray);
                 this.page.text(
                     this.theme.margin,
                     this.cursor,
@@ -443,8 +695,9 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                     }
                 );
 
-                this.advance(16);
+                this.advance(14);
 
+                this.page.gray(this.style.textGray);
                 this.page.text(
                     this.theme.margin,
                     this.cursor,
@@ -455,31 +708,33 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                     }
                 );
 
-                this.advance(this.theme.titleSize + 12);
+                this.advance(this.theme.titleSize + 10);
 
                 const lead = this.payload.subtitle
                     ? this.payload.subtitle + ". " + (sheet.lead || "")
                     : sheet.lead || "";
 
                 if (lead) {
+                    this.page.gray(this.style.mutedGray);
                     this.wrapped(
                         lead,
                         this.theme.subtitleSize,
                         false
                     );
-                    this.advance(4);
+                    this.page.gray(this.style.textGray);
+                    this.advance(3);
                 }
 
-                this.page.gray(0.82);
+                this.page.gray(this.style.ruleGray);
                 this.page.line(
                     this.theme.margin,
                     this.cursor,
                     this.page.width - this.theme.margin,
                     this.cursor
                 );
-                this.page.gray(0);
+                this.page.gray(this.style.textGray);
 
-                this.advance(20);
+                this.advance(16);
             }
 
             fieldList(fields) {
@@ -492,17 +747,33 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                 const x = this.theme.margin;
                 const width = this.page.width - this.theme.margin * 2;
                 const lines = Math.max(Number(field.lines || 3), 1);
-                const lineGap = Number(field.lineGap || 18);
-                const height = 34 + lines * lineGap;
+                const lineGap = Number(field.lineGap || 16);
+                const height = 30 + lines * lineGap;
+                const radius = Number(this.style.cornerRadius || 0);
 
-                this.ensure(height + 12);
+                this.ensure(height + 10);
 
-                this.page.gray(0.97);
-                this.page.rect(x, this.cursor - 12, width, height, "f");
-                this.page.gray(0.78);
-                this.page.rect(x, this.cursor - 12, width, height, "S");
-                this.page.gray(0);
+                this.page.gray(this.style.softGray);
+                this.page.roundRect(
+                    x,
+                    this.cursor - 10,
+                    width,
+                    height,
+                    radius,
+                    "f"
+                );
 
+                this.page.gray(this.style.borderGray);
+                this.page.roundRect(
+                    x,
+                    this.cursor - 10,
+                    width,
+                    height,
+                    radius,
+                    "S"
+                );
+
+                this.page.gray(this.style.textGray);
                 this.page.text(
                     x + 12,
                     this.cursor,
@@ -513,8 +784,7 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                     }
                 );
 
-                this.advance(20);
-
+                this.advance(18);
                 this.page.gray(0.72);
 
                 for (let index = 0; index < lines; index += 1) {
@@ -528,8 +798,8 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                     this.advance(lineGap);
                 }
 
-                this.page.gray(0);
-                this.advance(8);
+                this.page.gray(this.style.textGray);
+                this.advance(7);
             }
 
             block(block) {
@@ -555,7 +825,7 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                     break;
 
                 case "spacer":
-                    this.advance(Number(block.amount || 12));
+                    this.advance(Number(block.amount || 10));
                     break;
 
                 default:
@@ -565,10 +835,15 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
 
             heading(block) {
                 const level = Number(block.level || 2);
-                const size = level <= 1 ? this.theme.headingSize + 2 : this.theme.headingSize;
+                const size = level <= 1 ? this.theme.headingSize + 1.5 : this.theme.headingSize;
 
-                this.ensure(size + 18);
+                this.ensure(size + 14);
 
+                if (this.cursor > this.theme.margin + Number(this.theme.headerHeight || 0) + 18) {
+                    this.advance(3);
+                }
+
+                this.page.gray(this.style.textGray);
                 this.page.text(
                     this.theme.margin,
                     this.cursor,
@@ -579,12 +854,13 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                     }
                 );
 
-                this.advance(size + 10);
+                this.advance(size + 6);
             }
 
             paragraph(value) {
+                this.page.gray(this.style.textGray);
                 this.wrapped(value, this.theme.bodySize, false);
-                this.advance(4);
+                this.advance(2);
             }
 
             wrapped(value, size, bold, x = this.theme.margin, width = null) {
@@ -611,15 +887,25 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
             checklist(items) {
                 for (const item of items) {
                     const x = this.theme.margin;
-                    const box = 8;
-                    const textX = x + 16;
+                    const box = 7;
+                    const textX = x + 15;
                     const maxWidth = this.page.width - this.theme.margin - textX;
                     const lines = wrapText(item, this.theme.bodySize, maxWidth);
                     const height = Math.max(lines.length, 1) * this.theme.lineHeight;
 
-                    this.ensure(height + 6);
+                    this.ensure(height + 5);
 
-                    this.page.rect(x, this.cursor - 8, box, box, "S");
+                    this.page.gray(this.style.borderGray);
+                    this.page.roundRect(
+                        x,
+                        this.cursor - 8,
+                        box,
+                        box,
+                        2,
+                        "S"
+                    );
+
+                    this.page.gray(this.style.textGray);
 
                     for (const line of lines) {
                         this.page.text(
@@ -633,10 +919,10 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                         this.advance(this.theme.lineHeight);
                     }
 
-                    this.advance(3);
+                    this.advance(2);
                 }
 
-                this.advance(4);
+                this.advance(3);
             }
 
             callout(block) {
@@ -644,16 +930,33 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                 const width = this.page.width - this.theme.margin * 2;
                 const title = block.title || "";
                 const lines = wrapText(block.text || "", this.theme.bodySize, width - 24);
-                const titleHeight = title ? 18 : 0;
-                const height = titleHeight + lines.length * this.theme.lineHeight + 22;
+                const titleHeight = title ? 16 : 0;
+                const height = titleHeight + lines.length * this.theme.lineHeight + 18;
+                const radius = Number(this.style.cornerRadius || 0);
 
-                this.ensure(height + 10);
+                this.ensure(height + 8);
 
-                this.page.gray(0.96);
-                this.page.rect(x, this.cursor - 12, width, height, "f");
-                this.page.gray(0.76);
-                this.page.rect(x, this.cursor - 12, width, height, "S");
-                this.page.gray(0);
+                this.page.gray(this.style.calloutGray);
+                this.page.roundRect(
+                    x,
+                    this.cursor - 10,
+                    width,
+                    height,
+                    radius,
+                    "f"
+                );
+
+                this.page.gray(this.style.borderGray);
+                this.page.roundRect(
+                    x,
+                    this.cursor - 10,
+                    width,
+                    height,
+                    radius,
+                    "S"
+                );
+
+                this.page.gray(this.style.textGray);
 
                 if (title) {
                     this.page.text(
@@ -665,7 +968,7 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                             bold: true
                         }
                     );
-                    this.advance(18);
+                    this.advance(16);
                 }
 
                 for (const line of lines) {
@@ -680,22 +983,22 @@ public struct PortableDocumentFormatRuntimeScript: ReusableComponent {
                     this.advance(this.theme.lineHeight);
                 }
 
-                this.cursor += 18;
+                this.cursor += 12;
             }
 
             rule() {
-                this.ensure(18);
+                this.ensure(14);
 
-                this.page.gray(0.82);
+                this.page.gray(this.style.ruleGray);
                 this.page.line(
                     this.theme.margin,
                     this.cursor,
                     this.page.width - this.theme.margin,
                     this.cursor
                 );
-                this.page.gray(0);
+                this.page.gray(this.style.textGray);
 
-                this.advance(18);
+                this.advance(14);
             }
         }
 

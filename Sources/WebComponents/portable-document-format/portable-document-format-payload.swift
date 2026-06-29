@@ -20,6 +20,10 @@ public enum PortableDocumentFormatBlockKind: String, Sendable, Codable {
     case spacer
 }
 
+public enum PortableDocumentFormatImageEncoding: String, Sendable, Codable {
+    case rgb8
+}
+
 public struct PortableDocumentFormatPayload: Sendable, Codable {
     public let template: PortableDocumentFormatTemplate
     public let theme: PortableDocumentFormatTheme
@@ -27,6 +31,9 @@ public struct PortableDocumentFormatPayload: Sendable, Codable {
     public let subtitle: String?
     public let blocks: [PortableDocumentFormatBlock]
     public let sheet: PortableDocumentFormatSheet?
+    public let layout: PortableDocumentFormatLayout?
+    public let style: PortableDocumentFormatStyle?
+    public let chrome: PortableDocumentFormatChrome?
 
     public init(
         template: PortableDocumentFormatTemplate = .plain_a4,
@@ -34,7 +41,10 @@ public struct PortableDocumentFormatPayload: Sendable, Codable {
         title: String,
         subtitle: String? = nil,
         blocks: [PortableDocumentFormatBlock],
-        sheet: PortableDocumentFormatSheet? = nil
+        sheet: PortableDocumentFormatSheet? = nil,
+        layout: PortableDocumentFormatLayout? = nil,
+        style: PortableDocumentFormatStyle? = nil,
+        chrome: PortableDocumentFormatChrome? = nil
     ) {
         self.template = template
         self.theme = theme
@@ -42,6 +52,115 @@ public struct PortableDocumentFormatPayload: Sendable, Codable {
         self.subtitle = subtitle
         self.blocks = blocks
         self.sheet = sheet
+        self.layout = layout
+        self.style = style
+        self.chrome = chrome
+    }
+}
+
+public struct PortableDocumentFormatLayout: Sendable, Codable {
+    public let margin: Double?
+    public let headerHeight: Double?
+    public let footerHeight: Double?
+    public let logoSize: Double?
+    public let titleSize: Double?
+    public let subtitleSize: Double?
+    public let headingSize: Double?
+    public let bodySize: Double?
+    public let smallSize: Double?
+    public let lineHeight: Double?
+    public let gap: Double?
+
+    public init(
+        margin: Double? = nil,
+        headerHeight: Double? = nil,
+        footerHeight: Double? = nil,
+        logoSize: Double? = nil,
+        titleSize: Double? = nil,
+        subtitleSize: Double? = nil,
+        headingSize: Double? = nil,
+        bodySize: Double? = nil,
+        smallSize: Double? = nil,
+        lineHeight: Double? = nil,
+        gap: Double? = nil
+    ) {
+        self.margin = margin
+        self.headerHeight = headerHeight
+        self.footerHeight = footerHeight
+        self.logoSize = logoSize
+        self.titleSize = titleSize
+        self.subtitleSize = subtitleSize
+        self.headingSize = headingSize
+        self.bodySize = bodySize
+        self.smallSize = smallSize
+        self.lineHeight = lineHeight
+        self.gap = gap
+    }
+}
+
+public struct PortableDocumentFormatStyle: Sendable, Codable {
+    public let cornerRadius: Double?
+    public let borderGray: Double?
+    public let ruleGray: Double?
+    public let softGray: Double?
+    public let calloutGray: Double?
+    public let textGray: Double?
+    public let mutedGray: Double?
+    public let footerGray: Double?
+
+    public init(
+        cornerRadius: Double? = nil,
+        borderGray: Double? = nil,
+        ruleGray: Double? = nil,
+        softGray: Double? = nil,
+        calloutGray: Double? = nil,
+        textGray: Double? = nil,
+        mutedGray: Double? = nil,
+        footerGray: Double? = nil
+    ) {
+        self.cornerRadius = cornerRadius
+        self.borderGray = borderGray
+        self.ruleGray = ruleGray
+        self.softGray = softGray
+        self.calloutGray = calloutGray
+        self.textGray = textGray
+        self.mutedGray = mutedGray
+        self.footerGray = footerGray
+    }
+}
+
+public struct PortableDocumentFormatChrome: Sendable, Codable {
+    public let logo: PortableDocumentFormatImage?
+    public let headerText: String?
+    public let footerItems: [String]
+
+    public init(
+        logo: PortableDocumentFormatImage? = nil,
+        headerText: String? = nil,
+        footerItems: [String] = []
+    ) {
+        self.logo = logo
+        self.headerText = headerText
+        self.footerItems = footerItems
+    }
+}
+
+public struct PortableDocumentFormatImage: Sendable, Codable {
+    public let encoding: PortableDocumentFormatImageEncoding
+    public let width: Int
+    public let height: Int
+    public let base64: String
+
+    public init(
+        encoding: PortableDocumentFormatImageEncoding,
+        width: Int,
+        height: Int,
+        base64: String
+    ) {
+        self.encoding = encoding
+        self.width = max(width, 1)
+        self.height = max(height, 1)
+        self.base64 = base64
     }
 }
 
@@ -159,7 +278,10 @@ public extension PortableDocumentFormatPayload {
         title: String,
         subtitle: String? = nil,
         blocks: [PortableDocumentFormatBlock],
-        sheet: PortableDocumentFormatSheet? = nil
+        sheet: PortableDocumentFormatSheet? = nil,
+        layout: PortableDocumentFormatLayout? = nil,
+        style: PortableDocumentFormatStyle? = nil,
+        chrome: PortableDocumentFormatChrome? = nil
     ) -> Self {
         .init(
             template: template,
@@ -167,7 +289,10 @@ public extension PortableDocumentFormatPayload {
             title: title,
             subtitle: subtitle,
             blocks: blocks,
-            sheet: sheet
+            sheet: sheet,
+            layout: layout,
+            style: style,
+            chrome: chrome
         )
     }
 }
