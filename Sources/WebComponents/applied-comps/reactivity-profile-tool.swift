@@ -1889,7 +1889,7 @@ public struct ReactivityProfileToolScript: ReusableComponent {
                 pdfRule(),
                 pdfCallout(
                     'Gebruik',
-                    'Dit profiel is een hulpmiddel voor analyse en planning. Het vervangt geen professionele beoordeling van veiligheid, context en leerhistorie.'
+                    'Dit profiel is een hulpmiddel voor analyse en planning. Het is geen vervanging voor professionele hulp.'
                 )
             );
 
