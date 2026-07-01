@@ -1,5 +1,5 @@
 {
-  "originHash" : "f5ce92d846332fc7a0b4fd1b3b0c57b46bb4edb42ad3defcd2807bfb8cdf44f8",
+  "originHash" : "de69797302bda0ce5d34483afb514dc45b2da7b4e06e1468306322afad52efdb",
   "pins" : [
     {
       "identity" : "ansi",
@@ -223,7 +223,7 @@
       "location" : "https://github.com/leviouwendijk/Version.git",
       "state" : {
         "branch" : "master",
-        "revision" : "a7eeda6e3b84eca36f61366e5d420787c9aba69f"
+        "revision" : "7a29050af8694fbf8280a7e52551cd38b82beeac"
       }
     },
     {

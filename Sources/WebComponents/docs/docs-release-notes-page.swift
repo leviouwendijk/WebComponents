@@ -93,17 +93,29 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
     }
 
     public struct Entry: Sendable {
-        public let version: ObjectVersion
+        public let release: ReleaseVersion
         public let date: PartialDate
         public let title: String
         public let summary: String
         public let changes: [Change]
 
+        public var version: ObjectVersion {
+            release.version
+        }
+
         public var versionLabel: String {
-            version.string(
+            release.string(
                 prefixStyle: .short,
-                prefixSpace: false
+                includeMaturitySuffix: false
             )
+        }
+
+        public var maturityLabel: String? {
+            release.maturityLabel
+        }
+
+        public var lifecycleLabel: String? {
+            release.lifecycleLabel
         }
 
         public var dateValue: String {
@@ -127,17 +139,39 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
         }
 
         public init(
-            version: ObjectVersion,
+            release: ReleaseVersion,
             date: PartialDate,
             title: String,
             summary: String,
             changes: [Change]
         ) {
-            self.version = version
+            self.release = release
             self.date = Self.validated(date)
             self.title = title
             self.summary = summary
             self.changes = changes
+        }
+
+        public init(
+            version: ObjectVersion,
+            maturity: ReleaseMaturity = .stable,
+            lifecycle: Lifecycle = .active,
+            date: PartialDate,
+            title: String,
+            summary: String,
+            changes: [Change]
+        ) {
+            self.init(
+                release: ReleaseVersion(
+                    version: version,
+                    maturity: maturity,
+                    lifecycle: lifecycle
+                ),
+                date: date,
+                title: title,
+                summary: summary,
+                changes: changes
+            )
         }
 
         private static func validated(
@@ -246,7 +280,7 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
 
     private var sortedEntries: [Entry] {
         entries.sorted { lhs, rhs in
-            lhs.version > rhs.version
+            lhs.release > rhs.release
         }
     }
 
@@ -256,6 +290,14 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
 
     private var currentVersionLabel: String {
         currentEntry?.versionLabel ?? ""
+    }
+
+    private var currentMaturityLabel: String? {
+        currentEntry?.maturityLabel
+    }
+
+    private var currentLifecycleLabel: String? {
+        currentEntry?.lifecycleLabel
     }
 
     public init(
@@ -291,8 +333,24 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                                 HTML.text(title)
                             }
 
-                            HTML.span(["class": "\(Self.block)__current-version"]) {
-                                HTML.text(currentVersionLabel)
+                            if !currentVersionLabel.isEmpty {
+                                HTML.span(["class": "\(Self.block)__current-version"]) {
+                                    HTML.text(currentVersionLabel)
+                                }
+                            }
+
+                            if let currentMaturityLabel {
+                                release_badge(
+                                    currentMaturityLabel,
+                                    kind: "maturity"
+                                )
+                            }
+
+                            if let currentLifecycleLabel {
+                                release_badge(
+                                    currentLifecycleLabel,
+                                    kind: "lifecycle"
+                                )
                             }
                         }
 
@@ -317,6 +375,15 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
             ],
             stylesheets: includeStyles ? [Self.stylesheet()] : []
         )
+    }
+
+    private func release_badge(
+        _ label: String,
+        kind: String
+    ) -> any HTMLNode {
+        HTML.span(["class": "\(Self.block)__badge \(Self.block)__badge--\(kind)"]) {
+            HTML.text(label)
+        }
     }
 
     private func entry_node(
@@ -345,10 +412,25 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                             HTML.text(entry.versionLabel)
                         }
 
+                        if let maturityLabel = entry.maturityLabel {
+                            release_badge(
+                                maturityLabel,
+                                kind: "maturity"
+                            )
+                        }
+
+                        if let lifecycleLabel = entry.lifecycleLabel {
+                            release_badge(
+                                lifecycleLabel,
+                                kind: "lifecycle"
+                            )
+                        }
+
                         if current {
-                            HTML.span(["class": "\(Self.block)__badge"]) {
-                                HTML.text("Actueel")
-                            }
+                            release_badge(
+                                "Actueel",
+                                kind: "current"
+                            )
                         }
                     }
 
@@ -394,7 +476,7 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
             return false
         }
 
-        return entry.version == currentEntry.version
+        return entry.release == currentEntry.release
     }
 
     private func ordered_changes(
@@ -795,10 +877,24 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
                     CSS.decl("height", "24px"),
                     CSS.decl("padding", "0 8px"),
                     CSS.decl("border-radius", "999px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--wc-docs-release-accent) 12%, transparent)"),
-                    CSS.decl("color", "var(--wc-docs-release-accent)"),
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 8%, transparent)"),
+                    CSS.decl("color", "var(--wc-docs-release-muted)"),
                     CSS.decl("font-size", ".72rem"),
                     CSS.decl("font-weight", "760")
+                ),
+
+                CSS.rule(
+                    ".\(block)__badge--current, .\(block)__badge--maturity",
+                    CSS.decl(
+                        "background",
+                        "color-mix(in srgb, var(--wc-docs-release-accent) 12%, transparent)"),
+                    CSS.decl("color", "var(--wc-docs-release-accent)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__badge--lifecycle",
+                    CSS.decl("background", "color-mix(in srgb, var(--text-color) 9%, transparent)"),
+                    CSS.decl("color", "var(--wc-docs-release-muted)")
                 ),
 
                 CSS.rule(
