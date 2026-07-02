@@ -205,7 +205,7 @@ public struct ArticleAuthorSection: ReusableComponent, Sendable {
                             "aria-hidden": "true"
                         ]
                     ) {
-                        HTML.text("+")
+                        HTML.text("›")
                     }
                 }
 
@@ -718,6 +718,125 @@ public struct ArticleAuthorSection: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(ClassName.root)[open] .\(ClassName.summaryMarker)",
                     CSS.decl("transform", "rotate(45deg)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.root)--bar",
+                    CSS.decl("width", "min(100%, 960px)"),
+                    CSS.decl("margin", "14px 0 18px"),
+                    CSS.decl("padding", "8px"),
+                    CSS.decl("border", "1px solid var(--border-color, rgba(0, 0, 0, 0.12))"),
+                    CSS.decl("border-radius", "24px"),
+                    CSS.decl("background", "color-mix(in srgb, var(--surface-color, var(--background-color)) 92%, var(--text-color) 8%)"),
+                    CSS.decl("box-shadow", "0 1px 0 rgba(0, 0, 0, 0.025)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.root)--bar:not(.\(ClassName.root)--disclosure) > .\(ClassName.head)",
+                    CSS.decl("display", "none")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.root)--bar .\(ClassName.list)",
+                    CSS.decl("gap", "8px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.root)--bar .\(ClassName.item)",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "44px minmax(0, 1fr)"),
+                    CSS.decl("align-items", "center"),
+                    CSS.decl("gap", "11px"),
+                    CSS.decl("padding", "4px 6px"),
+                    CSS.decl("border", "0"),
+                    CSS.decl("border-radius", "18px"),
+                    CSS.decl("background", "transparent")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.avatar),\n.\(ClassName.avatarImage),\n.\(ClassName.avatarFallback)",
+                    CSS.decl("width", "44px"),
+                    CSS.decl("height", "44px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.avatar)",
+                    CSS.decl("overflow", "hidden"),
+                    CSS.decl("border-radius", "999px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.avatarImage)",
+                    CSS.decl("max-width", "44px"),
+                    CSS.decl("max-height", "44px"),
+                    CSS.decl("aspect-ratio", "1 / 1")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.name)",
+                    CSS.decl("font-size", "0.95rem"),
+                    CSS.decl("line-height", "1.1")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.role)",
+                    CSS.decl("font-size", "0.82rem"),
+                    CSS.decl("line-height", "1.25")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.bio)",
+                    CSS.decl("margin", "2px 0 0"),
+                    CSS.decl("font-size", "0.84rem"),
+                    CSS.decl("line-height", "1.3")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.links)",
+                    CSS.decl("margin-top", "5px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.link)",
+                    CSS.decl("min-height", "24px"),
+                    CSS.decl("padding", "3px 8px"),
+                    CSS.decl("font-size", "0.78rem")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.root)--disclosure .\(ClassName.summary)",
+                    CSS.decl("min-height", "44px"),
+                    CSS.decl("padding", "4px 6px 4px 12px"),
+                    CSS.decl("border-radius", "18px")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.root)--disclosure .\(ClassName.title)",
+                    CSS.decl("font-size", "0.88rem"),
+                    CSS.decl("letter-spacing", "0"),
+                    CSS.decl("text-transform", "none"),
+                    CSS.decl("color", "var(--text-color, #262626)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.summaryMarker)",
+                    CSS.decl("width", "32px"),
+                    CSS.decl("height", "32px"),
+                    CSS.decl("font-size", "1.4rem"),
+                    CSS.decl("font-weight", "520"),
+                    CSS.decl("transform", "rotate(0deg)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.root)[open] .\(ClassName.summaryMarker)",
+                    CSS.decl("transform", "rotate(90deg)")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.root)--disclosure .\(ClassName.list)",
+                    CSS.decl("margin-top", "8px"),
+                    CSS.decl("padding-top", "8px"),
+                    CSS.decl("border-top", "1px solid var(--border-color, rgba(0, 0, 0, 0.12))")
                 )
             ],
             media: [
