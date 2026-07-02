@@ -262,7 +262,9 @@ public struct DocsScrollDocument: SelectableComponent {
         return HTMLElement(
             "header",
             attrs: [
-                "class": "docs-scroll-hero \(Self.block)__hero"
+                "class": category.articleAuthors.isEmpty
+                    ? "docs-scroll-hero \(Self.block)__hero"
+                    : "docs-scroll-hero \(Self.block)__hero \(Self.block)__hero--with-authors"
             ],
             children: children
         )
@@ -494,6 +496,11 @@ public struct DocsScrollDocument: SelectableComponent {
                 CSS.rule(
                     ".\(block)__hero",
                     CSS.decl("margin", "0 0 48px")
+                ),
+
+                CSS.rule(
+                    ".\(block)__hero--with-authors",
+                    CSS.decl("margin-bottom", "30px")
                 ),
 
                 CSS.rule(

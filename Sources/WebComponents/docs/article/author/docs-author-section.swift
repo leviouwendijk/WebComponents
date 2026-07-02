@@ -445,6 +445,7 @@ public struct ArticleAuthorSection: ReusableComponent, Sendable {
             rules: [
                 CSS.rule(
                     ".\(ClassName.root)",
+                    CSS.decl("box-sizing", "border-box"),
                     CSS.decl("margin", "18px 0 34px"),
                     CSS.decl("font-family", #"var(--docs-ui-font, "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif)"#),
                     CSS.decl("color", "var(--text-color, #262626)")
@@ -722,11 +723,12 @@ public struct ArticleAuthorSection: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(ClassName.root)--bar",
-                    CSS.decl("width", "min(100%, 960px)"),
-                    CSS.decl("margin", "14px 0 18px"),
+                    CSS.decl("width", "100%"),
+                    CSS.decl("max-width", "100%"),
+                    CSS.decl("margin", "14px 0 0"),
                     CSS.decl("padding", "8px"),
                     CSS.decl("border", "1px solid var(--border-color, rgba(0, 0, 0, 0.12))"),
-                    CSS.decl("border-radius", "24px"),
+                    CSS.decl("border-radius", "16px"),
                     CSS.decl("background", "color-mix(in srgb, var(--surface-color, var(--background-color)) 92%, var(--text-color) 8%)"),
                     CSS.decl("box-shadow", "0 1px 0 rgba(0, 0, 0, 0.025)")
                 ),
