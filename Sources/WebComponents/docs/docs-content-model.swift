@@ -71,6 +71,7 @@ public struct DocsCategory: Sendable {
     public let sections: [DocsSection]
     public let reading: DocsReadingConfiguration
     public let articleMeta: DocsArticleMeta?
+    public let articleAuthors: [ArticleAuthorSection.Author]
     public let visibility: Set<BuildEnvironment>
 
     public init(
@@ -82,6 +83,7 @@ public struct DocsCategory: Sendable {
         sections: [DocsSection],
         reading: DocsReadingConfiguration = .disabled,
         articleMeta: DocsArticleMeta? = nil,
+        articleAuthors: [ArticleAuthorSection.Author] = [],
         visibility: Set<BuildEnvironment> = DocsVisibility.live
     ) {
         self.id = id
@@ -92,6 +94,7 @@ public struct DocsCategory: Sendable {
         self.sections = sections
         self.reading = reading
         self.articleMeta = articleMeta
+        self.articleAuthors = articleAuthors
         self.visibility = visibility
     }
 
@@ -119,6 +122,7 @@ public struct DocsCategory: Sendable {
             },
             reading: reading,
             articleMeta: articleMeta,
+            articleAuthors: articleAuthors,
             visibility: visibility
         )
     }

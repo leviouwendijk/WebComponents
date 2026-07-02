@@ -163,6 +163,7 @@ public struct DocsScrollDocument: SelectableComponent {
         return [
             Self.stylesheet(),
             DocsArticleMetaSummary.stylesheet(),
+            ArticleAuthorSection.stylesheet(),
             DocsReferenceSection.stylesheet()
         ] + readingControls.stylesheets
     }
@@ -244,6 +245,15 @@ public struct DocsScrollDocument: SelectableComponent {
             children += DocsArticleMetaSummary(
                 meta: articleMeta,
                 labels: lexicon.articleMetaLabels,
+                includeStyles: false
+            ).nodes.body
+        }
+
+        if !category.articleAuthors.isEmpty {
+            children += ArticleAuthorSection(
+                authors: category.articleAuthors,
+                presentation: .bar,
+                disclosure: .none,
                 includeStyles: false
             ).nodes.body
         }

@@ -23,13 +23,16 @@ public enum DocsHeaderMode: Sendable {
 
 public struct DocsArticle: Sendable {
     public let meta: DocsArticleMeta
+    public let authors: [ArticleAuthorSection.Author]
     public let sections: [DocsArticleSection]
 
     public init(
         meta: DocsArticleMeta = .init(),
+        authors: [ArticleAuthorSection.Author] = [],
         sections: [DocsArticleSection]
     ) {
         self.meta = meta
+        self.authors = authors
         self.sections = sections
     }
 }

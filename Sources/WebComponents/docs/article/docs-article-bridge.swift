@@ -32,6 +32,7 @@ public extension DocsArticle {
             ),
             reading: reading,
             articleMeta: meta,
+            articleAuthors: authors,
             visibility: visibility
         )
     }
