@@ -130,6 +130,7 @@ public struct DocsCategoryPage: ReusableComponent {
         case .scrollDocument:
             sheets.append(DocsScrollDocument.stylesheet())
             sheets.append(DocsArticleMetaSummary.stylesheet())
+            sheets.append(ArticleAuthorSection.stylesheet())
             sheets.append(DocsReadingControls.stylesheet())
             sheets.append(DocsReferenceSection.stylesheet())
 

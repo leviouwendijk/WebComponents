@@ -253,7 +253,8 @@ public struct DocsScrollDocument: SelectableComponent {
             children += ArticleAuthorSection(
                 authors: category.articleAuthors,
                 presentation: .bar,
-                disclosure: .none,
+                // disclosure: .none,
+                disclosure: category.articleAuthors.count > 1 ? .collapsed : .none,
                 includeStyles: false
             ).nodes.body
         }
