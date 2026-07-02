@@ -258,12 +258,18 @@ public struct PreviewCoordinatorScript: ReusableComponent {
                     root.getAttribute('data-preview-state') === 'closing'
                 ) {
                     root.removeAttribute('data-preview-state');
+                    root.removeAttribute('data-preview-close-reason');
                 }
             }, stateClearDelay);
         }
 
-        function close(root = activeRoot) {
+        function close(
+            root = activeRoot,
+            options = {}
+        ) {
             if (!root) return;
+
+            const reason = options.reason || 'leave';
 
             cancelClose();
 
@@ -273,23 +279,40 @@ public struct PreviewCoordinatorScript: ReusableComponent {
             }
 
             root.setAttribute('data-preview-state', 'closing');
+            root.setAttribute('data-preview-close-reason', reason);
             root.removeAttribute('data-wc-preview-open');
+
             setExpanded(root, false);
             clearStateLater(root);
         }
 
-        function closeActive() {
-            close(activeRoot);
+        function closeActive(
+            options = {}
+        ) {
+            close(
+                activeRoot,
+                options
+            );
         }
 
         function closeOthers(nextRoot) {
             if (activeRoot && activeRoot !== nextRoot) {
-                close(activeRoot);
+                close(
+                    activeRoot,
+                    {
+                        reason: 'superseded'
+                    }
+                );
             }
 
             document.querySelectorAll('[data-wc-preview-open="true"]').forEach(root => {
                 if (root !== nextRoot) {
-                    close(root);
+                    close(
+                        root,
+                        {
+                            reason: 'superseded'
+                        }
+                    );
                 }
             });
         }
@@ -307,6 +330,7 @@ public struct PreviewCoordinatorScript: ReusableComponent {
 
             position(root);
 
+            root.removeAttribute('data-preview-close-reason');
             root.setAttribute('data-preview-state', 'opening');
 
             cancelOpenFrame();
@@ -331,7 +355,12 @@ public struct PreviewCoordinatorScript: ReusableComponent {
 
             closeTimer = window.setTimeout(() => {
                 if (!shouldRemainOpen(root)) {
-                    close(root);
+                    close(
+                        root,
+                        {
+                            reason: 'leave'
+                        }
+                    );
                 }
             }, closeDelay);
         }
@@ -340,7 +369,12 @@ public struct PreviewCoordinatorScript: ReusableComponent {
             if (!activeRoot) return;
 
             if (!document.documentElement.contains(activeRoot)) {
-                closeActive();
+                closeActive(
+                    {
+                        reason: 'detached'
+                    }
+                );
+
                 return;
             }
 
@@ -362,6 +396,7 @@ public struct PreviewCoordinatorScript: ReusableComponent {
 
                 if (!root.hasAttribute('data-wc-preview-open')) {
                     root.removeAttribute('data-preview-state');
+                    root.removeAttribute('data-preview-close-reason');
                 }
             });
         }
@@ -438,10 +473,17 @@ public struct PreviewCoordinatorScript: ReusableComponent {
                 if (root) {
                     open(root);
                 } else if (activeRoot) {
-                    closeActive();
+                    closeActive(
+                        {
+                            reason: 'outside'
+                        }
+                    );
                 }
             },
-            { capture: true, passive: true }
+            {
+                capture: true,
+                passive: true
+            }
         );
 
         document.addEventListener(
@@ -450,7 +492,11 @@ public struct PreviewCoordinatorScript: ReusableComponent {
                 if (!activeRoot) return;
 
                 if (!activeRoot.contains(event.target)) {
-                    closeActive();
+                    closeActive(
+                        {
+                            reason: 'outside'
+                        }
+                    );
                 }
             },
             true
@@ -460,15 +506,25 @@ public struct PreviewCoordinatorScript: ReusableComponent {
             'keydown',
             event => {
                 if (event.key === 'Escape' && activeRoot) {
-                    closeActive();
-
-                    const adapter = activeAdapter || adapterForRoot(activeRoot);
-                    const trigger = activeRoot && adapter
-                        ? triggerFor(activeRoot, adapter)
+                    const root = activeRoot;
+                    const adapter = activeAdapter || adapterForRoot(root);
+                    const trigger = root && adapter
+                        ? triggerFor(root, adapter)
                         : null;
 
+                    close(
+                        root,
+                        {
+                            reason: 'escape'
+                        }
+                    );
+
                     if (trigger && typeof trigger.focus === 'function') {
-                        trigger.focus({ preventScroll: true });
+                        trigger.focus(
+                            {
+                                preventScroll: true
+                            }
+                        );
                     }
                 }
             },

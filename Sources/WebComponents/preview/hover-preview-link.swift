@@ -323,6 +323,14 @@ public struct HoverPreviewLink: SelectableComponent {
                 ),
 
                 CSS.rule(
+                    "\(root)[data-preview-state=\"closing\"][data-preview-close-reason=\"superseded\"] \(card), \(root)[data-preview-state=\"closing\"][data-preview-close-reason=\"outside\"] \(card), \(root)[data-preview-state=\"closing\"][data-preview-close-reason=\"escape\"] \(card), \(root)[data-preview-state=\"closing\"][data-preview-close-reason=\"detached\"] \(card)",
+                    CSS.decl("opacity", "0"),
+                    CSS.decl("visibility", "hidden"),
+                    CSS.decl("pointer-events", "none"),
+                    CSS.decl("transition", "opacity 0s linear, transform 0s linear, visibility 0s linear")
+                ),
+
+                CSS.rule(
                     "\(card)::after",
                     CSS.decl("content", "\"\""),
                     CSS.decl("position", "absolute"),

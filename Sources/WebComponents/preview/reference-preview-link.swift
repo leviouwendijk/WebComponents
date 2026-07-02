@@ -345,6 +345,14 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                 ),
 
                 CSS.rule(
+                    ".\(ClassName.root)[data-preview-state=\"closing\"][data-preview-close-reason=\"superseded\"] .\(ClassName.card), .\(ClassName.root)[data-preview-state=\"closing\"][data-preview-close-reason=\"outside\"] .\(ClassName.card), .\(ClassName.root)[data-preview-state=\"closing\"][data-preview-close-reason=\"escape\"] .\(ClassName.card), .\(ClassName.root)[data-preview-state=\"closing\"][data-preview-close-reason=\"detached\"] .\(ClassName.card)",
+                    CSS.decl("opacity", "0"),
+                    CSS.decl("visibility", "hidden"),
+                    CSS.decl("pointer-events", "none"),
+                    CSS.decl("transition", "opacity 0s linear, transform 0s linear, visibility 0s linear")
+                ),
+
+                CSS.rule(
                     ".\(ClassName.card)::after",
                     CSS.decl("content", "\"\""),
                     CSS.decl("position", "absolute"),
