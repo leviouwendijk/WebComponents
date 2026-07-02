@@ -326,8 +326,17 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                     CSS.decl("box-shadow", "0 20px 48px rgba(0, 0, 0, .34)")
                 ),
 
+                // CSS.rule(
+                //     ".\(ClassName.root):hover .\(ClassName.card), .\(ClassName.root):focus-within .\(ClassName.card)",
+                //     CSS.decl("opacity", "1"),
+                //     CSS.decl("visibility", "visible"),
+                //     CSS.decl("pointer-events", "auto"),
+                //     CSS.decl("transform", "translateX(-50%) translateY(0) scale(1)"),
+                //     CSS.decl("transition", "opacity .12s ease, transform .12s ease, visibility 0s linear 0s")
+                // ),
+
                 CSS.rule(
-                    ".\(ClassName.root):hover .\(ClassName.card), .\(ClassName.root):focus-within .\(ClassName.card)",
+                    ".\(ClassName.root)[data-wc-preview-open=\"true\"] .\(ClassName.card)",
                     CSS.decl("opacity", "1"),
                     CSS.decl("visibility", "visible"),
                     CSS.decl("pointer-events", "auto"),
@@ -489,8 +498,13 @@ public struct ReferencePreviewLink: ReusableComponent, Sendable {
                         CSS.decl("transform-origin", "center bottom")
                     ),
 
+                    // CSS.rule(
+                    //     ".\(ClassName.root):hover .\(ClassName.card), .\(ClassName.root):focus-within .\(ClassName.card)",
+                    //     CSS.decl("transform", "translateY(0) scale(1)")
+                    // ),
+
                     CSS.rule(
-                        ".\(ClassName.root):hover .\(ClassName.card), .\(ClassName.root):focus-within .\(ClassName.card)",
+                        ".\(ClassName.root)[data-wc-preview-open=\"true\"] .\(ClassName.card)",
                         CSS.decl("transform", "translateY(0) scale(1)")
                     ),
 
@@ -508,181 +522,189 @@ public struct ReferencePreviewLinkScript: ReusableComponent {
     public init() {}
 
     public var nodes: ReusableComponentNodes {
-        .init(
-            scripts: [
-                JSSource(Self.source).as_inline_script()
-            ]
-        )
+        PreviewCoordinatorScript().nodes
     }
-
-    private static let source = #"""
-    (() => {
-        if (window.wcReferencePreviewLink?.initialized) return;
-
-        const rootSelector = '.wc-reference-preview';
-        const triggerSelector = '.wc-reference-preview__trigger';
-        const cardSelector = '.wc-reference-preview__card';
-        const sheetQuery = '(max-width: 640px)';
-        const margin = 14;
-        const gap = 12;
-
-        function clamp(value, min, max) {
-            if (max < min) return min;
-            return Math.min(Math.max(value, min), max);
-        }
-
-        function viewportBox() {
-            const visual = window.visualViewport;
-
-            if (visual) {
-                return {
-                    left: visual.offsetLeft,
-                    top: visual.offsetTop,
-                    width: visual.width,
-                    height: visual.height
-                };
-            }
-
-            return {
-                left: 0,
-                top: 0,
-                width: document.documentElement.clientWidth || window.innerWidth,
-                height: window.innerHeight
-            };
-        }
-
-        function isSheetMode() {
-            return window.matchMedia?.(sheetQuery).matches ?? false;
-        }
-
-        function position(root) {
-            if (!root) return;
-
-            const trigger = root.querySelector(triggerSelector) || root;
-            const card = root.querySelector(cardSelector);
-
-            if (!trigger || !card) return;
-
-            if (isSheetMode()) {
-                root.setAttribute('data-preview-placement', 'sheet');
-                return;
-            }
-
-            const triggerRect = trigger.getBoundingClientRect();
-            const cardRect = card.getBoundingClientRect();
-            const viewport = viewportBox();
-
-            const cardWidth = Math.min(
-                Math.max(cardRect.width || 1, 1),
-                Math.max(viewport.width - margin * 2, 1)
-            );
-
-            const cardHeight = Math.min(
-                Math.max(cardRect.height || 1, 1),
-                Math.max(viewport.height - margin * 2, 1)
-            );
-
-            const idealCenterX = triggerRect.left + triggerRect.width / 2;
-            const minCenterX = viewport.left + margin + cardWidth / 2;
-            const maxCenterX = viewport.left + viewport.width - margin - cardWidth / 2;
-            const centerX = clamp(idealCenterX, minCenterX, maxCenterX);
-
-            const topLimit = viewport.top + margin;
-            const bottomLimit = viewport.top + viewport.height - margin;
-            const spaceAbove = triggerRect.top - topLimit - gap;
-            const spaceBelow = bottomLimit - triggerRect.bottom - gap;
-
-            const placement = spaceAbove < cardHeight && spaceBelow > spaceAbove
-                ? 'below'
-                : 'above';
-
-            const rawTop = placement === 'above'
-                ? triggerRect.top - gap - cardHeight
-                : triggerRect.bottom + gap;
-
-            const top = clamp(rawTop, topLimit, bottomLimit - cardHeight);
-            const cardLeft = centerX - cardWidth / 2;
-            const arrowLeft = clamp(idealCenterX - cardLeft, 18, cardWidth - 18);
-
-            root.style.setProperty('--wc-preview-left', `${centerX}px`);
-            root.style.setProperty('--wc-preview-top', `${top}px`);
-            root.style.setProperty('--wc-preview-arrow-left', `${arrowLeft}px`);
-            root.setAttribute('data-preview-placement', placement);
-        }
-
-        function rootFromEvent(event) {
-            return event.target?.closest?.(rootSelector) || null;
-        }
-
-        function activeRoots() {
-            return Array.from(document.querySelectorAll(rootSelector)).filter(root => {
-                return root.matches(':hover') || root.contains(document.activeElement);
-            });
-        }
-
-        function updateActive() {
-            activeRoots().forEach(position);
-        }
-
-        function init(scope = document) {
-            const roots = scope.matches?.(rootSelector)
-                ? [scope]
-                : Array.from(scope.querySelectorAll?.(rootSelector) || []);
-
-            roots.forEach(root => {
-                if (root.matches(':hover') || root.contains(document.activeElement)) {
-                    position(root);
-                }
-            });
-        }
-
-        document.addEventListener(
-            'mouseover',
-            event => {
-                const root = rootFromEvent(event);
-                if (root) position(root);
-            },
-            true
-        );
-
-        document.addEventListener(
-            'focusin',
-            event => {
-                const root = rootFromEvent(event);
-                if (root) position(root);
-            },
-            true
-        );
-
-        document.addEventListener(
-            'touchstart',
-            event => {
-                const root = rootFromEvent(event);
-                if (root) position(root);
-            },
-            { capture: true, passive: true }
-        );
-
-        window.addEventListener('resize', updateActive, { passive: true });
-        window.addEventListener('scroll', updateActive, true);
-
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', updateActive, { passive: true });
-            window.visualViewport.addEventListener('scroll', updateActive, { passive: true });
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => init());
-        } else {
-            init();
-        }
-
-        window.wcReferencePreviewLink = {
-            initialized: true,
-            init,
-            position,
-            updateActive
-        };
-    })();
-    """#
 }
+
+// public struct ReferencePreviewLinkScript: ReusableComponent {
+//     public init() {}
+
+//     public var nodes: ReusableComponentNodes {
+//         .init(
+//             scripts: [
+//                 JSSource(Self.source).as_inline_script()
+//             ]
+//         )
+//     }
+
+//     private static let source = #"""
+//     (() => {
+//         if (window.wcReferencePreviewLink?.initialized) return;
+
+//         const rootSelector = '.wc-reference-preview';
+//         const triggerSelector = '.wc-reference-preview__trigger';
+//         const cardSelector = '.wc-reference-preview__card';
+//         const sheetQuery = '(max-width: 640px)';
+//         const margin = 14;
+//         const gap = 12;
+
+//         function clamp(value, min, max) {
+//             if (max < min) return min;
+//             return Math.min(Math.max(value, min), max);
+//         }
+
+//         function viewportBox() {
+//             const visual = window.visualViewport;
+
+//             if (visual) {
+//                 return {
+//                     left: visual.offsetLeft,
+//                     top: visual.offsetTop,
+//                     width: visual.width,
+//                     height: visual.height
+//                 };
+//             }
+
+//             return {
+//                 left: 0,
+//                 top: 0,
+//                 width: document.documentElement.clientWidth || window.innerWidth,
+//                 height: window.innerHeight
+//             };
+//         }
+
+//         function isSheetMode() {
+//             return window.matchMedia?.(sheetQuery).matches ?? false;
+//         }
+
+//         function position(root) {
+//             if (!root) return;
+
+//             const trigger = root.querySelector(triggerSelector) || root;
+//             const card = root.querySelector(cardSelector);
+
+//             if (!trigger || !card) return;
+
+//             if (isSheetMode()) {
+//                 root.setAttribute('data-preview-placement', 'sheet');
+//                 return;
+//             }
+
+//             const triggerRect = trigger.getBoundingClientRect();
+//             const cardRect = card.getBoundingClientRect();
+//             const viewport = viewportBox();
+
+//             const cardWidth = Math.min(
+//                 Math.max(cardRect.width || 1, 1),
+//                 Math.max(viewport.width - margin * 2, 1)
+//             );
+
+//             const cardHeight = Math.min(
+//                 Math.max(cardRect.height || 1, 1),
+//                 Math.max(viewport.height - margin * 2, 1)
+//             );
+
+//             const idealCenterX = triggerRect.left + triggerRect.width / 2;
+//             const minCenterX = viewport.left + margin + cardWidth / 2;
+//             const maxCenterX = viewport.left + viewport.width - margin - cardWidth / 2;
+//             const centerX = clamp(idealCenterX, minCenterX, maxCenterX);
+
+//             const topLimit = viewport.top + margin;
+//             const bottomLimit = viewport.top + viewport.height - margin;
+//             const spaceAbove = triggerRect.top - topLimit - gap;
+//             const spaceBelow = bottomLimit - triggerRect.bottom - gap;
+
+//             const placement = spaceAbove < cardHeight && spaceBelow > spaceAbove
+//                 ? 'below'
+//                 : 'above';
+
+//             const rawTop = placement === 'above'
+//                 ? triggerRect.top - gap - cardHeight
+//                 : triggerRect.bottom + gap;
+
+//             const top = clamp(rawTop, topLimit, bottomLimit - cardHeight);
+//             const cardLeft = centerX - cardWidth / 2;
+//             const arrowLeft = clamp(idealCenterX - cardLeft, 18, cardWidth - 18);
+
+//             root.style.setProperty('--wc-preview-left', `${centerX}px`);
+//             root.style.setProperty('--wc-preview-top', `${top}px`);
+//             root.style.setProperty('--wc-preview-arrow-left', `${arrowLeft}px`);
+//             root.setAttribute('data-preview-placement', placement);
+//         }
+
+//         function rootFromEvent(event) {
+//             return event.target?.closest?.(rootSelector) || null;
+//         }
+
+//         function activeRoots() {
+//             return Array.from(document.querySelectorAll(rootSelector)).filter(root => {
+//                 return root.matches(':hover') || root.contains(document.activeElement);
+//             });
+//         }
+
+//         function updateActive() {
+//             activeRoots().forEach(position);
+//         }
+
+//         function init(scope = document) {
+//             const roots = scope.matches?.(rootSelector)
+//                 ? [scope]
+//                 : Array.from(scope.querySelectorAll?.(rootSelector) || []);
+
+//             roots.forEach(root => {
+//                 if (root.matches(':hover') || root.contains(document.activeElement)) {
+//                     position(root);
+//                 }
+//             });
+//         }
+
+//         document.addEventListener(
+//             'mouseover',
+//             event => {
+//                 const root = rootFromEvent(event);
+//                 if (root) position(root);
+//             },
+//             true
+//         );
+
+//         document.addEventListener(
+//             'focusin',
+//             event => {
+//                 const root = rootFromEvent(event);
+//                 if (root) position(root);
+//             },
+//             true
+//         );
+
+//         document.addEventListener(
+//             'touchstart',
+//             event => {
+//                 const root = rootFromEvent(event);
+//                 if (root) position(root);
+//             },
+//             { capture: true, passive: true }
+//         );
+
+//         window.addEventListener('resize', updateActive, { passive: true });
+//         window.addEventListener('scroll', updateActive, true);
+
+//         if (window.visualViewport) {
+//             window.visualViewport.addEventListener('resize', updateActive, { passive: true });
+//             window.visualViewport.addEventListener('scroll', updateActive, { passive: true });
+//         }
+
+//         if (document.readyState === 'loading') {
+//             document.addEventListener('DOMContentLoaded', () => init());
+//         } else {
+//             init();
+//         }
+
+//         window.wcReferencePreviewLink = {
+//             initialized: true,
+//             init,
+//             position,
+//             updateActive
+//         };
+//     })();
+//     """#
+// }
