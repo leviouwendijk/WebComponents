@@ -57,6 +57,7 @@ public struct ProcessPathCard: ReusableComponent, Sendable {
     public let eyebrow: String?
     public let title: String
     public let lead: String?
+    public let label: String
     public let steps: [Step]
     public let caption: String?
     public let includeStyles: Bool
@@ -66,6 +67,7 @@ public struct ProcessPathCard: ReusableComponent, Sendable {
         eyebrow: String? = nil,
         title: String,
         lead: String? = nil,
+        label: String = "hoogtepunten",
         steps: [Step],
         caption: String? = nil,
         includeStyles: Bool = true
@@ -74,6 +76,7 @@ public struct ProcessPathCard: ReusableComponent, Sendable {
         self.eyebrow = eyebrow
         self.title = title
         self.lead = lead
+        self.label = label
         self.steps = steps
         self.caption = caption
         self.includeStyles = includeStyles
@@ -96,7 +99,12 @@ public struct ProcessPathCard: ReusableComponent, Sendable {
                 "data-process-path-card": ""
             ]
         ) {
-            HTML.div(["class": ClassName.stage]) {
+            HTML.div(
+                [
+                    "class": ClassName.stage,
+                    "data-process-path-label": normalized(label) ?? "hoogtepunten"
+                ]
+            ) {
                 headerNode()
 
                 HTML.ol(["class": ClassName.steps]) {
@@ -228,9 +236,9 @@ public struct ProcessPathCard: ReusableComponent, Sendable {
                     CSS.decl("--wc-process-path-border", "var(--border-color, rgba(15, 23, 42, .13))"),
                     CSS.decl("--wc-process-path-border-soft", "color-mix(in srgb, var(--wc-process-path-border) 68%, transparent)"),
                     CSS.decl("--wc-process-path-surface", "var(--surface-color, #fff)"),
-                    CSS.decl("--wc-process-path-panel", "color-mix(in srgb, var(--wc-process-path-surface) 88%, var(--wc-process-path-ink) 12%)"),
-                    CSS.decl("--wc-process-path-card", "color-mix(in srgb, var(--wc-process-path-surface) 94%, var(--wc-process-path-ink) 6%)"),
-                    CSS.decl("--wc-process-path-accent", "var(--link-color, #2563eb)")
+                    CSS.decl("--wc-process-path-panel", "color-mix(in srgb, var(--wc-process-path-surface) 92%, var(--wc-process-path-ink) 8%)"),
+                    CSS.decl("--wc-process-path-card", "color-mix(in srgb, var(--wc-process-path-surface) 96%, var(--wc-process-path-ink) 4%)"),
+                    CSS.decl("--wc-process-path-accent", "color-mix(in srgb, var(--wc-process-path-ink) 54%, var(--wc-process-path-muted))")
                 ),
 
                 CSS.rule(
@@ -240,8 +248,8 @@ public struct ProcessPathCard: ReusableComponent, Sendable {
                     CSS.decl("--wc-process-path-border", "var(--border-color, rgba(255, 255, 255, .13))"),
                     CSS.decl("--wc-process-path-border-soft", "color-mix(in srgb, var(--wc-process-path-border) 70%, transparent)"),
                     CSS.decl("--wc-process-path-surface", "var(--surface-color, #1b1c1f)"),
-                    CSS.decl("--wc-process-path-panel", "color-mix(in srgb, var(--wc-process-path-surface) 86%, var(--wc-process-path-ink) 14%)"),
-                    CSS.decl("--wc-process-path-card", "color-mix(in srgb, var(--wc-process-path-surface) 88%, var(--wc-process-path-ink) 12%)")
+                    CSS.decl("--wc-process-path-panel", "color-mix(in srgb, var(--wc-process-path-surface) 90%, var(--wc-process-path-ink) 10%)"),
+                    CSS.decl("--wc-process-path-card", "color-mix(in srgb, var(--wc-process-path-surface) 91%, var(--wc-process-path-ink) 9%)")
                 ),
 
                 CSS.rule(
@@ -254,28 +262,17 @@ public struct ProcessPathCard: ReusableComponent, Sendable {
                     CSS.decl("position", "relative"),
                     CSS.decl("display", "grid"),
                     CSS.decl("gap", "18px"),
-                    CSS.decl("padding", "22px 22px 24px 26px"),
+                    CSS.decl("padding", "22px 22px 24px"),
                     CSS.decl("border", "1px solid var(--wc-process-path-border-soft)"),
                     CSS.decl("border-radius", "24px"),
-                    CSS.decl("background", "linear-gradient(180deg, var(--wc-process-path-surface), var(--wc-process-path-panel))"),
-                    CSS.decl("box-shadow", "0 18px 42px rgba(15, 23, 42, .055)"),
+                    CSS.decl("background", "var(--wc-process-path-panel)"),
+                    CSS.decl("box-shadow", "0 18px 42px rgba(15, 23, 42, .05)"),
                     CSS.decl("overflow", "hidden")
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.stage)::before",
-                    CSS.decl("content", "\"\""),
-                    CSS.decl("position", "absolute"),
-                    CSS.decl("inset", "18px auto 18px 0"),
-                    CSS.decl("width", "4px"),
-                    CSS.decl("border-radius", "999px"),
-                    CSS.decl("background", "linear-gradient(180deg, color-mix(in srgb, var(--wc-process-path-accent) 42%, var(--wc-process-path-border)), var(--wc-process-path-border-soft))"),
-                    CSS.decl("opacity", ".72")
-                ),
-
-                CSS.rule(
                     ".\(ClassName.stage)::after",
-                    CSS.decl("content", "\"korte samenvatting\""),
+                    CSS.decl("content", "attr(data-process-path-label)"),
                     CSS.decl("position", "absolute"),
                     CSS.decl("top", "16px"),
                     CSS.decl("right", "18px"),
@@ -296,7 +293,7 @@ public struct ProcessPathCard: ReusableComponent, Sendable {
                     CSS.decl("display", "grid"),
                     CSS.decl("gap", "6px"),
                     CSS.decl("max-width", "560px"),
-                    CSS.decl("padding-right", "150px")
+                    CSS.decl("padding-right", "140px")
                 ),
 
                 CSS.rule(
@@ -346,7 +343,7 @@ public struct ProcessPathCard: ReusableComponent, Sendable {
                     CSS.decl("bottom", "32px"),
                     CSS.decl("left", "17px"),
                     CSS.decl("width", "1px"),
-                    CSS.decl("background", "linear-gradient(180deg, var(--wc-process-path-border-soft), color-mix(in srgb, var(--wc-process-path-accent) 32%, var(--wc-process-path-border-soft)), var(--wc-process-path-border-soft))"),
+                    CSS.decl("background", "var(--wc-process-path-border-soft)"),
                     CSS.decl("pointer-events", "none")
                 ),
 
@@ -386,7 +383,7 @@ public struct ProcessPathCard: ReusableComponent, Sendable {
                     CSS.decl("place-items", "center"),
                     CSS.decl("width", "34px"),
                     CSS.decl("height", "34px"),
-                    CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-process-path-accent) 24%, var(--wc-process-path-border))"),
+                    CSS.decl("border", "1px solid var(--wc-process-path-border-soft)"),
                     CSS.decl("border-radius", "999px"),
                     CSS.decl("background", "var(--wc-process-path-surface)"),
                     CSS.decl("color", "var(--wc-process-path-accent)")
@@ -459,9 +456,9 @@ public struct ProcessPathCard: ReusableComponent, Sendable {
                     CSS.decl("align-items", "center"),
                     CSS.decl("min-height", "22px"),
                     CSS.decl("padding", "2px 8px"),
-                    CSS.decl("border", "1px solid color-mix(in srgb, var(--wc-process-path-accent) 22%, var(--wc-process-path-border))"),
+                    CSS.decl("border", "1px solid var(--wc-process-path-border-soft)"),
                     CSS.decl("border-radius", "999px"),
-                    CSS.decl("background", "color-mix(in srgb, var(--wc-process-path-accent) 7%, transparent)"),
+                    CSS.decl("background", "color-mix(in srgb, var(--wc-process-path-surface) 82%, var(--wc-process-path-ink) 18%)"),
                     CSS.decl("font-size", ".72rem"),
                     CSS.decl("font-weight", "680"),
                     CSS.decl("line-height", "1.15"),

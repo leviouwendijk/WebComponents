@@ -1,3 +1,8 @@
+public enum DocsThemeToggleLabelStyle: String, Sendable {
+    case symbols
+    case words
+}
+
 public struct DocsLexicon: Sendable {
     public let docs: String
     public let allDocs: String
@@ -20,6 +25,9 @@ public struct DocsLexicon: Sendable {
 
     public let lightModeLabel: String
     public let darkModeLabel: String
+    public let lightModeSymbol: String
+    public let darkModeSymbol: String
+    public let themeToggleLabelStyle: DocsThemeToggleLabelStyle
 
     public let categorySingularLabel: String
     public let categoryPluralLabel: String
@@ -47,6 +55,9 @@ public struct DocsLexicon: Sendable {
         searchButton: String,
         lightModeLabel: String,
         darkModeLabel: String,
+        lightModeSymbol: String = "☀︎",
+        darkModeSymbol: String = "☾",
+        themeToggleLabelStyle: DocsThemeToggleLabelStyle = .symbols,
         categorySingularLabel: String,
         categoryPluralLabel: String,
         entrySingularLabel: String,
@@ -72,6 +83,9 @@ public struct DocsLexicon: Sendable {
         self.searchButton = searchButton
         self.lightModeLabel = lightModeLabel
         self.darkModeLabel = darkModeLabel
+        self.lightModeSymbol = lightModeSymbol
+        self.darkModeSymbol = darkModeSymbol
+        self.themeToggleLabelStyle = themeToggleLabelStyle
         self.categorySingularLabel = categorySingularLabel
         self.categoryPluralLabel = categoryPluralLabel
         self.entrySingularLabel = entrySingularLabel
@@ -79,6 +93,28 @@ public struct DocsLexicon: Sendable {
         self.definitionSingularLabel = definitionSingularLabel
         self.definitionPluralLabel = definitionPluralLabel
         self.definitionRelatedLinksLabel = definitionRelatedLinksLabel
+    }
+
+    public func lightModeDisplayLabel(
+        style: DocsThemeToggleLabelStyle? = nil
+    ) -> String {
+        switch style ?? themeToggleLabelStyle {
+        case .symbols:
+            return lightModeSymbol
+        case .words:
+            return lightModeLabel
+        }
+    }
+
+    public func darkModeDisplayLabel(
+        style: DocsThemeToggleLabelStyle? = nil
+    ) -> String {
+        switch style ?? themeToggleLabelStyle {
+        case .symbols:
+            return darkModeSymbol
+        case .words:
+            return darkModeLabel
+        }
     }
 
     public func categoryCountLabel(
@@ -127,6 +163,9 @@ public struct DocsLexicon: Sendable {
         searchButton: "Search",
         lightModeLabel: "Light",
         darkModeLabel: "Dark",
+        lightModeSymbol: "☀︎",
+        darkModeSymbol: "☾",
+        themeToggleLabelStyle: .symbols,
         categorySingularLabel: "category",
         categoryPluralLabel: "categories",
         entrySingularLabel: "entry",
@@ -154,6 +193,9 @@ public struct DocsLexicon: Sendable {
         searchButton: "Zoeken",
         lightModeLabel: "licht",
         darkModeLabel: "donker",
+        lightModeSymbol: "☀︎",
+        darkModeSymbol: "☾",
+        themeToggleLabelStyle: .symbols,
         categorySingularLabel: "categorie",
         categoryPluralLabel: "categorieën",
         entrySingularLabel: "onderdeel",
