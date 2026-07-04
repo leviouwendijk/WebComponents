@@ -52,6 +52,11 @@ public struct PreviewCoordinatorScript: ReusableComponent {
         let activeAdapter = null;
         let closeTimer = null;
         let openFrame = null;
+        let pointerOpeningEnabled = false;
+
+        window.setTimeout(() => {
+            pointerOpeningEnabled = true;
+        }, 180);
 
         function normalizedPath(path) {
             const next = String(path || '/').replace(/\/+$/, '');
@@ -296,24 +301,34 @@ public struct PreviewCoordinatorScript: ReusableComponent {
         }
 
         function closeOthers(nextRoot) {
+            const supersededRoots = new Set();
+
             if (activeRoot && activeRoot !== nextRoot) {
+                supersededRoots.add(activeRoot);
+            }
+
+            document.querySelectorAll(rootSelector).forEach(root => {
+                if (root === nextRoot) return;
+
+                const state = root.getAttribute('data-preview-state');
+
+                if (
+                    root.hasAttribute('data-wc-preview-open') ||
+                    state === 'opening' ||
+                    state === 'open' ||
+                    state === 'closing'
+                ) {
+                    supersededRoots.add(root);
+                }
+            });
+
+            supersededRoots.forEach(root => {
                 close(
-                    activeRoot,
+                    root,
                     {
                         reason: 'superseded'
                     }
                 );
-            }
-
-            document.querySelectorAll('[data-wc-preview-open="true"]').forEach(root => {
-                if (root !== nextRoot) {
-                    close(
-                        root,
-                        {
-                            reason: 'superseded'
-                        }
-                    );
-                }
             });
         }
 
@@ -404,6 +419,8 @@ public struct PreviewCoordinatorScript: ReusableComponent {
         document.addEventListener(
             'mouseover',
             event => {
+                if (!pointerOpeningEnabled) return;
+
                 const root = rootFromEvent(event);
 
                 if (!root) return;
