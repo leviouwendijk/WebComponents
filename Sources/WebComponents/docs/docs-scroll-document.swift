@@ -7,11 +7,17 @@ public struct DocsScrollDocument: SelectableComponent {
     public enum Namespace {}
     public typealias SelectorNamespace = Namespace
 
+    public enum Surface: Sendable {
+        case page
+        case embedded(id: String)
+    }
+
     public static let block = "wc-docs-scroll-document"
 
     public let category: DocsCategory
     public let kicker: String
     public let lexicon: DocsLexicon
+    public let surface: Surface
     public let includeReferences: Bool
     public let includeStyles: Bool
     public let includeScript: Bool
@@ -20,16 +26,15 @@ public struct DocsScrollDocument: SelectableComponent {
         category: DocsCategory,
         kicker: String? = nil,
         lexicon: DocsLexicon = .english,
+        surface: Surface = .page,
         includeReferences: Bool = true,
         includeStyles: Bool = true,
         includeScript: Bool = true
     ) {
         self.category = category
-
-        // self.kicker = kicker ?? lexicon.contentKicker
         self.kicker = kicker ?? category.subtitle ?? lexicon.contentKicker
-
         self.lexicon = lexicon
+        self.surface = surface
         self.includeReferences = includeReferences
         self.includeStyles = includeStyles
         self.includeScript = includeScript
@@ -90,14 +95,29 @@ public struct DocsScrollDocument: SelectableComponent {
                 children: [
                     HTMLElement(
                         "div",
-                        attrs: [
-                            "id": "content-text-container"
-                        ],
+                        attrs: contentContainerAttributes(),
                         children: contentChildren
                     )
                 ]
             )
         ]
+
+        // let body: HTMLFragment = [
+        //     HTML.comment("Docs Scroll Document"),
+        //     HTMLElement(
+        //         "main",
+        //         attrs: rootAttributes(),
+        //         children: [
+        //             HTMLElement(
+        //                 "div",
+        //                 attrs: [
+        //                     "id": "content-text-container"
+        //                 ],
+        //                 children: contentChildren
+        //             )
+        //         ]
+        //     )
+        // ]
 
         return .init(
             head: contentDependencies.head,
@@ -131,6 +151,14 @@ public struct DocsScrollDocument: SelectableComponent {
     }
 
     private var showsReadingControls: Bool {
+        switch surface {
+        case .embedded:
+            return false
+
+        case .page:
+            break
+        }
+
         switch category.reading.controls {
         case .enabled:
             return true
@@ -141,13 +169,31 @@ public struct DocsScrollDocument: SelectableComponent {
     }
 
     private func rootAttributes() -> HTMLAttribute {
-        var attrs: HTMLAttribute = [
-            "id": "content-area",
-            "class": "docs-scroll-content \(Self.block)",
-            "data-wc-docs-scroll-document": category.id
-        ]
+        var attrs: HTMLAttribute
+
+        switch surface {
+        case .page:
+            attrs = [
+                "id": "content-area",
+                "class": "docs-scroll-content \(Self.block)",
+                "data-wc-docs-scroll-document": category.id,
+                "data-docs-scroll-surface": "page"
+            ]
+
+        case .embedded(let id):
+            attrs = [
+                "id": id,
+                "class": "docs-scroll-content \(Self.block) \(Self.block)--embedded",
+                "data-wc-docs-scroll-document": category.id,
+                "data-docs-scroll-surface": "embedded"
+            ]
+        }
 
         guard category.reading.enabled else {
+            return attrs
+        }
+
+        guard case .page = surface else {
             return attrs
         }
 
@@ -161,6 +207,34 @@ public struct DocsScrollDocument: SelectableComponent {
         ])
 
         return attrs
+    }
+
+    private func contentContainerAttributes() -> HTMLAttribute {
+        switch surface {
+        case .page:
+            return [
+                "id": "content-text-container",
+                "class": "\(Self.block)__content"
+            ]
+
+        case .embedded:
+            return [
+                "class": "\(Self.block)__content",
+                "data-docs-scroll-content": category.id
+            ]
+        }
+    }
+
+    private func scopedContentID(
+        _ rawValue: String
+    ) -> String {
+        switch surface {
+        case .page:
+            return rawValue
+
+        case .embedded(let id):
+            return "\(id)-\(rawValue)"
+        }
     }
 
     private func stylesheets(
@@ -185,9 +259,26 @@ public struct DocsScrollDocument: SelectableComponent {
             return []
         }
 
-        return DocsScrollSpyScript().nodes.scripts
-            + readingControls.scripts
+        var scripts = readingControls.scripts
+
+        if case .page = surface {
+            scripts = DocsScrollSpyScript().nodes.scripts
+                + scripts
+        }
+
+        return scripts
     }
+
+    // private func scripts(
+    //     readingControls: ReusableComponentNodes
+    // ) -> [JSScript] {
+    //     guard includeScript else {
+    //         return []
+    //     }
+
+    //     return DocsScrollSpyScript().nodes.scripts
+    //         + readingControls.scripts
+    // }
 
     private func contentDependencyNodes() -> ReusableComponentNodes {
         var head: HTMLFragment = []
@@ -343,7 +434,7 @@ public struct DocsScrollDocument: SelectableComponent {
         _ section: DocsSection
     ) -> HTMLAttribute {
         var attrs: HTMLAttribute = [
-            "id": section.id,
+            "id": scopedContentID(section.id),
             "class": sectionClass(section),
             "data-docs-section": section.id
         ]
@@ -356,6 +447,24 @@ public struct DocsScrollDocument: SelectableComponent {
 
         return attrs
     }
+
+    // private func sectionAttrs(
+    //     _ section: DocsSection
+    // ) -> HTMLAttribute {
+    //     var attrs: HTMLAttribute = [
+    //         "id": section.id,
+    //         "class": sectionClass(section),
+    //         "data-docs-section": section.id
+    //     ]
+
+    //     if section.presentation == .chapter {
+    //         attrs.merge([
+    //             "data-scroll-section": section.id
+    //         ])
+    //     }
+
+    //     return attrs
+    // }
 
     private func sectionClass(
         _ section: DocsSection
@@ -446,7 +555,8 @@ public struct DocsScrollDocument: SelectableComponent {
         )
 
         return children.asArticle(
-            id: item.id,
+            // id: item.id,
+            id: scopedContentID(item.id),
             className: "\(Self.block)__item"
         )
     }
