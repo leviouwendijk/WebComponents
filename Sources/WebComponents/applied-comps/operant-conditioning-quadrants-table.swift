@@ -10,9 +10,9 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
         var title: String {
             switch self {
             case .appetitive:
-                return "Appetitief"
+                return "Appetitieve stimulus"
             case .aversive:
-                return "Aversief"
+                return "Aversieve stimulus"
             }
         }
     }
@@ -478,7 +478,7 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
 
             outcomeGroup(
                 className: ClassName.outcomeGroupReinforcement,
-                title: "Voordeel",
+                title: "Voordeel (aantrekkend)",
                 note: "uitkomst maakt deze keuze waarschijnlijker",
                 top: .positive_reinforcement,
                 bottom: .negative_reinforcement
@@ -486,7 +486,7 @@ public struct OperantConditioningQuadrantsTable: ReusableComponent, Sendable {
 
             outcomeGroup(
                 className: ClassName.outcomeGroupPunishment,
-                title: "Nadeel",
+                title: "Nadeel (afstotend)",
                 note: "uitkomst maakt deze keuze minder waarschijnlijk",
                 top: .positive_punishment,
                 bottom: .negative_punishment

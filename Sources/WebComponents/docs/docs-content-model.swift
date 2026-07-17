@@ -250,6 +250,7 @@ public extension DocsSection {
 public enum DocsItemContent: Sendable {
     case fragment(@Sendable () -> HTMLFragment)
     case article(DocsArticleBody)
+    case nodes(@Sendable () -> ReusableComponentNodes)
 
     public var body: @Sendable () -> HTMLFragment {
         switch self {
@@ -259,6 +260,11 @@ public enum DocsItemContent: Sendable {
         case .article(let body):
             return {
                 DocsReadableBodyRenderer.plain(body)
+            }
+
+        case .nodes(let nodes):
+            return {
+                nodes().body
             }
         }
     }
@@ -313,6 +319,26 @@ public struct DocsItem: Sendable {
         self.header = header
         self.visibility = visibility
         self.content = content
+    }
+
+    public init(
+        id: String,
+        title: String,
+        summary: String,
+        href: String? = nil,
+        header: Bool = true,
+        visibility: Set<BuildEnvironment> = DocsVisibility.live,
+        nodes: @escaping @Sendable () -> ReusableComponentNodes
+    ) {
+        self.init(
+            id: id,
+            title: title,
+            summary: summary,
+            href: href,
+            header: header,
+            visibility: visibility,
+            content: .nodes(nodes)
+        )
     }
 
     public static func article(

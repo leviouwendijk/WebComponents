@@ -80,6 +80,7 @@ public struct DocsScrollDocument: SelectableComponent {
         }
 
         let readingControls = readingControlNodes()
+        let contentDependencies = contentDependencyNodes()
 
         let body: HTMLFragment = [
             HTML.comment("Docs Scroll Document"),
@@ -98,13 +99,22 @@ public struct DocsScrollDocument: SelectableComponent {
             )
         ]
 
-        return .body(
-            body,
+        return .init(
+            head: contentDependencies.head,
+            body: body,
             stylesheets: stylesheets(
                 readingControls: readingControls
+            ) + (
+                includeStyles
+                    ? contentDependencies.stylesheets
+                    : []
             ),
             scripts: scripts(
                 readingControls: readingControls
+            ) + (
+                includeScript
+                    ? contentDependencies.scripts
+                    : []
             )
         )
     }
@@ -177,6 +187,32 @@ public struct DocsScrollDocument: SelectableComponent {
 
         return DocsScrollSpyScript().nodes.scripts
             + readingControls.scripts
+    }
+
+    private func contentDependencyNodes() -> ReusableComponentNodes {
+        var head: HTMLFragment = []
+        var stylesheets: [CSSStyleSheet] = []
+        var scripts: [JSScript] = []
+
+        for section in category.sections {
+            for item in section.items {
+                guard case .nodes(let buildNodes) = item.content else {
+                    continue
+                }
+
+                let itemNodes = buildNodes()
+
+                head += itemNodes.head
+                stylesheets += itemNodes.stylesheets
+                scripts += itemNodes.scripts
+            }
+        }
+
+        return .init(
+            head: head,
+            stylesheets: stylesheets,
+            scripts: scripts
+        )
     }
 
     private func unresolvedContentContainerChildren() -> HTMLFragment {
@@ -425,6 +461,9 @@ public struct DocsScrollDocument: SelectableComponent {
 
         case .article(let body):
             return renderer.render(body)
+
+        case .nodes(let buildNodes):
+            return buildNodes().body
         }
     }
 
