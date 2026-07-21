@@ -68,6 +68,7 @@ public struct DocsCategory: Sendable {
     public let subtitle: String?
     public let description: String
     public let href: String
+    public let notice: @Sendable () -> HTMLFragment
     public let sections: [DocsSection]
     public let reading: DocsReadingConfiguration
     public let articleMeta: DocsArticleMeta?
@@ -80,6 +81,7 @@ public struct DocsCategory: Sendable {
         subtitle: String? = nil,
         description: String,
         href: String,
+        notice: @escaping @Sendable () -> HTMLFragment = { [] },
         sections: [DocsSection],
         reading: DocsReadingConfiguration = .disabled,
         articleMeta: DocsArticleMeta? = nil,
@@ -91,6 +93,7 @@ public struct DocsCategory: Sendable {
         self.subtitle = subtitle
         self.description = description
         self.href = href
+        self.notice = notice
         self.sections = sections
         self.reading = reading
         self.articleMeta = articleMeta
@@ -117,6 +120,7 @@ public struct DocsCategory: Sendable {
             subtitle: subtitle,
             description: description,
             href: href,
+            notice: notice,
             sections: sections.compactMap { section in
                 section.visible(in: environment)
             },

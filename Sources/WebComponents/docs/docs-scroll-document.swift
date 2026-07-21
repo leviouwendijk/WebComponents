@@ -365,6 +365,20 @@ public struct DocsScrollDocument: SelectableComponent {
             heroNode()
         ]
 
+        let notice = category.notice()
+
+        if !notice.isEmpty {
+            children.append(
+                HTMLElement(
+                    "div",
+                    attrs: [
+                        "class": "\(Self.block)__page-notice"
+                    ],
+                    children: notice
+                )
+            )
+        }
+
         children += readingControls.body
 
         children.append(
@@ -736,6 +750,11 @@ public struct DocsScrollDocument: SelectableComponent {
                     CSS.decl("font-size", "1.08rem"),
                     CSS.decl("line-height", "1.56"),
                     CSS.decl("color", "var(--muted-text-color)")
+                ),
+
+                CSS.rule(
+                    ".\(block)__page-notice",
+                    CSS.decl("margin", "24px 0 32px")
                 ),
 
                 CSS.rule(
