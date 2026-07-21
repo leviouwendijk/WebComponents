@@ -154,6 +154,7 @@ public struct DocsCategoryNav: SelectableComponent {
                     CSS.decl("color", "var(--text-color)"),
                     CSS.decl("border", "1px solid transparent"),
                     CSS.decl("background", "transparent"),
+                    CSS.decl("overflow", "hidden"),
                     CSS.decl("transition", "background 140ms ease, border-color 140ms ease, transform 140ms ease")
                 ),
 
@@ -172,14 +173,20 @@ public struct DocsCategoryNav: SelectableComponent {
 
                 CSS.rule(
                     ".docs-category-nav__label",
+                    CSS.decl("display", "block"),
+                    CSS.decl("max-width", "100%"),
                     CSS.decl("font-size", ".86rem"),
                     CSS.decl("font-weight", "700"),
                     CSS.decl("line-height", "1.12"),
-                    CSS.decl("white-space", "nowrap")
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("overflow", "hidden"),
+                    CSS.decl("text-overflow", "ellipsis")
                 ),
 
                 CSS.rule(
                     ".docs-category-nav__description",
+                    CSS.decl("display", "block"),
+                    CSS.decl("max-width", "100%"),
                     CSS.decl("font-size", ".72rem"),
                     CSS.decl("line-height", "1.22"),
                     CSS.decl("color", "color-mix(in srgb, var(--text-color) 58%, transparent)"),

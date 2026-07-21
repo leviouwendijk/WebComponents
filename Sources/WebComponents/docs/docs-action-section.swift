@@ -247,12 +247,16 @@ public struct DocsActionCard: ReusableComponent, Sendable {
                 CSS.rule(
                     ".\(block)__eyebrow",
                     CSS.decl("display", "block"),
+                    CSS.decl("max-width", "100%"),
                     CSS.decl("margin", "0 0 12px"),
                     CSS.decl("font-size", ".72rem"),
                     CSS.decl("font-weight", "750"),
                     CSS.decl("letter-spacing", ".1em"),
                     CSS.decl("text-transform", "uppercase"),
-                    CSS.decl("color", "var(--project-hub-muted, var(--muted-text-color, rgba(0, 0, 0, .62)))")
+                    CSS.decl("color", "var(--project-hub-muted, var(--muted-text-color, rgba(0, 0, 0, .62)))"),
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("overflow", "hidden"),
+                    CSS.decl("text-overflow", "ellipsis")
                 ),
 
                 CSS.rule(
@@ -330,17 +334,25 @@ public struct DocsActionCard: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(block) h3",
+                    CSS.decl("min-width", "0"),
                     CSS.decl("margin", "0"),
                     CSS.decl("font-size", "1.32rem"),
                     CSS.decl("line-height", "1.12"),
-                    CSS.decl("letter-spacing", "-.02em")
+                    CSS.decl("letter-spacing", "-.02em"),
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("overflow", "hidden"),
+                    CSS.decl("text-overflow", "ellipsis")
                 ),
 
                 CSS.rule(
                     ".\(block) p",
                     CSS.decl("margin", "12px 0 0"),
                     CSS.decl("line-height", "1.55"),
-                    CSS.decl("color", "var(--project-hub-muted, var(--muted-text-color, rgba(0, 0, 0, .62)))")
+                    CSS.decl("color", "var(--project-hub-muted, var(--muted-text-color, rgba(0, 0, 0, .62)))"),
+                    CSS.decl("display", "-webkit-box"),
+                    CSS.decl("-webkit-box-orient", "vertical"),
+                    CSS.decl("-webkit-line-clamp", "3"),
+                    CSS.decl("overflow", "hidden")
                 ),
 
                 CSS.rule(
