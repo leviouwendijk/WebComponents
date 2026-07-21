@@ -3,7 +3,7 @@ import CSS
 import HTML
 import JS
 
-public struct DocsProjectPreview: ReusableComponent, Sendable {
+public struct DocsPreviewEmbedded: ReusableComponent, Sendable {
     private struct RenderedCategory: Sendable {
         let category: DocsCategory
         let key: String
@@ -121,7 +121,7 @@ public struct DocsProjectPreview: ReusableComponent, Sendable {
                 + inlinePreviewRuntime.scripts
                 + DocsProjectContextNavScript().nodes.scripts
                 + DocsCategoryNavScript().nodes.scripts
-                + DocsProjectPreviewScript().nodes.scripts
+                + DocsPreviewEmbeddedScript().nodes.scripts
         }
 
         return .init(

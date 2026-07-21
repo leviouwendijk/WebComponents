@@ -1,7 +1,7 @@
 import Constructors
 import JS
 
-public struct DocsProjectPreviewScript: ReusableComponent {
+public struct DocsPreviewEmbeddedScript: ReusableComponent {
     public init() {}
 
     public var nodes: ReusableComponentNodes {

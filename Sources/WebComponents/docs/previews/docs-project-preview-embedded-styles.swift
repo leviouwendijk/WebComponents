@@ -1,6 +1,6 @@
 import CSS
 
-extension DocsProjectPreview {
+extension DocsPreviewEmbedded {
     public static func stylesheet() -> CSSStyleSheet {
         let root = ".wc-docs-project-preview"
 
