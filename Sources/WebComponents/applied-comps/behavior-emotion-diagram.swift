@@ -106,6 +106,8 @@ public struct BehaviorEmotionDiagram:
         static let path = "wc-behavior-emotion__path"
         static let pathBehavior = "wc-behavior-emotion__path--behavior"
         static let pathEmotion = "wc-behavior-emotion__path--emotion"
+        static let arrowHead = "wc-behavior-emotion__arrow-head"
+        static let connector = "wc-behavior-emotion__connector"
 
         static let pathLabel = "wc-behavior-emotion__path-label"
         static let caption = "wc-behavior-emotion__caption"
@@ -329,7 +331,7 @@ public struct BehaviorEmotionDiagram:
                 "svg",
                 [
                     "class": ClassName.svg,
-                    "viewBox": "0 0 760 500",
+                    "viewBox": "0 0 760 380",
                     "role": "img",
                     "aria-labelledby": "\(id)-cycle-title \(id)-cycle-description",
                     "xmlns": "http://www.w3.org/2000/svg"
@@ -353,35 +355,55 @@ public struct BehaviorEmotionDiagram:
                     ]
                 ) {
                     HTML.text(
-                        "Emotie beïnvloedt welke gedragsopties waarschijnlijk worden. "
-                            + "Gedrag genereert ervaringen die emotionele associaties vormen. "
+                        "Gedrag genereert ervaringen die emotionele associaties vormen. "
+                            + "Emotie beïnvloedt vervolgens welke gedragsopties waarschijnlijk worden. "
                             + "Gewoonte ligt als stimulus-responsverbinding tussen beide."
                     )
                 }
 
-                markerDefinitions()
-
-                cyclePath(
-                    className: ClassName.pathEmotion,
-                    path: """
-                    M 570 154
-                    C 676 188 676 312 570 346
-                    """,
-                    markerID: "\(id)-arrow-emotion"
-                )
-
-                cyclePath(
+                cycleArrow(
                     className: ClassName.pathBehavior,
                     path: """
-                    M 190 346
-                    C 84 312 84 188 190 154
+                    M 290 145
+                    C 334 64 426 64 470 145
                     """,
-                    markerID: "\(id)-arrow-behavior"
+                    arrowHead: """
+                    M 470 145
+                    L 452 138
+                    L 458 156
+                    Z
+                    """
+                )
+
+                cycleArrow(
+                    className: ClassName.pathEmotion,
+                    path: """
+                    M 470 255
+                    C 426 336 334 336 290 255
+                    """,
+                    arrowHead: """
+                    M 290 255
+                    L 308 248
+                    L 302 266
+                    Z
+                    """
+                )
+
+                cyclePathLabel(
+                    x: 380,
+                    y: 48,
+                    text: copy.behaviorToEmotion
+                )
+
+                cyclePathLabel(
+                    x: 380,
+                    y: 360,
+                    text: copy.emotionToBehavior
                 )
 
                 cycleNodeBox(
-                    x: 80,
-                    y: 180,
+                    x: 70,
+                    y: 130,
                     width: 220,
                     height: 140,
                     title: copy.behaviorTitle,
@@ -390,8 +412,8 @@ public struct BehaviorEmotionDiagram:
                 )
 
                 cycleNodeBox(
-                    x: 460,
-                    y: 180,
+                    x: 470,
+                    y: 130,
                     width: 220,
                     height: 140,
                     title: copy.emotionTitle,
@@ -401,7 +423,7 @@ public struct BehaviorEmotionDiagram:
 
                 cycleNodeBox(
                     x: 305,
-                    y: 205,
+                    y: 155,
                     width: 150,
                     height: 90,
                     title: copy.habitTitle,
@@ -409,102 +431,61 @@ public struct BehaviorEmotionDiagram:
                     className: ClassName.nodeHabit
                 )
 
-                cyclePathLabel(
-                    x: 646,
-                    y: 250,
-                    text: copy.emotionToBehavior,
-                    rotation: 90
+                cycleConnector(
+                    fromX: 290,
+                    toX: 305,
+                    y: 200
                 )
 
-                cyclePathLabel(
-                    x: 114,
-                    y: 250,
-                    text: copy.behaviorToEmotion,
-                    rotation: -90
-                )
-
-                cyclePath(
-                    className: ClassName.path,
-                    path: """
-                    M 300 250
-                    L 305 250
-                    """,
-                    markerID: nil
-                )
-
-                cyclePath(
-                    className: ClassName.path,
-                    path: """
-                    M 455 250
-                    L 460 250
-                    """,
-                    markerID: nil
+                cycleConnector(
+                    fromX: 455,
+                    toX: 470,
+                    y: 200
                 )
             }
         }
     }
 
-    private func markerDefinitions() -> any HTMLNode {
-        HTML.el("defs") {
-            arrowMarker(
-                id: "\(id)-arrow-emotion",
-                className: ClassName.pathEmotion
-            )
-
-            arrowMarker(
-                id: "\(id)-arrow-behavior",
-                className: ClassName.pathBehavior
-            )
-        }
-    }
-
-    private func arrowMarker(
-        id: String,
-        className: String
+    private func cycleArrow(
+        className: String,
+        path: String,
+        arrowHead: String
     ) -> any HTMLNode {
         HTML.el(
-            "marker",
+            "g",
             [
-                "id": id,
-                "viewBox": "0 0 10 10",
-                "refX": "9",
-                "refY": "5",
-                "markerWidth": "8",
-                "markerHeight": "8",
-                "orient": "auto-start-reverse"
+                "class": className
             ]
         ) {
             HTML.el(
                 "path",
                 [
-                    "class": "\(ClassName.path) \(className)",
-                    "d": "M 0 0 L 10 5 L 0 10 Z"
+                    "class": ClassName.path,
+                    "d": path
+                ]
+            ) {}
+
+            HTML.el(
+                "path",
+                [
+                    "class": ClassName.arrowHead,
+                    "d": arrowHead
                 ]
             ) {}
         }
     }
 
-    private func cyclePath(
-        className: String,
-        path: String,
-        markerID: String?
+    private func cycleConnector(
+        fromX: Int,
+        toX: Int,
+        y: Int
     ) -> any HTMLNode {
-        var attributes: HTMLAttribute = [
-            "class": "\(ClassName.path) \(className)",
-            "d": path
-        ]
-
-        if let markerID {
-            attributes.merge(
-                [
-                    "marker-end": "url(#\(markerID))"
-                ]
-            )
-        }
-
-        return HTML.el(
+        HTML.el(
             "path",
-            attributes
+            [
+                "class": ClassName.connector,
+                "d": "M \(fromX) \(y) L \(toX) \(y)"
+            ]
         ) {}
     }
 
@@ -518,8 +499,7 @@ public struct BehaviorEmotionDiagram:
         className: String
     ) -> any HTMLNode {
         let centerX = x + (width / 2)
-        let titleY = y + (height / 2) - 6
-        let subtitleY = titleY + 28
+        let centerY = y + (height / 2)
 
         return HTML.el(
             "g",
@@ -543,7 +523,7 @@ public struct BehaviorEmotionDiagram:
                 [
                     "class": ClassName.nodeTitle,
                     "x": "\(centerX)",
-                    "y": "\(titleY)",
+                    "y": "\(centerY - 8)",
                     "text-anchor": "middle"
                 ]
             ) {
@@ -555,7 +535,7 @@ public struct BehaviorEmotionDiagram:
                 [
                     "class": ClassName.nodeSubtitle,
                     "x": "\(centerX)",
-                    "y": "\(subtitleY)",
+                    "y": "\(centerY + 24)",
                     "text-anchor": "middle"
                 ]
             ) {
@@ -567,8 +547,7 @@ public struct BehaviorEmotionDiagram:
     private func cyclePathLabel(
         x: Int,
         y: Int,
-        text: String,
-        rotation: Int
+        text: String
     ) -> any HTMLNode {
         HTML.el(
             "text",
@@ -576,8 +555,7 @@ public struct BehaviorEmotionDiagram:
                 "class": ClassName.pathLabel,
                 "x": "\(x)",
                 "y": "\(y)",
-                "text-anchor": "middle",
-                "transform": "rotate(\(rotation) \(x) \(y))"
+                "text-anchor": "middle"
             ]
         ) {
             HTML.text(text)
@@ -618,6 +596,14 @@ public struct BehaviorEmotionDiagram:
                     CSS.decl(
                         "--wc-behavior-emotion-emotion",
                         "color-mix(in srgb, var(--link-color, #2563eb) 34%, var(--wc-behavior-emotion-surface))"
+                    ),
+                    CSS.decl(
+                        "--wc-behavior-emotion-arrow-behavior",
+                        "color-mix(in srgb, var(--link-color, #2563eb) 72%, var(--wc-behavior-emotion-ink))"
+                    ),
+                    CSS.decl(
+                        "--wc-behavior-emotion-arrow-emotion",
+                        "color-mix(in srgb, var(--link-color, #2563eb) 46%, var(--wc-behavior-emotion-ink))"
                     )
                 ),
 
@@ -626,17 +612,19 @@ public struct BehaviorEmotionDiagram:
                     CSS.decl("display", "grid"),
                     CSS.decl(
                         "grid-template-columns",
-                        "minmax(0, 1fr) 72px minmax(0, .82fr) 72px minmax(0, 1fr)"
+                        "minmax(0, 1fr) 58px minmax(0, .82fr) 58px minmax(0, 1fr)"
                     ),
-                    CSS.decl("gap", "12px"),
+                    CSS.decl("gap", "14px"),
                     CSS.decl("align-items", "stretch")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.card)",
                     CSS.decl("box-sizing", "border-box"),
+                    CSS.decl("display", "flex"),
+                    CSS.decl("flex-direction", "column"),
                     CSS.decl("min-width", "0"),
-                    CSS.decl("padding", "24px"),
+                    CSS.decl("padding", "24px 26px 26px"),
                     CSS.decl(
                         "border",
                         "1px solid var(--wc-behavior-emotion-border)"
@@ -661,8 +649,7 @@ public struct BehaviorEmotionDiagram:
                     CSS.decl(
                         "background",
                         "var(--wc-behavior-emotion-habit)"
-                    ),
-                    CSS.decl("align-self", "center")
+                    )
                 ),
 
                 CSS.rule(
@@ -675,10 +662,11 @@ public struct BehaviorEmotionDiagram:
 
                 CSS.rule(
                     ".\(ClassName.eyebrow)",
-                    CSS.decl("margin", "0 0 7px"),
-                    CSS.decl("font-size", ".7rem"),
-                    CSS.decl("font-weight", "700"),
-                    CSS.decl("letter-spacing", ".08em"),
+                    CSS.decl("margin", "0 0 12px"),
+                    CSS.decl("font-size", ".72rem"),
+                    CSS.decl("font-weight", "720"),
+                    CSS.decl("line-height", "1"),
+                    CSS.decl("letter-spacing", ".075em"),
                     CSS.decl("text-transform", "uppercase"),
                     CSS.decl(
                         "color",
@@ -688,15 +676,17 @@ public struct BehaviorEmotionDiagram:
 
                 CSS.rule(
                     ".\(ClassName.title)",
-                    CSS.decl("margin", "0 0 18px"),
-                    CSS.decl("font-size", "1.35rem"),
-                    CSS.decl("line-height", "1.1")
+                    CSS.decl("margin", "0 0 16px"),
+                    CSS.decl("font-size", "1.55rem"),
+                    CSS.decl("font-weight", "760"),
+                    CSS.decl("line-height", "1.05"),
+                    CSS.decl("letter-spacing", "-.025em")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.list)",
                     CSS.decl("display", "grid"),
-                    CSS.decl("gap", "8px"),
+                    CSS.decl("gap", "9px"),
                     CSS.decl("margin", "0"),
                     CSS.decl("padding", "0"),
                     CSS.decl("list-style", "none")
@@ -704,18 +694,19 @@ public struct BehaviorEmotionDiagram:
 
                 CSS.rule(
                     ".\(ClassName.item)",
-                    CSS.decl("font-size", ".92rem"),
-                    CSS.decl("line-height", "1.35")
+                    CSS.decl("margin", "0"),
+                    CSS.decl("font-size", ".94rem"),
+                    CSS.decl("line-height", "1.25")
                 ),
 
                 CSS.rule(
                     ".\(ClassName.bridge)",
                     CSS.decl("display", "grid"),
-                    CSS.decl("grid-template-rows", "auto 1fr auto"),
-                    CSS.decl("gap", "8px"),
+                    CSS.decl("grid-template-rows", "auto minmax(52px, 1fr) auto"),
+                    CSS.decl("gap", "10px"),
                     CSS.decl("align-items", "center"),
                     CSS.decl("justify-items", "center"),
-                    CSS.decl("padding", "22px 0")
+                    CSS.decl("padding", "28px 0 24px")
                 ),
 
                 CSS.rule(
@@ -724,7 +715,6 @@ public struct BehaviorEmotionDiagram:
                     CSS.decl("display", "block"),
                     CSS.decl("width", "2px"),
                     CSS.decl("height", "100%"),
-                    CSS.decl("min-height", "58px"),
                     CSS.decl(
                         "background",
                         "var(--wc-behavior-emotion-border)"
@@ -736,9 +726,9 @@ public struct BehaviorEmotionDiagram:
                     CSS.decl("content", "\"\""),
                     CSS.decl("position", "absolute"),
                     CSS.decl("left", "50%"),
-                    CSS.decl("bottom", "-1px"),
-                    CSS.decl("width", "9px"),
-                    CSS.decl("height", "9px"),
+                    CSS.decl("bottom", "0"),
+                    CSS.decl("width", "8px"),
+                    CSS.decl("height", "8px"),
                     CSS.decl(
                         "border-right",
                         "2px solid var(--wc-behavior-emotion-muted)"
@@ -749,14 +739,15 @@ public struct BehaviorEmotionDiagram:
                     ),
                     CSS.decl(
                         "transform",
-                        "translateX(-50%) rotate(45deg)"
+                        "translate(-50%, 1px) rotate(45deg)"
                     )
                 ),
 
                 CSS.rule(
                     ".\(ClassName.bridgeLabel)",
-                    CSS.decl("font-size", ".68rem"),
-                    CSS.decl("font-weight", "650"),
+                    CSS.decl("max-width", "58px"),
+                    CSS.decl("font-size", ".67rem"),
+                    CSS.decl("font-weight", "680"),
                     CSS.decl("line-height", "1.15"),
                     CSS.decl("text-align", "center"),
                     CSS.decl(
@@ -851,27 +842,52 @@ public struct BehaviorEmotionDiagram:
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.pathBehavior)",
+                    ".\(ClassName.arrowHead)",
+                    CSS.decl("stroke", "none")
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.pathBehavior) .\(ClassName.path)",
                     CSS.decl(
                         "stroke",
-                        "color-mix(in srgb, var(--link-color, #2563eb) 70%, var(--wc-behavior-emotion-ink))"
-                    ),
-                    CSS.decl(
-                        "fill",
-                        "color-mix(in srgb, var(--link-color, #2563eb) 70%, var(--wc-behavior-emotion-ink))"
+                        "var(--wc-behavior-emotion-arrow-behavior)"
                     )
                 ),
 
                 CSS.rule(
-                    ".\(ClassName.pathEmotion)",
-                    CSS.decl(
-                        "stroke",
-                        "color-mix(in srgb, var(--link-color, #2563eb) 42%, var(--wc-behavior-emotion-ink))"
-                    ),
+                    ".\(ClassName.pathBehavior) .\(ClassName.arrowHead)",
                     CSS.decl(
                         "fill",
-                        "color-mix(in srgb, var(--link-color, #2563eb) 42%, var(--wc-behavior-emotion-ink))"
+                        "var(--wc-behavior-emotion-arrow-behavior)"
                     )
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.pathEmotion) .\(ClassName.path)",
+                    CSS.decl(
+                        "stroke",
+                        "var(--wc-behavior-emotion-arrow-emotion)"
+                    )
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.pathEmotion) .\(ClassName.arrowHead)",
+                    CSS.decl(
+                        "fill",
+                        "var(--wc-behavior-emotion-arrow-emotion)"
+                    )
+                ),
+
+                CSS.rule(
+                    ".\(ClassName.connector)",
+                    CSS.decl("fill", "none"),
+                    CSS.decl(
+                        "stroke",
+                        "var(--wc-behavior-emotion-border)"
+                    ),
+                    CSS.decl("stroke-width", "2"),
+                    CSS.decl("stroke-linecap", "round"),
+                    CSS.decl("vector-effect", "non-scaling-stroke")
                 ),
 
                 CSS.rule(
@@ -882,8 +898,8 @@ public struct BehaviorEmotionDiagram:
                     ),
                     CSS.decl("font-family", "inherit"),
                     CSS.decl("font-size", "13px"),
-                    CSS.decl("font-weight", "650"),
-                    CSS.decl("letter-spacing", ".02em")
+                    CSS.decl("font-weight", "680"),
+                    CSS.decl("letter-spacing", ".01em")
                 ),
 
                 CSS.rule(
