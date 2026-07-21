@@ -670,23 +670,23 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
                 }
             }
 
-            HTML.div(
-                [
-                    "class": "wc-docs-preview-tree__metrics"
-                ]
-            ) {
-                metric(
-                    label: labels.directChildren,
-                    value: node.children.count
-                )
-
-                metric(
-                    label: labels.descendants,
-                    value: node.descendantCount
-                )
-            }
-
             if !node.children.isEmpty {
+                HTML.div(
+                    [
+                        "class": "wc-docs-preview-tree__metrics"
+                    ]
+                ) {
+                    metric(
+                        label: labels.directChildren,
+                        value: node.children.count
+                    )
+
+                    metric(
+                        label: labels.descendants,
+                        value: node.descendantCount
+                    )
+                }
+
                 HTML.div(
                     [
                         "class": "wc-docs-preview-tree__children"
