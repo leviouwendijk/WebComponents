@@ -129,15 +129,16 @@ public struct BehaviorControlLayersDiagram:
         id: String = "behavior-control-layers",
         choice: Layer = Layer(
             title: "Keuze",
-            subtitle: "A–O"
+            subtitle: "Uitkomst-afhankelijk (A–O)"
         ),
         habit: Layer = Layer(
-            title: "Gewoonte",
-            subtitle: "S–R"
+            title: "Patroon",
+            subtitle: "Gewoontelijk (S–R)"
         ),
         emotion: Layer = Layer(
             title: "Emotie",
-            subtitle: "Associatie"
+            // subtitle: "Associatie"
+            subtitle: "Verwachting"
         ),
         caption: String? = nil,
         includeStyles: Bool = true
