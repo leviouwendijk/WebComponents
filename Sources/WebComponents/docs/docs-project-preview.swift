@@ -58,6 +58,18 @@ public struct DocsProjectPreview: ReusableComponent, Sendable {
             return .init()
         }
 
+        let inlinePreviewRuntime = ReusableComponentNodes(
+            stylesheets: includeStyles
+                ? [
+                    HoverPreviewLink.stylesheet(),
+                    ReferencePreviewLink.stylesheet()
+                ]
+                : [],
+            scripts: includeScript
+                ? PreviewCoordinatorScript().nodes.scripts
+                : []
+        )
+
         return .init(
             head: rendered.flatMap { $0.nodes.head },
             body: [
@@ -69,10 +81,13 @@ public struct DocsProjectPreview: ReusableComponent, Sendable {
             stylesheets: includeStyles
                 ? [
                     Self.stylesheet()
-                ] + rendered.flatMap { $0.nodes.stylesheets }
+                ]
+                    + rendered.flatMap { $0.nodes.stylesheets }
+                    + inlinePreviewRuntime.stylesheets
                 : [],
             scripts: includeScript
                 ? rendered.flatMap { $0.nodes.scripts }
+                    + inlinePreviewRuntime.scripts
                     + DocsProjectPreviewScript().nodes.scripts
                 : []
         )

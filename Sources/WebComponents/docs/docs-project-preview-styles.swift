@@ -246,7 +246,22 @@ extension DocsProjectPreview {
                     CSS.decl("width", "100%"),
                     CSS.decl("margin", "0"),
                     CSS.decl("padding", "32px 36px 44px"),
-                    CSS.decl("color", "var(--wc-docs-preview-ink)")
+                    CSS.decl("color", "var(--wc-docs-preview-ink)"),
+                    CSS.decl("font-size", "16px"),
+                    CSS.decl("line-height", "1.5"),
+                    CSS.decl("--wc-docs-reading-font-size", "16px"),
+                    CSS.decl("--wc-docs-reading-line-height", "1.68"),
+                    CSS.decl("--wc-docs-reading-font-family", "\"Instrument Sans\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif")
+                ),
+
+                CSS.rule(
+                    "\(root) .wc-docs-scroll-document--embedded .wc-docs-scroll-document__item-body > p",
+                    CSS.decl("margin", "0 0 1em")
+                ),
+
+                CSS.rule(
+                    "\(root) .wc-docs-scroll-document--embedded .wc-docs-scroll-document__item-body > p:last-child",
+                    CSS.decl("margin-bottom", "0")
                 ),
 
                 CSS.rule(
