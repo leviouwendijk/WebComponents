@@ -112,7 +112,7 @@ public struct DocsAIContentNotice:
                     CSS.decl("align-items", "start"),
                     CSS.decl("gap", "12px"),
                     CSS.decl("width", "100%"),
-                    CSS.decl("margin", "0 0 28px"),
+                    CSS.decl("margin", "0"),
                     CSS.decl("padding", "14px 16px"),
                     CSS.decl(
                         "border",

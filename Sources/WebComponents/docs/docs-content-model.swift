@@ -277,6 +277,7 @@ public struct DocsItem: Sendable {
     public let href: String
     public let header: Bool
     public let content: DocsItemContent
+    public let notice: @Sendable () -> HTMLFragment
     public let visibility: Set<BuildEnvironment>
 
     public var body: @Sendable () -> HTMLFragment {
@@ -290,6 +291,7 @@ public struct DocsItem: Sendable {
         href: String? = nil,
         header: Bool = true,
         visibility: Set<BuildEnvironment> = DocsVisibility.live,
+        notice: @escaping @Sendable () -> HTMLFragment = { [] },
         body: @escaping @Sendable () -> HTMLFragment = { [] }
     ) {
         self.init(
@@ -299,6 +301,7 @@ public struct DocsItem: Sendable {
             href: href,
             header: header,
             visibility: visibility,
+            notice: notice,
             content: .fragment(body)
         )
     }
@@ -310,6 +313,7 @@ public struct DocsItem: Sendable {
         href: String? = nil,
         header: Bool = true,
         visibility: Set<BuildEnvironment> = DocsVisibility.live,
+        notice: @escaping @Sendable () -> HTMLFragment = { [] },
         content: DocsItemContent
     ) {
         self.id = id
@@ -318,6 +322,7 @@ public struct DocsItem: Sendable {
         self.href = href ?? "#\(id)"
         self.header = header
         self.visibility = visibility
+        self.notice = notice
         self.content = content
     }
 
@@ -328,6 +333,7 @@ public struct DocsItem: Sendable {
         href: String? = nil,
         header: Bool = true,
         visibility: Set<BuildEnvironment> = DocsVisibility.live,
+        notice: @escaping @Sendable () -> HTMLFragment = { [] },
         nodes: @escaping @Sendable () -> ReusableComponentNodes
     ) {
         self.init(
@@ -337,6 +343,7 @@ public struct DocsItem: Sendable {
             href: href,
             header: header,
             visibility: visibility,
+            notice: notice,
             content: .nodes(nodes)
         )
     }
@@ -348,6 +355,7 @@ public struct DocsItem: Sendable {
         href: String? = nil,
         header: Bool = true,
         visibility: Set<BuildEnvironment> = DocsVisibility.live,
+        notice: @escaping @Sendable () -> HTMLFragment = { [] },
         body: DocsArticleBody
     ) -> DocsItem {
         DocsItem(
@@ -357,6 +365,7 @@ public struct DocsItem: Sendable {
             href: href,
             header: header,
             visibility: visibility,
+            notice: notice,
             content: .article(body)
         )
     }

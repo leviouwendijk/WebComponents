@@ -581,6 +581,20 @@ public struct DocsScrollDocument: SelectableComponent {
             )
         }
 
+        let notice = item.notice()
+
+        if !notice.isEmpty {
+            children.append(
+                HTMLElement(
+                    "div",
+                    attrs: [
+                        "class": "\(Self.block)__item-notice"
+                    ],
+                    children: notice
+                )
+            )
+        }
+
         children.append(
             HTMLElement(
                 "div",
@@ -595,7 +609,6 @@ public struct DocsScrollDocument: SelectableComponent {
         )
 
         return children.asArticle(
-            // id: item.id,
             id: scopedContentID(item.id),
             className: "\(Self.block)__item"
         )
@@ -644,6 +657,12 @@ public struct DocsScrollDocument: SelectableComponent {
                 )
             ]
         )
+    }
+
+    private func hasContent(
+        _ fragment: HTMLFragment
+    ) -> Bool {
+        !fragment.isEmpty
     }
 
     public static func stylesheet() -> CSSStyleSheet {
@@ -774,6 +793,11 @@ public struct DocsScrollDocument: SelectableComponent {
                     CSS.decl("font-size", "clamp(1.42rem, 2.2vw, 1.78rem)"),
                     CSS.decl("line-height", "1.12"),
                     CSS.decl("letter-spacing", "-.025em")
+                ),
+
+                CSS.rule(
+                    ".\(block)__item-notice",
+                    CSS.decl("margin", "20px 0 28px")
                 ),
 
                 CSS.rule(
