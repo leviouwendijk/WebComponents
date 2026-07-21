@@ -391,8 +391,8 @@ public struct BehaviorEmotionDiagram:
                     """,
                     arrowHead: """
                     M 520 149
-                    L 503 136
-                    L 502 157
+                    L 504.4 137
+                    L 518.4 129.4
                     Z
                     """
                 )
@@ -405,8 +405,8 @@ public struct BehaviorEmotionDiagram:
                     """,
                     arrowHead: """
                     M 300 251
-                    L 317 264
-                    L 318 243
+                    L 315.6 263
+                    L 301.6 270.6
                     Z
                     """
                 )
