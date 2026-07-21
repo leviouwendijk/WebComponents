@@ -95,6 +95,10 @@ public struct DocsProjectPreviewScript: ReusableComponent {
                 tab.tabIndex = selected ? 0 : -1;
             });
 
+            panels.forEach((panel) => {
+                panel.hidden = panel !== nextPanel;
+            });
+
             const scroller = root.querySelector(
                 '.wc-docs-project-preview__panels'
             );
