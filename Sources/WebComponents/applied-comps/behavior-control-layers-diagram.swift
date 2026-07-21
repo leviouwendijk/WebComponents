@@ -19,6 +19,88 @@ public struct BehaviorControlLayersDiagram:
         }
     }
 
+    private struct Point: Sendable {
+        let x: Double
+        let y: Double
+    }
+
+    private struct ArcBoundary: Sendable {
+        let left: Point
+        let control: Point
+        let right: Point
+
+        var labelY: Double {
+            (
+                left.y
+                + (2 * control.y)
+                + right.y
+            ) / 4
+        }
+    }
+
+    private struct Geometry: Sendable {
+        let width: Double
+        let height: Double
+        let centerX: Double
+        let apex: Point
+
+        let outer: ArcBoundary
+        let habit: ArcBoundary
+        let emotion: ArcBoundary
+
+        static let standard = Geometry(
+            width: 600,
+            height: 400,
+            centerX: 300,
+            apex: Point(
+                x: 300,
+                y: 372
+            ),
+            outer: ArcBoundary(
+                left: Point(
+                    x: 60,
+                    y: 118
+                ),
+                control: Point(
+                    x: 300,
+                    y: -34
+                ),
+                right: Point(
+                    x: 540,
+                    y: 118
+                )
+            ),
+            habit: ArcBoundary(
+                left: Point(
+                    x: 115,
+                    y: 176
+                ),
+                control: Point(
+                    x: 300,
+                    y: 58
+                ),
+                right: Point(
+                    x: 485,
+                    y: 176
+                )
+            ),
+            emotion: ArcBoundary(
+                left: Point(
+                    x: 173,
+                    y: 238
+                ),
+                control: Point(
+                    x: 300,
+                    y: 158
+                ),
+                right: Point(
+                    x: 427,
+                    y: 238
+                )
+            )
+        )
+    }
+
     private enum ClassName {
         static let root = "wc-behavior-control-layers"
         static let figure = "wc-behavior-control-layers__figure"
@@ -82,7 +164,9 @@ public struct BehaviorControlLayersDiagram:
     }
 
     public func node() -> any HTMLNode {
-        HTML.figure(
+        let geometry = Geometry.standard
+
+        return HTML.figure(
             [
                 "id": id,
                 "class": ClassName.root,
@@ -98,7 +182,9 @@ public struct BehaviorControlLayersDiagram:
                     "svg",
                     [
                         "class": ClassName.svg,
-                        "viewBox": "0 0 600 400",
+                        "viewBox": viewBox(
+                            for: geometry
+                        ),
                         "role": "img",
                         "aria-labelledby": "\(id)-title \(id)-description",
                         "xmlns": "http://www.w3.org/2000/svg"
@@ -122,7 +208,7 @@ public struct BehaviorControlLayersDiagram:
                         ]
                     ) {
                         HTML.text(
-                            "Een ingezoomde cirkelsector met drie lagen. "
+                            "Een ingezoomde cirkelsector met drie aansluitende lagen. "
                                 + "\(choice.title) vormt de buitenste laag, "
                                 + "\(habit.title) de middelste laag en "
                                 + "\(emotion.title) de diepste kern."
@@ -131,47 +217,53 @@ public struct BehaviorControlLayersDiagram:
 
                     layerPath(
                         className: "\(ClassName.layer) \(ClassName.choice)",
-                        path: """
-                        M 60 118
-                        Q 300 -34 540 118
-                        L 300 372
-                        Z
-                        """
+                        path: bandPath(
+                            outer: geometry.outer,
+                            inner: geometry.habit
+                        )
                     )
 
                     layerPath(
                         className: "\(ClassName.layer) \(ClassName.habit)",
-                        path: """
-                        M 116 176
-                        Q 300 58 484 176
-                        L 300 372
-                        Z
-                        """
+                        path: bandPath(
+                            outer: geometry.habit,
+                            inner: geometry.emotion
+                        )
                     )
 
                     layerPath(
                         className: "\(ClassName.layer) \(ClassName.emotion)",
-                        path: """
-                        M 178 238
-                        Q 300 158 422 238
-                        L 300 372
-                        Z
-                        """
+                        path: sectorPath(
+                            boundary: geometry.emotion,
+                            apex: geometry.apex
+                        )
                     )
 
                     layerLabel(
                         layer: choice,
-                        y: 91
+                        x: geometry.centerX,
+                        y: labelY(
+                            between: geometry.outer,
+                            and: geometry.habit
+                        )
                     )
 
                     layerLabel(
                         layer: habit,
-                        y: 166
+                        x: geometry.centerX,
+                        y: labelY(
+                            between: geometry.habit,
+                            and: geometry.emotion
+                        )
                     )
 
                     layerLabel(
                         layer: emotion,
-                        y: 246
+                        x: geometry.centerX,
+                        y: labelY(
+                            between: geometry.emotion,
+                            and: geometry.apex
+                        )
                     )
                 }
             }
@@ -186,6 +278,99 @@ public struct BehaviorControlLayersDiagram:
                 }
             }
         }
+    }
+
+    private func viewBox(
+        for geometry: Geometry
+    ) -> String {
+        "0 0 \(number(geometry.width)) \(number(geometry.height))"
+    }
+
+    private func bandPath(
+        outer: ArcBoundary,
+        inner: ArcBoundary
+    ) -> String {
+        [
+            move(to: outer.left),
+            quadratic(
+                control: outer.control,
+                to: outer.right
+            ),
+            line(to: inner.right),
+            quadratic(
+                control: inner.control,
+                to: inner.left
+            ),
+            "Z"
+        ]
+        .joined(separator: " ")
+    }
+
+    private func sectorPath(
+        boundary: ArcBoundary,
+        apex: Point
+    ) -> String {
+        [
+            move(to: boundary.left),
+            quadratic(
+                control: boundary.control,
+                to: boundary.right
+            ),
+            line(to: apex),
+            "Z"
+        ]
+        .joined(separator: " ")
+    }
+
+    private func move(
+        to point: Point
+    ) -> String {
+        "M \(number(point.x)) \(number(point.y))"
+    }
+
+    private func line(
+        to point: Point
+    ) -> String {
+        "L \(number(point.x)) \(number(point.y))"
+    }
+
+    private func quadratic(
+        control: Point,
+        to point: Point
+    ) -> String {
+        "Q \(number(control.x)) \(number(control.y)) \(number(point.x)) \(number(point.y))"
+    }
+
+    private func labelY(
+        between outer: ArcBoundary,
+        and inner: ArcBoundary
+    ) -> Double {
+        (
+            outer.labelY
+            + inner.labelY
+        ) / 2
+    }
+
+    private func labelY(
+        between boundary: ArcBoundary,
+        and apex: Point
+    ) -> Double {
+        (
+            boundary.labelY
+            + apex.y
+        ) / 2
+    }
+
+    private func number(
+        _ value: Double
+    ) -> String {
+        if value.rounded() == value {
+            return String(
+                Int(value)
+            )
+        }
+
+        return String(value)
     }
 
     private func layerPath(
@@ -203,14 +388,18 @@ public struct BehaviorControlLayersDiagram:
 
     private func layerLabel(
         layer: Layer,
-        y: Int
+        x: Double,
+        y: Double
     ) -> any HTMLNode {
-        HTML.el(
+        let renderedX = number(x)
+        let renderedY = number(y)
+
+        return HTML.el(
             "text",
             [
                 "class": ClassName.label,
-                "x": "300",
-                "y": "\(y)",
+                "x": renderedX,
+                "y": renderedY,
                 "text-anchor": "middle"
             ]
         ) {
@@ -218,7 +407,7 @@ public struct BehaviorControlLayersDiagram:
                 "tspan",
                 [
                     "class": ClassName.title,
-                    "x": "300",
+                    "x": renderedX,
                     "dy": "0"
                 ]
             ) {
@@ -230,7 +419,7 @@ public struct BehaviorControlLayersDiagram:
                     "tspan",
                     [
                         "class": ClassName.subtitle,
-                        "x": "300",
+                        "x": renderedX,
                         "dy": "22"
                     ]
                 ) {
@@ -310,6 +499,7 @@ public struct BehaviorControlLayersDiagram:
                         "var(--wc-behavior-layer-border)"
                     ),
                     CSS.decl("stroke-width", "2"),
+                    CSS.decl("stroke-linecap", "round"),
                     CSS.decl("stroke-linejoin", "round"),
                     CSS.decl("vector-effect", "non-scaling-stroke")
                 ),
