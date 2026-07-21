@@ -5,15 +5,18 @@ import JS
 
 public struct DocsPreviewTree: ReusableComponent, Sendable {
     public struct Selection: Sendable {
+        public let projectID: String?
         public let categoryID: String?
         public let sectionID: String?
         public let itemID: String?
 
         public init(
+            projectID: String? = nil,
             categoryID: String? = nil,
             sectionID: String? = nil,
             itemID: String? = nil
         ) {
+            self.projectID = projectID
             self.categoryID = categoryID
             self.sectionID = sectionID
             self.itemID = itemID
@@ -21,6 +24,7 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
     }
 
     public struct Labels: Sendable {
+        public let site: String
         public let project: String
         public let category: String
         public let section: String
@@ -32,6 +36,7 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
         public let noDirectDestination: String
 
         public init(
+            site: String,
             project: String,
             category: String,
             section: String,
@@ -42,6 +47,7 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
             openSelection: String,
             noDirectDestination: String
         ) {
+            self.site = site
             self.project = project
             self.category = category
             self.section = section
@@ -54,6 +60,7 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
         }
 
         public static let english = Self(
+            site: "Documentation",
             project: "Project",
             category: "Category",
             section: "Section",
@@ -66,6 +73,7 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
         )
 
         public static let dutch = Self(
+            site: "Kennisbank",
             project: "Project",
             category: "Categorie",
             section: "Sectie",
@@ -79,6 +87,7 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
     }
 
     private enum NodeKind: String, Sendable {
+        case site
         case project
         case category
         case section
@@ -89,6 +98,7 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
         let key: String
         let kind: NodeKind
         let sourceID: String
+        let projectID: String?
         let categoryID: String?
         let sectionID: String?
         let title: String
@@ -117,7 +127,6 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
 
     public let id: String
     public let site: DocsSite
-    public let projectID: String
     public let destinationOrigin: String?
     public let initialSelection: Selection?
     public let lexicon: DocsLexicon
@@ -129,7 +138,6 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
     public init(
         id: String = "docs-preview-tree",
         site: DocsSite,
-        projectID: String,
         destinationOrigin: String? = nil,
         initialSelection: Selection? = nil,
         lexicon: DocsLexicon = .english,
@@ -140,7 +148,6 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
     ) {
         self.id = id
         self.site = site
-        self.projectID = projectID
         self.destinationOrigin = destinationOrigin
         self.initialSelection = initialSelection
         self.lexicon = lexicon
@@ -151,15 +158,11 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
     }
 
     public var nodes: ReusableComponentNodes {
-        guard let project = site.project(
-            id: projectID
-        ) else {
+        guard !site.projects.isEmpty else {
             return .init()
         }
 
-        let root = projectNode(
-            project
-        )
+        let root = siteNode()
 
         let flattened = flattenedNodes(
             root
@@ -177,15 +180,8 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
 
         let contextNodes = DocsProjectContextNav(
             site: site,
-            context: .projectHub(project),
+            context: .siteHub(),
             lexicon: lexicon,
-            switcherLinks: [
-                DocsNavigationCrumb(
-                    label: project.label,
-                    href: project.href,
-                    isCurrent: true
-                )
-            ],
             includeStyles: false
         ).nodes
 
@@ -193,7 +189,6 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
             head: contextNodes.head,
             body: [
                 rootNode(
-                    project: project,
                     root: root,
                     flattened: flattened,
                     active: active,
@@ -213,13 +208,42 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
         )
     }
 
+    private func siteNode() -> Node {
+        let path = [
+            site.title
+        ]
+
+        return Node(
+            key: siteKey(
+                site.id
+            ),
+            kind: .site,
+            sourceID: site.id,
+            projectID: nil,
+            categoryID: nil,
+            sectionID: nil,
+            title: site.title,
+            summary: nil,
+            href: destinationHref(
+                site.homeHref
+            ),
+            path: path,
+            children: site.projects.map { project in
+                projectNode(
+                    project,
+                    path: path
+                )
+            }
+        )
+    }
+
     private func projectNode(
-        _ project: DocsProject
+        _ project: DocsProject,
+        path: [String]
     ) -> Node {
-        let children = project
-            .knowledgeBase
-            .categories
-            .map(categoryNode)
+        let projectPath = path + [
+            project.label
+        ]
 
         return Node(
             key: projectKey(
@@ -227,6 +251,7 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
             ),
             kind: .project,
             sourceID: project.id,
+            projectID: project.id,
             categoryID: nil,
             sectionID: nil,
             title: project.label,
@@ -234,17 +259,26 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
             href: destinationHref(
                 project.href
             ),
-            path: [
-                project.label
-            ],
-            children: children
+            path: projectPath,
+            children: project
+                .knowledgeBase
+                .categories
+                .map { category in
+                    categoryNode(
+                        category,
+                        project: project,
+                        path: projectPath
+                    )
+                }
         )
     }
 
     private func categoryNode(
-        _ category: DocsCategory
+        _ category: DocsCategory,
+        project: DocsProject,
+        path: [String]
     ) -> Node {
-        let path = [
+        let categoryPath = path + [
             category.label
         ]
 
@@ -254,9 +288,10 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
                 return section.items.map { item in
                     itemNode(
                         item,
+                        project: project,
                         category: category,
                         section: section,
-                        path: path
+                        path: categoryPath
                     )
                 }
 
@@ -264,8 +299,9 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
                 return [
                     sectionNode(
                         section,
+                        project: project,
                         category: category,
-                        path: path
+                        path: categoryPath
                     )
                 ]
             }
@@ -273,10 +309,12 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
 
         return Node(
             key: categoryKey(
-                category.id
+                projectID: project.id,
+                categoryID: category.id
             ),
             kind: .category,
             sourceID: category.id,
+            projectID: project.id,
             categoryID: category.id,
             sectionID: nil,
             title: category.label,
@@ -284,13 +322,14 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
             href: destinationHref(
                 category.href
             ),
-            path: path,
+            path: categoryPath,
             children: children
         )
     }
 
     private func sectionNode(
         _ section: DocsSection,
+        project: DocsProject,
         category: DocsCategory,
         path: [String]
     ) -> Node {
@@ -300,11 +339,13 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
 
         return Node(
             key: sectionKey(
+                projectID: project.id,
                 categoryID: category.id,
                 sectionID: section.id
             ),
             kind: .section,
             sourceID: section.id,
+            projectID: project.id,
             categoryID: category.id,
             sectionID: section.id,
             title: section.title,
@@ -314,6 +355,7 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
             children: section.items.map { item in
                 itemNode(
                     item,
+                    project: project,
                     category: category,
                     section: section,
                     path: sectionPath
@@ -324,18 +366,21 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
 
     private func itemNode(
         _ item: DocsItem,
+        project: DocsProject,
         category: DocsCategory,
         section: DocsSection,
         path: [String]
     ) -> Node {
         Node(
             key: itemKey(
+                projectID: project.id,
                 categoryID: category.id,
                 sectionID: section.id,
                 itemID: item.id
             ),
             kind: .item,
             sourceID: item.id,
+            projectID: project.id,
             categoryID: category.id,
             sectionID: section.id,
             title: item.title,
@@ -352,7 +397,6 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
     }
 
     private func rootNode(
-        project: DocsProject,
         root: Node,
         flattened: [Node],
         active: Node,
@@ -790,18 +834,35 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
            let match = nodes.first(where: { node in
                node.kind == .category
                    && node.sourceID == categoryID
+                   && (
+                       initialSelection?.projectID == nil
+                           || node.projectID == initialSelection?.projectID
+                   )
+           }) {
+            return match.key
+        }
+
+        if let projectID = initialSelection?.projectID,
+           let match = nodes.first(where: { node in
+               node.kind == .project
+                   && node.sourceID == projectID
            }) {
             return match.key
         }
 
         return nodes.first(where: { node in
-            node.kind == .category
+            node.kind == .project
         })?.key ?? nodes[0].key
     }
 
     private func matchesSelectionContext(
         _ node: Node
     ) -> Bool {
+        if let projectID = initialSelection?.projectID,
+           node.projectID != projectID {
+            return false
+        }
+
         if let categoryID = initialSelection?.categoryID,
            node.categoryID != categoryID {
             return false
@@ -825,6 +886,12 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
         )
     }
 
+    private func siteKey(
+        _ siteID: String
+    ) -> String {
+        "site|\(siteID)"
+    }
+
     private func projectKey(
         _ projectID: String
     ) -> String {
@@ -832,30 +899,36 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
     }
 
     private func categoryKey(
-        _ categoryID: String
+        projectID: String,
+        categoryID: String
     ) -> String {
-        "category|\(categoryID)"
+        "category|\(projectID)|\(categoryID)"
     }
 
     private func sectionKey(
+        projectID: String,
         categoryID: String,
         sectionID: String
     ) -> String {
-        "section|\(categoryID)|\(sectionID)"
+        "section|\(projectID)|\(categoryID)|\(sectionID)"
     }
 
     private func itemKey(
+        projectID: String,
         categoryID: String,
         sectionID: String,
         itemID: String
     ) -> String {
-        "item|\(categoryID)|\(sectionID)|\(itemID)"
+        "item|\(projectID)|\(categoryID)|\(sectionID)|\(itemID)"
     }
 
     private func kindLabel(
         _ kind: NodeKind
     ) -> String {
         switch kind {
+        case .site:
+            return labels.site
+
         case .project:
             return labels.project
 
