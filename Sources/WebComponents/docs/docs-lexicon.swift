@@ -211,7 +211,7 @@ public struct DocsLexicon: Sendable {
         definitionSingularLabel: "Definitie",
         definitionPluralLabel: "Definities",
         definitionRelatedLinksLabel: "Raadpleeg ook",
-        aiContentNoticeTitle: "Met AI ondersteunde inhoud",
+        aiContentNoticeTitle: "Bevat AI-gegenereerde inhoud",
         aiContentNoticeMessage: "Dit onderdeel is geheel of gedeeltelijk tot stand gekomen met behulp van kunstmatige intelligentie en kan daarom fouten bevatten. Deze melding geldt uitsluitend voor de inhoud waarbij zij wordt weergegeven en zegt niets over andere onderdelen van deze documentatie."
     )
 }
