@@ -8,21 +8,30 @@ public struct DocsScopedTOC: SelectableComponent {
 
     public static let block = "wc-docs-toc"
 
+    public let id: String
     public let navigation: NavigationStructure
     public let title: String
     public let currentHref: String?
     public let includeStyles: Bool
 
     public init(
+        id: String = "toc",
         navigation: NavigationStructure,
         title: String = "Inhoud",
         currentHref: String? = nil,
         includeStyles: Bool = true
     ) {
+        self.id = id
         self.navigation = navigation
         self.title = title
         self.currentHref = currentHref
         self.includeStyles = includeStyles
+    }
+
+    private var listID: String {
+        id == "toc"
+            ? "toc-list"
+            : "\(id)-list"
     }
 
     public var nodes: ReusableComponentNodes {
@@ -33,9 +42,9 @@ public struct DocsScopedTOC: SelectableComponent {
         let body: HTMLFragment = [
             HTML.nav(
                 [
-                    "id": "toc",
+                    "id": id,
                     "class": "toc open \(Self.block)",
-                    "data-wc-docs-toc": "",
+                    "data-wc-docs-toc": id,
                     "data-docs-mobile-menu-target": "",
                     "data-docs-mobile-menu-desktop-open": "true"
                 ]
@@ -44,8 +53,10 @@ public struct DocsScopedTOC: SelectableComponent {
                     HTML.text(title)
                 }
 
-                HTML.ul(["id": "toc-list"]) {
-                    renderRoots(navigation.roots)
+                HTML.ul(["id": listID]) {
+                    renderRoots(
+                        navigation.roots
+                    )
                 }
             }
         ]

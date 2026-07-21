@@ -32,7 +32,8 @@ public struct DocsCategoryNav: SelectableComponent {
                 HTML.nav(
                     [
                         "class": "docs-category-nav \(Self.block)",
-                        "aria-label": ariaLabel
+                        "aria-label": ariaLabel,
+                        "data-wc-docs-category-nav": ""
                     ]
                 ) {
                     HTML.div(["class": "docs-category-nav__inner \(Self.block)__inner"]) {
@@ -51,26 +52,42 @@ public struct DocsCategoryNav: SelectableComponent {
     private func link(
         _ category: DocsCategory
     ) -> any HTMLNode {
-        let attrs: HTMLAttribute = {
-            if activeID == category.id {
-                return [
-                    "class": "docs-category-nav__link \(Self.block)__link",
+        var attrs: HTMLAttribute = [
+            "class": "docs-category-nav__link \(Self.block)__link",
+            "data-docs-category-id": category.id,
+            "data-docs-category-href": category.href
+        ]
+
+        if activeID == category.id {
+            attrs.merge(
+                [
                     "aria-current": "page"
                 ]
+            )
+        }
+
+        return HTML.a(
+            category.href,
+            attrs
+        ) {
+            HTML.span(
+                [
+                    "class": "docs-category-nav__label \(Self.block)__label"
+                ]
+            ) {
+                HTML.text(
+                    category.label
+                )
             }
 
-            return [
-                "class": "docs-category-nav__link \(Self.block)__link"
-            ]
-        }()
-
-        return HTML.a(category.href, attrs) {
-            HTML.span(["class": "docs-category-nav__label \(Self.block)__label"]) {
-                HTML.text(category.label)
-            }
-
-            HTML.span(["class": "docs-category-nav__description \(Self.block)__description"]) {
-                HTML.text(category.description)
+            HTML.span(
+                [
+                    "class": "docs-category-nav__description \(Self.block)__description"
+                ]
+            ) {
+                HTML.text(
+                    category.description
+                )
             }
         }
     }

@@ -49,17 +49,25 @@ public struct DocsScrollDocument: SelectableComponent {
     public func navigation(
         includeReferencesTitle referencesTitle: String? = nil
     ) -> NavigationStructure {
-        var roots = category.navigation.roots
+        var roots = category
+            .navigation
+            .roots
+            .map(scopedNavigationNode)
+
         let resolved = resolvedContent
 
         if includeReferences,
-            let referencesTitle,
-            resolved.hasBackmatter
+           let referencesTitle,
+           resolved.hasBackmatter
         {
             roots.append(
                 NavigationNode(
-                    label: resolved.references.isEmpty ? lexicon.footnotesTitle : referencesTitle,
-                    path: "#references"
+                    label: resolved.references.isEmpty
+                        ? lexicon.footnotesTitle
+                        : referencesTitle,
+                    path: scopedNavigationHref(
+                        "#references"
+                    )
                 )
             )
         }
@@ -235,6 +243,38 @@ public struct DocsScrollDocument: SelectableComponent {
         case .embedded(let id):
             return "\(id)-\(rawValue)"
         }
+    }
+
+    private func scopedNavigationNode(
+        _ node: NavigationNode
+    ) -> NavigationNode {
+        NavigationNode(
+            label: node.label,
+            path: node.path.map(
+                scopedNavigationHref
+            ),
+            children: node.children.map(
+                scopedNavigationNode
+            )
+        )
+    }
+
+    private func scopedNavigationHref(
+        _ href: String
+    ) -> String {
+        guard href.hasPrefix("#") else {
+            return href
+        }
+
+        let rawID = String(
+            href.dropFirst()
+        )
+
+        guard !rawID.isEmpty else {
+            return href
+        }
+
+        return "#\(scopedContentID(rawID))"
     }
 
     private func stylesheets(
