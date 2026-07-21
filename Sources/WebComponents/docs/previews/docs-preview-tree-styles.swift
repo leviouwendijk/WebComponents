@@ -152,6 +152,7 @@ extension DocsPreviewTree {
                     CSS.decl("width", "100%"),
                     CSS.decl("padding", "9px 7px"),
                     CSS.decl("border", "0"),
+                    CSS.decl("border-radius", "8px"),
                     CSS.decl("background", "transparent"),
                     CSS.decl("color", "inherit"),
                     CSS.decl("font", "inherit"),

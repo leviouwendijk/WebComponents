@@ -400,12 +400,7 @@ public struct DocsPreviewTreeScript: ReusableComponent {
                         root,
                         selectControl.getAttribute(
                             'data-docs-preview-tree-select'
-                        ),
-                        {
-                            focus: selectControl.closest(
-                                itemSelector
-                            ) != null
-                        }
+                        )
                     );
                 },
                 true

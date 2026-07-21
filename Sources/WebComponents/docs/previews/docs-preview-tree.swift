@@ -24,7 +24,6 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
     }
 
     public struct Labels: Sendable {
-        public let site: String
         public let project: String
         public let category: String
         public let section: String
@@ -36,7 +35,6 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
         public let noDirectDestination: String
 
         public init(
-            site: String,
             project: String,
             category: String,
             section: String,
@@ -47,7 +45,6 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
             openSelection: String,
             noDirectDestination: String
         ) {
-            self.site = site
             self.project = project
             self.category = category
             self.section = section
@@ -60,7 +57,6 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
         }
 
         public static let english = Self(
-            site: "Documentation",
             project: "Project",
             category: "Category",
             section: "Section",
@@ -73,7 +69,6 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
         )
 
         public static let dutch = Self(
-            site: "Kennisbank",
             project: "Project",
             category: "Categorie",
             section: "Sectie",
@@ -87,7 +82,6 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
     }
 
     private enum NodeKind: String, Sendable {
-        case site
         case project
         case category
         case section
@@ -162,11 +156,18 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
             return .init()
         }
 
-        let root = siteNode()
+        let roots = site.projects.map { project in
+            projectNode(
+                project,
+                path: []
+            )
+        }
 
-        let flattened = flattenedNodes(
-            root
-        )
+        let flattened = roots.flatMap { root in
+            flattenedNodes(
+                root
+            )
+        }
 
         let activeKey = initialKey(
             in: flattened
@@ -189,7 +190,7 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
             head: contextNodes.head,
             body: [
                 rootNode(
-                    root: root,
+                    roots: roots,
                     flattened: flattened,
                     active: active,
                     contextNodes: contextNodes
@@ -208,34 +209,34 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
         )
     }
 
-    private func siteNode() -> Node {
-        let path = [
-            site.title
-        ]
+    // private func siteNode() -> Node {
+    //     let path = [
+    //         site.title
+    //     ]
 
-        return Node(
-            key: siteKey(
-                site.id
-            ),
-            kind: .site,
-            sourceID: site.id,
-            projectID: nil,
-            categoryID: nil,
-            sectionID: nil,
-            title: site.title,
-            summary: nil,
-            href: destinationHref(
-                site.homeHref
-            ),
-            path: path,
-            children: site.projects.map { project in
-                projectNode(
-                    project,
-                    path: path
-                )
-            }
-        )
-    }
+    //     return Node(
+    //         key: siteKey(
+    //             site.id
+    //         ),
+    //         kind: .site,
+    //         sourceID: site.id,
+    //         projectID: nil,
+    //         categoryID: nil,
+    //         sectionID: nil,
+    //         title: site.title,
+    //         summary: nil,
+    //         href: destinationHref(
+    //             site.homeHref
+    //         ),
+    //         path: path,
+    //         children: site.projects.map { project in
+    //             projectNode(
+    //                 project,
+    //                 path: path
+    //             )
+    //         }
+    //     )
+    // }
 
     private func projectNode(
         _ project: DocsProject,
@@ -397,7 +398,7 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
     }
 
     private func rootNode(
-        root: Node,
+        roots: [Node],
         flattened: [Node],
         active: Node,
         contextNodes: ReusableComponentNodes
@@ -435,11 +436,13 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
                             "role": "tree"
                         ]
                     ) {
-                        treeNode(
-                            root,
-                            activeKey: active.key,
-                            depth: 0
-                        )
+                        for root in roots {
+                            treeNode(
+                                root,
+                                activeKey: active.key,
+                                depth: 0
+                            )
+                        }
                     }
                 }
 
@@ -886,11 +889,11 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
         )
     }
 
-    private func siteKey(
-        _ siteID: String
-    ) -> String {
-        "site|\(siteID)"
-    }
+    // private func siteKey(
+    //     _ siteID: String
+    // ) -> String {
+    //     "site|\(siteID)"
+    // }
 
     private func projectKey(
         _ projectID: String
@@ -926,9 +929,6 @@ public struct DocsPreviewTree: ReusableComponent, Sendable {
         _ kind: NodeKind
     ) -> String {
         switch kind {
-        case .site:
-            return labels.site
-
         case .project:
             return labels.project
 
