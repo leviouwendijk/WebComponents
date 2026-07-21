@@ -36,6 +36,8 @@ public struct DocsLexicon: Sendable {
     public let definitionSingularLabel: String
     public let definitionPluralLabel: String
     public let definitionRelatedLinksLabel: String
+    public let aiContentNoticeTitle: String
+    public let aiContentNoticeMessage: String
 
     public init(
         docs: String,
@@ -64,7 +66,9 @@ public struct DocsLexicon: Sendable {
         entryPluralLabel: String,
         definitionSingularLabel: String,
         definitionPluralLabel: String,
-        definitionRelatedLinksLabel: String
+        definitionRelatedLinksLabel: String,
+        aiContentNoticeTitle: String = "AI-assisted content",
+        aiContentNoticeMessage: String = "This section was created in whole or in part with the assistance of artificial intelligence and may therefore contain errors. This notice applies only to the content on which it is displayed and does not apply to other parts of this documentation."
     ) {
         self.docs = docs
         self.allDocs = allDocs
@@ -93,6 +97,8 @@ public struct DocsLexicon: Sendable {
         self.definitionSingularLabel = definitionSingularLabel
         self.definitionPluralLabel = definitionPluralLabel
         self.definitionRelatedLinksLabel = definitionRelatedLinksLabel
+        self.aiContentNoticeTitle = aiContentNoticeTitle
+        self.aiContentNoticeMessage = aiContentNoticeMessage
     }
 
     public func lightModeDisplayLabel(
@@ -172,7 +178,9 @@ public struct DocsLexicon: Sendable {
         entryPluralLabel: "entries",
         definitionSingularLabel: "Definition",
         definitionPluralLabel: "Definitions",
-        definitionRelatedLinksLabel: "See also"
+        definitionRelatedLinksLabel: "See also",
+        aiContentNoticeTitle: "AI-assisted content",
+        aiContentNoticeMessage: "This section was created in whole or in part with the assistance of artificial intelligence and may therefore contain errors. This notice applies only to the content on which it is displayed and does not apply to other parts of this documentation."
     )
 
     public static let dutch = DocsLexicon(
@@ -202,6 +210,8 @@ public struct DocsLexicon: Sendable {
         entryPluralLabel: "onderdelen",
         definitionSingularLabel: "Definitie",
         definitionPluralLabel: "Definities",
-        definitionRelatedLinksLabel: "Raadpleeg ook"
+        definitionRelatedLinksLabel: "Raadpleeg ook",
+        aiContentNoticeTitle: "Met AI ondersteunde inhoud",
+        aiContentNoticeMessage: "Dit onderdeel is geheel of gedeeltelijk tot stand gekomen met behulp van kunstmatige intelligentie en kan daarom fouten bevatten. Deze melding geldt uitsluitend voor de inhoud waarbij zij wordt weergegeven en zegt niets over andere onderdelen van deze documentatie."
     )
 }
