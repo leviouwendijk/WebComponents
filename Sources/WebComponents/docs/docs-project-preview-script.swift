@@ -16,13 +16,22 @@ public struct DocsProjectPreviewScript: ReusableComponent {
     (() => {
         if (window.wcDocsProjectPreview?.initialized) return;
 
-        const rootSelector = '[data-docs-project-preview]';
-        const tabSelector = '[data-docs-project-preview-tab]';
-        const panelSelector = '[data-docs-project-preview-panel]';
-        const currentSelector = '[data-docs-project-preview-current]';
-        const destinationSelector = '[data-docs-project-preview-destination]';
+        const rootSelector =
+            '[data-docs-project-preview]';
 
-        function previewRoots(scope = document) {
+        const categoryLinkSelector =
+            '[data-wc-docs-category-nav] [data-docs-category-id]';
+
+        const panelSelector =
+            '[data-docs-project-preview-panel]';
+
+        const currentSelector =
+            '[data-docs-project-preview-current]';
+
+        const destinationSelector =
+            '[data-docs-project-preview-destination]';
+
+        function roots(scope = document) {
             if (scope?.matches?.(rootSelector)) {
                 return [scope];
             }
@@ -32,21 +41,25 @@ public struct DocsProjectPreviewScript: ReusableComponent {
             );
         }
 
-        function previewTabs(root) {
+        function categoryLinks(root) {
             return Array.from(
-                root?.querySelectorAll?.(tabSelector) || []
+                root?.querySelectorAll?.(
+                    categoryLinkSelector
+                ) || []
             );
         }
 
-        function previewPanels(root) {
+        function panels(root) {
             return Array.from(
-                root?.querySelectorAll?.(panelSelector) || []
+                root?.querySelectorAll?.(
+                    panelSelector
+                ) || []
             );
         }
 
-        function categoryIDForTab(tab) {
-            return tab?.getAttribute(
-                'data-docs-project-preview-tab'
+        function categoryIDForLink(link) {
+            return link?.getAttribute(
+                'data-docs-category-id'
             ) || '';
         }
 
@@ -56,10 +69,83 @@ public struct DocsProjectPreviewScript: ReusableComponent {
             ) || '';
         }
 
-        function activeTab(root) {
-            return previewTabs(root).find((tab) => {
-                return tab.getAttribute('aria-selected') === 'true';
-            }) || null;
+        function destinationHref(
+            root,
+            rawHref
+        ) {
+            if (!rawHref) return rawHref;
+
+            if (
+                rawHref.startsWith('#')
+                || rawHref.startsWith('//')
+                || /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(
+                    rawHref
+                )
+            ) {
+                return rawHref;
+            }
+
+            const origin = root.getAttribute(
+                'data-docs-project-preview-origin'
+            ) || '';
+
+            if (!origin) return rawHref;
+
+            try {
+                const base = origin.endsWith('/')
+                    ? origin
+                    : `${origin}/`;
+
+                return new URL(
+                    rawHref,
+                    base
+                ).href;
+            } catch {
+                return rawHref;
+            }
+        }
+
+        function applyLinkPolicy(root) {
+            const openInNewTab =
+                root.getAttribute(
+                    'data-docs-project-preview-new-tab'
+                ) === 'true';
+
+            root.querySelectorAll(
+                'a[href]'
+            ).forEach((anchor) => {
+                const rawHref = anchor.getAttribute(
+                    'href'
+                );
+
+                const resolvedHref = destinationHref(
+                    root,
+                    rawHref
+                );
+
+                if (resolvedHref) {
+                    anchor.setAttribute(
+                        'href',
+                        resolvedHref
+                    );
+                }
+
+                if (
+                    openInNewTab
+                    && resolvedHref
+                    && !resolvedHref.startsWith('#')
+                ) {
+                    anchor.setAttribute(
+                        'target',
+                        '_blank'
+                    );
+
+                    anchor.setAttribute(
+                        'rel',
+                        'noopener noreferrer'
+                    );
+                }
+            });
         }
 
         function activate(
@@ -67,59 +153,75 @@ public struct DocsProjectPreviewScript: ReusableComponent {
             categoryID,
             options = {}
         ) {
-            if (!root || !categoryID) return false;
-
-            const tabs = previewTabs(root);
-            const panels = previewPanels(root);
-
-            const nextTab = tabs.find((tab) => {
-                return categoryIDForTab(tab) === categoryID;
-            });
-
-            const nextPanel = panels.find((panel) => {
-                return categoryIDForPanel(panel) === categoryID;
-            });
-
-            if (!nextTab || !nextPanel) {
+            if (!root || !categoryID) {
                 return false;
             }
 
-            tabs.forEach((tab) => {
-                const selected = tab === nextTab;
+            const links = categoryLinks(root);
+            const availablePanels = panels(root);
 
-                tab.setAttribute(
-                    'aria-selected',
-                    selected ? 'true' : 'false'
-                );
-
-                tab.tabIndex = selected ? 0 : -1;
+            const nextLink = links.find((link) => {
+                return categoryIDForLink(link)
+                    === categoryID;
             });
 
-            panels.forEach((panel) => {
+            const nextPanel = availablePanels.find(
+                (panel) => {
+                    return categoryIDForPanel(panel)
+                        === categoryID;
+                }
+            );
+
+            if (!nextLink || !nextPanel) {
+                return false;
+            }
+
+            links.forEach((link) => {
+                if (link === nextLink) {
+                    link.setAttribute(
+                        'aria-current',
+                        'page'
+                    );
+                } else {
+                    link.removeAttribute(
+                        'aria-current'
+                    );
+                }
+            });
+
+            availablePanels.forEach((panel) => {
                 panel.hidden = panel !== nextPanel;
             });
 
-            const scroller = root.querySelector(
-                '.wc-docs-project-preview__panels'
-            );
-
-            if (scroller) {
-                scroller.scrollTop = 0;
-                scroller.scrollLeft = 0;
-            }
+            nextPanel.scrollTop = 0;
+            nextPanel.scrollLeft = 0;
 
             root.setAttribute(
                 'data-docs-project-preview-active',
                 categoryID
             );
 
-            const label = nextTab.getAttribute(
-                'data-docs-project-preview-label'
-            ) || nextTab.textContent?.trim() || '';
+            const label =
+                nextLink
+                    .querySelector(
+                        '.docs-category-nav__label'
+                    )
+                    ?.textContent
+                    ?.trim()
+                || nextLink.textContent?.trim()
+                || '';
 
-            const href = nextTab.getAttribute(
-                'data-docs-project-preview-href'
-            ) || '';
+            const rawHref =
+                nextLink.getAttribute(
+                    'data-docs-category-href'
+                )
+                || nextLink.getAttribute('href')
+                || '';
+
+            const resolvedHref = destinationHref(
+                root,
+                rawHref
+            );
 
             const current = root.querySelector(
                 currentSelector
@@ -133,16 +235,23 @@ public struct DocsProjectPreviewScript: ReusableComponent {
                 destinationSelector
             );
 
-            if (destination && href) {
+            if (destination && resolvedHref) {
                 destination.setAttribute(
                     'href',
-                    href
+                    resolvedHref
                 );
             }
 
             if (options.focus === true) {
-                nextTab.focus();
+                nextLink.focus();
             }
+
+            window.requestAnimationFrame(() => {
+                window
+                    .wcDocsCategoryNav
+                    ?.settle
+                    ?.();
+            });
 
             root.dispatchEvent(
                 new CustomEvent(
@@ -152,7 +261,7 @@ public struct DocsProjectPreviewScript: ReusableComponent {
                         detail: {
                             categoryID,
                             label,
-                            href,
+                            href: resolvedHref,
                             panel: nextPanel
                         }
                     }
@@ -165,16 +274,26 @@ public struct DocsProjectPreviewScript: ReusableComponent {
         function initializeRoot(root) {
             if (!root) return;
 
+            applyLinkPolicy(root);
+
             const requested = root.getAttribute(
                 'data-docs-project-preview-active'
             );
 
-            const selected = activeTab(root);
-            const first = previewTabs(root)[0];
+            const selected = categoryLinks(root).find(
+                (link) => {
+                    return link.getAttribute(
+                        'aria-current'
+                    ) === 'page';
+                }
+            );
 
-            const categoryID = requested
-                || categoryIDForTab(selected)
-                || categoryIDForTab(first);
+            const first = categoryLinks(root)[0];
+
+            const categoryID =
+                requested
+                || categoryIDForLink(selected)
+                || categoryIDForLink(first);
 
             if (!categoryID) return;
 
@@ -188,88 +307,36 @@ public struct DocsProjectPreviewScript: ReusableComponent {
             document.addEventListener(
                 'click',
                 (event) => {
-                    const tab = event.target?.closest?.(
-                        tabSelector
-                    );
+                    const link =
+                        event.target?.closest?.(
+                            categoryLinkSelector
+                        );
 
-                    if (!tab) return;
+                    if (!link) return;
 
-                    const root = tab.closest(
+                    const root = link.closest(
                         rootSelector
                     );
 
                     if (!root) return;
 
-                    activate(
-                        root,
-                        categoryIDForTab(tab)
-                    );
-                },
-                true
-            );
-        }
-
-        function bindKeyboard() {
-            document.addEventListener(
-                'keydown',
-                (event) => {
-                    const tab = event.target?.closest?.(
-                        tabSelector
-                    );
-
-                    if (!tab) return;
-
-                    const root = tab.closest(
-                        rootSelector
-                    );
-
-                    if (!root) return;
-
-                    const tabs = previewTabs(root);
-                    const index = tabs.indexOf(tab);
-
-                    if (index < 0 || tabs.length === 0) {
-                        return;
-                    }
-
-                    let nextIndex;
-
-                    switch (event.key) {
-                    case 'ArrowRight':
-                    case 'ArrowDown':
-                        nextIndex = (
-                            index + 1
-                        ) % tabs.length;
-                        break;
-
-                    case 'ArrowLeft':
-                    case 'ArrowUp':
-                        nextIndex = (
-                            index - 1 + tabs.length
-                        ) % tabs.length;
-                        break;
-
-                    case 'Home':
-                        nextIndex = 0;
-                        break;
-
-                    case 'End':
-                        nextIndex = tabs.length - 1;
-                        break;
-
-                    default:
+                    if (
+                        event.button !== 0
+                        || event.metaKey
+                        || event.ctrlKey
+                        || event.shiftKey
+                        || event.altKey
+                    ) {
                         return;
                     }
 
                     event.preventDefault();
 
-                    const nextTab = tabs[nextIndex];
-
                     activate(
                         root,
-                        categoryIDForTab(nextTab),
+                        categoryIDForLink(link),
                         {
-                            focus: true
+                            focus: false
                         }
                     );
                 },
@@ -278,14 +345,13 @@ public struct DocsProjectPreviewScript: ReusableComponent {
         }
 
         function init(scope = document) {
-            previewRoots(scope).forEach(
+            roots(scope).forEach(
                 initializeRoot
             );
         }
 
         function boot() {
             bindClicks();
-            bindKeyboard();
             init();
         }
 
@@ -306,6 +372,13 @@ public struct DocsProjectPreviewScript: ReusableComponent {
         } else {
             boot();
         }
+
+        window.addEventListener(
+            'pageshow',
+            () => {
+                init();
+            }
+        );
     })();
     """#
 }

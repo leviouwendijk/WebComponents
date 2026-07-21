@@ -12,12 +12,13 @@ public struct DocsProjectPreview: ReusableComponent, Sendable {
     }
 
     public let id: String
-    public let project: DocsProject
+    public let site: DocsSite
+    public let projectID: String
     public let categoryIDs: [String]?
+    public let contentMode: DocsCategoryContentMode
     public let lexicon: DocsLexicon
     public let destinationOrigin: String?
     public let initialCategoryID: String?
-    public let itemLimitPerCategory: Int?
     public let openCategoryLabel: String
     public let openLinksInNewTab: Bool
     public let includeStyles: Bool
@@ -25,24 +26,26 @@ public struct DocsProjectPreview: ReusableComponent, Sendable {
 
     public init(
         id: String = "docs-project-preview",
-        project: DocsProject,
+        site: DocsSite,
+        projectID: String,
         categoryIDs: [String]? = nil,
+        contentMode: DocsCategoryContentMode = .scrollDocument,
         lexicon: DocsLexicon = .english,
         destinationOrigin: String? = nil,
         initialCategoryID: String? = nil,
-        itemLimitPerCategory: Int? = 3,
         openCategoryLabel: String = "Open section",
         openLinksInNewTab: Bool = false,
         includeStyles: Bool = true,
         includeScript: Bool = true
     ) {
         self.id = id
-        self.project = project
+        self.site = site
+        self.projectID = projectID
         self.categoryIDs = categoryIDs
+        self.contentMode = contentMode
         self.lexicon = lexicon
         self.destinationOrigin = destinationOrigin
         self.initialCategoryID = initialCategoryID
-        self.itemLimitPerCategory = itemLimitPerCategory
         self.openCategoryLabel = openCategoryLabel
         self.openLinksInNewTab = openLinksInNewTab
         self.includeStyles = includeStyles
@@ -50,13 +53,35 @@ public struct DocsProjectPreview: ReusableComponent, Sendable {
     }
 
     public var nodes: ReusableComponentNodes {
-        let rendered = renderedCategories()
+        guard let project = site.project(
+            id: projectID
+        ) else {
+            return .init()
+        }
 
-        guard let active = rendered.first(where: { rendered in
-            rendered.category.id == initialCategoryID
+        let rendered = renderedCategories(
+            in: project
+        )
+
+        guard let active = rendered.first(where: { item in
+            item.category.id == initialCategoryID
         }) ?? rendered.first else {
             return .init()
         }
+
+        let contextNodes = DocsProjectContextNav(
+            site: site,
+            context: .projectHub(project),
+            lexicon: lexicon,
+            includeStyles: false
+        ).nodes
+
+        let categoryNavigationNodes = DocsCategoryNav(
+            categories: rendered.map(\.category),
+            activeID: active.category.id,
+            ariaLabel: lexicon.categoryNavAriaLabel,
+            includeStyles: false
+        ).nodes
 
         let inlinePreviewRuntime = ReusableComponentNodes(
             stylesheets: includeStyles
@@ -70,315 +95,171 @@ public struct DocsProjectPreview: ReusableComponent, Sendable {
                 : []
         )
 
+        var stylesheets: [CSSStyleSheet] = []
+        var scripts: [JSScript] = []
+
+        if includeStyles {
+            stylesheets = [
+                Self.stylesheet(),
+                DocsProjectContextNav.stylesheet(),
+                DocsCategoryNav.stylesheet()
+            ]
+                + contextNodes.stylesheets
+                + categoryNavigationNodes.stylesheets
+                + rendered.flatMap { item in
+                    item.nodes.stylesheets
+                }
+                + inlinePreviewRuntime.stylesheets
+        }
+
+        if includeScript {
+            scripts = contextNodes.scripts
+                + categoryNavigationNodes.scripts
+                + rendered.flatMap { item in
+                    item.nodes.scripts
+                }
+                + inlinePreviewRuntime.scripts
+                + DocsProjectContextNavScript().nodes.scripts
+                + DocsCategoryNavScript().nodes.scripts
+                + DocsProjectPreviewScript().nodes.scripts
+        }
+
         return .init(
-            head: rendered.flatMap { $0.nodes.head },
+            head: contextNodes.head
+                + categoryNavigationNodes.head
+                + rendered.flatMap { item in
+                    item.nodes.head
+                },
             body: [
                 rootNode(
-                    rendered,
-                    active: active
+                    project: project,
+                    rendered: rendered,
+                    active: active,
+                    contextNodes: contextNodes,
+                    categoryNavigationNodes: categoryNavigationNodes
                 )
             ],
-            stylesheets: includeStyles
-                ? [
-                    Self.stylesheet()
-                ]
-                    + rendered.flatMap { $0.nodes.stylesheets }
-                    + inlinePreviewRuntime.stylesheets
-                : [],
-            scripts: includeScript
-                ? rendered.flatMap { $0.nodes.scripts }
-                    + inlinePreviewRuntime.scripts
-                    + DocsProjectPreviewScript().nodes.scripts
-                : []
+            stylesheets: stylesheets,
+            scripts: scripts
         )
     }
 
-    private func renderedCategories() -> [RenderedCategory] {
-        let categories: [DocsCategory]
-
-        if let categoryIDs {
-            categories = categoryIDs.compactMap { id in
-                project.category(
-                    id: id
-                )
-            }
-        } else {
-            categories = project.knowledgeBase.categories
+    private func selectedCategories(
+        in project: DocsProject
+    ) -> [DocsCategory] {
+        guard let categoryIDs else {
+            return project.knowledgeBase.categories
         }
 
-        return categories.map { category in
-            let projected = projectedCategory(
-                category
+        return categoryIDs.compactMap { categoryID in
+            project.category(
+                id: categoryID
             )
-            let panelID = "\(id)-panel-\(category.id)"
-            let documentID = "\(panelID)-document"
+        }
+    }
 
-            let document = DocsScrollDocument(
-                category: projected,
-                lexicon: lexicon,
+    private func renderedCategories(
+        in project: DocsProject
+    ) -> [RenderedCategory] {
+        selectedCategories(
+            in: project
+        ).map { category in
+            let panelID = "\(id)-panel-\(category.id)"
+
+            let pane = DocsCategoryPane(
+                category: category,
+                mode: contentMode,
                 surface: .embedded(
-                    id: documentID
+                    id: "\(panelID)-pane"
                 ),
-                includeReferences: false,
+                currentHref: category.href,
+                lexicon: lexicon,
+                includeReferences: true,
                 includeStyles: includeStyles,
                 includeScript: includeScript
             )
 
             return RenderedCategory(
-                category: projected,
+                category: category,
                 key: category.id,
                 panelID: panelID,
-                nodes: document.nodes
+                nodes: pane.nodes
             )
         }
-    }
-
-    private func projectedCategory(
-        _ category: DocsCategory
-    ) -> DocsCategory {
-        guard let itemLimitPerCategory else {
-            return category
-        }
-
-        var remaining = max(
-            itemLimitPerCategory,
-            0
-        )
-        var sections: [DocsSection] = []
-
-        for section in category.sections where remaining > 0 {
-            let items = Array(
-                section.items.prefix(remaining)
-            )
-
-            guard !items.isEmpty else {
-                continue
-            }
-
-            sections.append(
-                DocsSection(
-                    id: section.id,
-                    title: section.title,
-                    summary: section.summary,
-                    items: items,
-                    presentation: section.presentation,
-                    visibility: section.visibility
-                )
-            )
-
-            remaining -= items.count
-        }
-
-        return DocsCategory(
-            id: category.id,
-            label: category.label,
-            subtitle: category.subtitle,
-            description: category.description,
-            href: category.href,
-            sections: sections,
-            reading: category.reading,
-            articleMeta: category.articleMeta,
-            articleAuthors: category.articleAuthors,
-            visibility: category.visibility
-        )
     }
 
     private func rootNode(
-        _ rendered: [RenderedCategory],
-        active: RenderedCategory
+        project: DocsProject,
+        rendered: [RenderedCategory],
+        active: RenderedCategory,
+        contextNodes: ReusableComponentNodes,
+        categoryNavigationNodes: ReusableComponentNodes
     ) -> any HTMLNode {
         HTML.div(
             [
                 "id": id,
                 "class": "wc-docs-project-preview",
+                "role": "region",
+                "aria-label": project.label,
                 "data-docs-project-preview": "",
-                "data-docs-project-preview-active": active.key
+                "data-docs-project-preview-active": active.key,
+                "data-docs-project-preview-origin": destinationOrigin ?? "",
+                "data-docs-project-preview-new-tab": openLinksInNewTab
+                    ? "true"
+                    : "false"
             ]
         ) {
+            contextNodes.body
+            categoryNavigationNodes.body
+
             HTML.div(
                 [
-                    "class": "wc-docs-project-preview__toolbar"
+                    "class": "wc-docs-project-preview__viewport",
+                    "data-docs-project-preview-viewport": ""
                 ]
             ) {
+                for item in rendered {
+                    panelNode(
+                        item,
+                        isActive: item.key == active.key
+                    )
+                }
+            }
+
+            HTML.div(
+                [
+                    "class": "wc-docs-project-preview__footer"
+                ]
+            ) {
+                HTML.span(
+                    [
+                        "class": "wc-docs-project-preview__current",
+                        "data-docs-project-preview-current": ""
+                    ]
+                ) {
+                    HTML.text(
+                        active.category.label
+                    )
+                }
+
                 HTML.a(
                     destinationHref(
-                        project.href
+                        active.category.href
                     ),
-                    linkAttributes(
-                        className: "wc-docs-project-preview__brand"
-                    )
+                    destinationLinkAttributes()
                 ) {
-                    HTML.span(
-                        [
-                            "class": "wc-docs-project-preview__brand-mark"
-                        ]
-                    ) {
-                        HTML.text(
-                            String(project.label.prefix(1))
-                        )
-                    }
+                    HTML.text(
+                        openCategoryLabel
+                    )
 
                     HTML.span(
                         [
-                            "class": "wc-docs-project-preview__brand-title"
-                        ]
-                    ) {
-                        HTML.text(
-                            project.label
-                        )
-                    }
-
-                    HTML.span(
-                        [
-                            "class": "wc-docs-project-preview__brand-product",
                             "aria-hidden": "true"
                         ]
                     ) {
-                        HTML.text(
-                            "/ \(lexicon.docs)"
-                        )
+                        HTML.text(" ↗")
                     }
                 }
-            }
-
-            HTML.div(
-                [
-                    "class": "wc-docs-project-preview__body"
-                ]
-            ) {
-                HTML.aside(
-                    [
-                        "class": "wc-docs-project-preview__navigation",
-                        "aria-label": lexicon.categoryNavAriaLabel
-                    ]
-                ) {
-                    HTML.p(
-                        [
-                            "class": "wc-docs-project-preview__navigation-label"
-                        ]
-                    ) {
-                        HTML.text(
-                            lexicon.categoryPluralLabel
-                        )
-                    }
-
-                    HTML.div(
-                        [
-                            "class": "wc-docs-project-preview__tabs",
-                            "role": "tablist"
-                        ]
-                    ) {
-                        for item in rendered {
-                            categoryTab(
-                                item,
-                                isActive: item.key == active.key
-                            )
-                        }
-                    }
-                }
-
-                HTML.div(
-                    [
-                        "class": "wc-docs-project-preview__content"
-                    ]
-                ) {
-                    HTML.div(
-                        [
-                            "class": "wc-docs-project-preview__panels"
-                        ]
-                    ) {
-                        for item in rendered {
-                            panelNode(
-                                item,
-                                isActive: item.key == active.key
-                            )
-                        }
-                    }
-
-                    HTML.div(
-                        [
-                            "class": "wc-docs-project-preview__footer"
-                        ]
-                    ) {
-                        HTML.span(
-                            [
-                                "class": "wc-docs-project-preview__current",
-                                "data-docs-project-preview-current": ""
-                            ]
-                        ) {
-                            HTML.text(
-                                active.category.label
-                            )
-                        }
-
-                        HTML.a(
-                            destinationHref(
-                                active.category.href
-                            ),
-                            destinationLinkAttributes()
-                        ) {
-                            HTML.text(
-                                openCategoryLabel
-                            )
-
-                            HTML.span(
-                                [
-                                    "aria-hidden": "true"
-                                ]
-                            ) {
-                                HTML.text(" ↗")
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private func categoryTab(
-        _ item: RenderedCategory,
-        isActive: Bool
-    ) -> any HTMLNode {
-        var attrs: HTMLAttribute = [
-            "type": "button",
-            "class": "wc-docs-project-preview__tab",
-            "role": "tab",
-            "aria-selected": isActive ? "true" : "false",
-            "aria-controls": item.panelID,
-            "data-docs-project-preview-tab": item.key,
-            "data-docs-project-preview-href": destinationHref(
-                item.category.href
-            ),
-            "data-docs-project-preview-label": item.category.label
-        ]
-
-        if !isActive {
-            attrs.merge(
-                [
-                    "tabindex": "-1"
-                ]
-            )
-        }
-
-        return HTML.button(attrs) {
-            HTML.span(
-                [
-                    "class": "wc-docs-project-preview__tab-title"
-                ]
-            ) {
-                HTML.text(
-                    item.category.label
-                )
-            }
-
-            HTML.span(
-                [
-                    "class": "wc-docs-project-preview__tab-summary"
-                ]
-            ) {
-                HTML.text(
-                    item.category.description
-                )
             }
         }
     }
@@ -387,23 +268,23 @@ public struct DocsProjectPreview: ReusableComponent, Sendable {
         _ item: RenderedCategory,
         isActive: Bool
     ) -> any HTMLNode {
-        var attrs: HTMLAttribute = [
+        var attributes: HTMLAttribute = [
             "id": item.panelID,
             "class": "wc-docs-project-preview__panel",
-            "role": "tabpanel",
+            "role": "region",
             "aria-label": item.category.label,
             "data-docs-project-preview-panel": item.key
         ]
 
         if !isActive {
-            attrs.merge(
+            attributes.merge(
                 [
                     "hidden": ""
                 ]
             )
         }
 
-        return HTML.div(attrs) {
+        return HTML.div(attributes) {
             item.nodes.body
         }
     }
@@ -411,8 +292,11 @@ public struct DocsProjectPreview: ReusableComponent, Sendable {
     private func destinationHref(
         _ href: String
     ) -> String {
-        guard !href.hasPrefix("http://"),
+        guard !href.hasPrefix("#"),
+              !href.hasPrefix("http://"),
               !href.hasPrefix("https://"),
+              !href.hasPrefix("mailto:"),
+              !href.hasPrefix("tel:"),
               let destinationOrigin,
               !destinationOrigin.isEmpty else {
             return href
@@ -421,6 +305,7 @@ public struct DocsProjectPreview: ReusableComponent, Sendable {
         let origin = destinationOrigin.hasSuffix("/")
             ? String(destinationOrigin.dropLast())
             : destinationOrigin
+
         let path = href.hasPrefix("/")
             ? href
             : "/\(href)"
@@ -429,28 +314,13 @@ public struct DocsProjectPreview: ReusableComponent, Sendable {
     }
 
     private func destinationLinkAttributes() -> HTMLAttribute {
-        var attrs = linkAttributes(
-            className: "wc-docs-project-preview__destination"
-        )
-
-        attrs.merge(
-            [
-                "data-docs-project-preview-destination": ""
-            ]
-        )
-
-        return attrs
-    }
-
-    private func linkAttributes(
-        className: String
-    ) -> HTMLAttribute {
-        var attrs: HTMLAttribute = [
-            "class": className
+        var attributes: HTMLAttribute = [
+            "class": "wc-docs-project-preview__destination",
+            "data-docs-project-preview-destination": ""
         ]
 
         if openLinksInNewTab {
-            attrs.merge(
+            attributes.merge(
                 [
                     "target": "_blank",
                     "rel": "noopener noreferrer"
@@ -458,6 +328,6 @@ public struct DocsProjectPreview: ReusableComponent, Sendable {
             )
         }
 
-        return attrs
+        return attributes
     }
 }
