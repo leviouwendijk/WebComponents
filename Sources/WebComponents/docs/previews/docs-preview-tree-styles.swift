@@ -387,13 +387,18 @@ extension DocsPreviewTree {
                         ),
                         CSS.decl(
                             "grid-template-rows",
-                            "240px minmax(0, 1fr)"
+                            "auto auto"
                         ),
-                        CSS.decl("height", "570px")
+                        CSS.decl("height", "auto")
                     ),
 
                     CSS.rule(
                         "\(root)__navigation",
+                        CSS.decl("overflow", "visible"),
+                        CSS.decl(
+                            "overscroll-behavior",
+                            "auto"
+                        ),
                         CSS.decl("border-right", "0"),
                         CSS.decl(
                             "border-bottom",
@@ -403,6 +408,11 @@ extension DocsPreviewTree {
 
                     CSS.rule(
                         "\(root)__inspector",
+                        CSS.decl("overflow", "visible"),
+                        CSS.decl(
+                            "overscroll-behavior",
+                            "auto"
+                        ),
                         CSS.decl("padding", "24px 20px")
                     )
                 ),

@@ -283,10 +283,31 @@ public struct DocsPreviewTreeScript: ReusableComponent {
                     ?.focus();
             }
 
-            item.scrollIntoView({
-                block: 'nearest',
-                inline: 'nearest'
-            });
+            const navigation = item.closest(
+                '.wc-docs-preview-tree__navigation'
+            );
+
+            if (
+                navigation
+                && navigation.scrollHeight
+                    > navigation.clientHeight + 1
+            ) {
+                const navigationRect =
+                    navigation.getBoundingClientRect();
+
+                const itemRect =
+                    item.getBoundingClientRect();
+
+                if (itemRect.top < navigationRect.top) {
+                    navigation.scrollTop -=
+                        navigationRect.top - itemRect.top;
+                } else if (
+                    itemRect.bottom > navigationRect.bottom
+                ) {
+                    navigation.scrollTop +=
+                        itemRect.bottom - navigationRect.bottom;
+                }
+            }
 
             root.dispatchEvent(
                 new CustomEvent(
