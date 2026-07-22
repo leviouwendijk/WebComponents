@@ -720,7 +720,12 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
 
                 CSS.rule(
                     ".\(block)__eyebrow",
-                    CSS.decl("margin", "0 0 8px")
+                    CSS.decl("margin", "0 0 8px"),
+                    CSS.decl("font-size", ".72rem"),
+                    CSS.decl("font-weight", "750"),
+                    CSS.decl("letter-spacing", ".1em"),
+                    CSS.decl("text-transform", "uppercase"),
+                    CSS.decl("color", "var(--wc-docs-release-muted)")
                 ),
 
                 CSS.rule(
