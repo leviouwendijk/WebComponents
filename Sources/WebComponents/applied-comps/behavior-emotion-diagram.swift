@@ -29,7 +29,7 @@ public struct BehaviorEmotionDiagram:
 
         public init(
             behaviorTitle: String = "Gedrag",
-            behaviorSubtitle: String = "A–O / operant",
+            behaviorSubtitle: String = "Operant (A-O)",
             behaviorItems: [String] = [
                 "Keuzes",
                 "Beslissingen",
@@ -37,7 +37,7 @@ public struct BehaviorEmotionDiagram:
                 "Uitkomsten"
             ],
             habitTitle: String = "Gewoonte",
-            habitSubtitle: String = "S–R",
+            habitSubtitle: String = "Klassiek (S–R)",
             habitItems: [String] = [
                 "Automatische respons",
                 "Routine",
