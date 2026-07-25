@@ -141,12 +141,21 @@ public struct RecommendedProductCatalog:
             ]
         ) {
             for category in categories
-                where !category.products.isEmpty
-                {
+            where !category.products.isEmpty
+            {
                 HTML.a(
                     "#\(category.id)",
                     [
-                        "class": "\(Self.block)__nav-link"
+                        "class": "\(Self.block)__nav-link",
+                        "aria-controls": category.id,
+                        "onclick": """
+                        (() => {
+                            const category = document.getElementById('\(category.id)');
+                            if (category?.tagName === 'DETAILS') {
+                                category.open = true;
+                            }
+                        })();
+                        """
                     ]
                 ) {
                     HTML.text(category.title)
