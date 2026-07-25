@@ -657,6 +657,14 @@ public struct RecommendedProductCatalog:
                         "inline-flex"
                     ),
                     CSS.decl(
+                        "align-items",
+                        "center"
+                    ),
+                    CSS.decl(
+                        "flex",
+                        "0 0 auto"
+                    ),
+                    CSS.decl(
                         "gap",
                         ".4rem"
                     ),
@@ -679,6 +687,14 @@ public struct RecommendedProductCatalog:
                     CSS.decl(
                         "font-weight",
                         "700"
+                    ),
+                    CSS.decl(
+                        "line-height",
+                        "1.15"
+                    ),
+                    CSS.decl(
+                        "white-space",
+                        "nowrap"
                     ),
                     CSS.decl(
                         "text-decoration",
@@ -766,15 +782,31 @@ public struct RecommendedProductCatalog:
                     "\(root)__category-heading",
                     CSS.decl(
                         "display",
-                        "flex"
+                        "grid"
                     ),
                     CSS.decl(
-                        "justify-content",
-                        "space-between"
+                        "grid-template-columns",
+                        "minmax(0, 1fr) max-content"
+                    ),
+                    CSS.decl(
+                        "align-items",
+                        "start"
                     ),
                     CSS.decl(
                         "gap",
                         "1rem"
+                    ),
+                    CSS.decl(
+                        "min-width",
+                        "0"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)__category-heading > div",
+                    CSS.decl(
+                        "min-width",
+                        "0"
                     )
                 ),
 
@@ -813,8 +845,20 @@ public struct RecommendedProductCatalog:
                 CSS.rule(
                     "\(root)__category-count",
                     CSS.decl(
+                        "display",
+                        "block"
+                    ),
+                    CSS.decl(
                         "font-size",
                         ".78rem"
+                    ),
+                    CSS.decl(
+                        "line-height",
+                        "1.25"
+                    ),
+                    CSS.decl(
+                        "white-space",
+                        "nowrap"
                     ),
                     CSS.decl(
                         "color",
@@ -1405,6 +1449,14 @@ public struct RecommendedProductCatalog:
                         CSS.decl(
                             "overflow-x",
                             "auto"
+                        ),
+                        CSS.decl(
+                            "overscroll-behavior-x",
+                            "contain"
+                        ),
+                        CSS.decl(
+                            "scrollbar-width",
+                            "thin"
                         )
                     ),
                     CSS.rule(
