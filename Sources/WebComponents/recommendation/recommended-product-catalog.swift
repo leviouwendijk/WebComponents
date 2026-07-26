@@ -753,8 +753,12 @@ public struct RecommendedProductCatalog:
                 CSS.rule(
                     "\(root)__header",
                     CSS.decl(
+                        "width",
+                        "100%"
+                    ),
+                    CSS.decl(
                         "max-width",
-                        "760px"
+                        "none"
                     ),
                     CSS.decl(
                         "margin-bottom",
@@ -771,6 +775,14 @@ public struct RecommendedProductCatalog:
                     CSS.decl(
                         "font-size",
                         "clamp(2rem, 5vw, 3.5rem)"
+                    ),
+                    CSS.decl(
+                        "line-height",
+                        "1.05"
+                    ),
+                    CSS.decl(
+                        "letter-spacing",
+                        "-.035em"
                     )
                 ),
 
@@ -1631,6 +1643,10 @@ public struct RecommendedProductCatalog:
                     CSS.decl(
                         "align-items",
                         "center"
+                    ),
+                    CSS.decl(
+                        "justify-self",
+                        "end"
                     ),
                     CSS.decl(
                         "gap",
