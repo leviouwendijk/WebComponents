@@ -1078,7 +1078,7 @@ public struct RecommendedProductCatalog:
                     ),
                     CSS.decl(
                         "grid-template-columns",
-                        "repeat(auto-fit, minmax(min(100%, 300px), 1fr))"
+                        "repeat(3, minmax(0, 1fr))"
                     ),
                     CSS.decl(
                         "gap",
@@ -1863,6 +1863,16 @@ public struct RecommendedProductCatalog:
                 )
             ],
             media: [
+                CSS.media(
+                    "(max-width: 980px)",
+                    CSS.rule(
+                        "\(root)__grid",
+                        CSS.decl(
+                            "grid-template-columns",
+                            "repeat(2, minmax(0, 1fr))"
+                        )
+                    )
+                ),
                 CSS.media(
                     "(max-width: 720px)",
                     CSS.rule(
