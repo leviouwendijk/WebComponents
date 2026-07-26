@@ -13,6 +13,43 @@ public struct RecommendedProductCatalog:
         case expanded
     }
 
+    public enum DetailLevel:
+        String,
+        Sendable
+    {
+        case compact
+        case detailed
+    }
+
+    public enum Presentation: Sendable {
+        case compact
+        case detailed
+        case switchable(
+            default: DetailLevel
+        )
+
+        fileprivate var initialLevel: DetailLevel {
+            switch self {
+            case .compact:
+                return .compact
+
+            case .detailed:
+                return .detailed
+
+            case .switchable(let level):
+                return level
+            }
+        }
+
+        fileprivate var isSwitchable: Bool {
+            if case .switchable = self {
+                return true
+            }
+
+            return false
+        }
+    }
+
     public struct Category: Sendable {
         public let id: String
         public let title: String
@@ -42,6 +79,7 @@ public struct RecommendedProductCatalog:
     public let intro: String?
     public let categories: [Category]
     public let specificationLimit: Int?
+    public let presentation: Presentation
     public let includeNavigation: Bool
     public let includeStyles: Bool
 
@@ -51,6 +89,7 @@ public struct RecommendedProductCatalog:
         intro: String? = nil,
         categories: [Category],
         specificationLimit: Int? = 6,
+        presentation: Presentation = .detailed,
         includeNavigation: Bool = true,
         includeStyles: Bool = true
     ) {
@@ -59,6 +98,7 @@ public struct RecommendedProductCatalog:
         self.intro = intro
         self.categories = categories
         self.specificationLimit = specificationLimit
+        self.presentation = presentation
         self.includeNavigation = includeNavigation
         self.includeStyles = includeStyles
     }
@@ -88,7 +128,9 @@ public struct RecommendedProductCatalog:
         HTML.section(
             [
                 "id": id,
-                "class": Self.block
+                "class": Self.block,
+                "data-presentation":
+                    presentation.initialLevel.rawValue
             ]
         ) {
             HTML.header(
@@ -96,21 +138,33 @@ public struct RecommendedProductCatalog:
                     "class": "\(Self.block)__header"
                 ]
             ) {
-                HTML.h2(
+                HTML.div(
                     [
-                        "class": "\(Self.block)__title"
+                        "class": "\(Self.block)__heading"
                     ]
                 ) {
-                    HTML.text(title)
-                }
+                    HTML.div {
+                        HTML.h2(
+                            [
+                                "class": "\(Self.block)__title"
+                            ]
+                        ) {
+                            HTML.text(title)
+                        }
 
-                if let intro, !intro.isEmpty {
-                    HTML.p(
-                        [
-                            "class": "\(Self.block)__intro"
-                        ]
-                    ) {
-                        HTML.text(intro)
+                        if let intro, !intro.isEmpty {
+                            HTML.p(
+                                [
+                                    "class": "\(Self.block)__intro"
+                                ]
+                            ) {
+                                HTML.text(intro)
+                            }
+                        }
+                    }
+
+                    if presentation.isSwitchable {
+                        presentationControl()
                     }
                 }
             }
@@ -130,6 +184,118 @@ public struct RecommendedProductCatalog:
                     categoryNode(category)
                 }
             }
+        }
+    }
+
+    private func presentationControl() -> any HTMLNode {
+        HTML.div(
+            [
+                "class": "\(Self.block)__view-control",
+                "role": "group",
+                "aria-label": "Weergave productkaarten"
+            ]
+        ) {
+            HTML.span(
+                [
+                    "class": "\(Self.block)__view-label"
+                ]
+            ) {
+                HTML.text("Weergave")
+            }
+
+            HTML.label(
+                [
+                    "class": "\(Self.block)__view-option"
+                ]
+            ) {
+                if presentation.initialLevel == .compact {
+                    HTML.input(
+                        [
+                            "type": "radio",
+                            "name": "\(id)-presentation",
+                            "value": DetailLevel.compact.rawValue,
+                            "data-catalog-view":
+                                DetailLevel.compact.rawValue,
+                            "checked": "checked"
+                        ]
+                    )
+                } else {
+                    HTML.input(
+                        [
+                            "type": "radio",
+                            "name": "\(id)-presentation",
+                            "value": DetailLevel.compact.rawValue,
+                            "data-catalog-view":
+                                DetailLevel.compact.rawValue
+                        ]
+                    )
+                }
+
+                HTML.span {
+                    HTML.text("Compact")
+                }
+            }
+
+            HTML.label(
+                [
+                    "class": "\(Self.block)__view-option"
+                ]
+            ) {
+                if presentation.initialLevel == .detailed {
+                    HTML.input(
+                        [
+                            "type": "radio",
+                            "name": "\(id)-presentation",
+                            "value": DetailLevel.detailed.rawValue,
+                            "data-catalog-view":
+                                DetailLevel.detailed.rawValue,
+                            "checked": "checked"
+                        ]
+                    )
+                } else {
+                    HTML.input(
+                        [
+                            "type": "radio",
+                            "name": "\(id)-presentation",
+                            "value": DetailLevel.detailed.rawValue,
+                            "data-catalog-view":
+                                DetailLevel.detailed.rawValue
+                        ]
+                    )
+                }
+
+                HTML.span {
+                    HTML.text("Uitgebreid")
+                }
+            }
+
+            HTML.scriptInline(
+                """
+                (() => {
+                    const root = document.getElementById('\(id)');
+                    if (
+                        !root
+                        || root.dataset.catalogViewReady === 'true'
+                    ) {
+                        return;
+                    }
+
+                    root.dataset.catalogViewReady = 'true';
+
+                    root.addEventListener('change', event => {
+                        const input = event.target.closest(
+                            '[data-catalog-view]'
+                        );
+
+                        if (!input) {
+                            return;
+                        }
+
+                        root.dataset.presentation = input.value;
+                    });
+                })();
+                """
+            )
         }
     }
 
@@ -387,89 +553,95 @@ public struct RecommendedProductCatalog:
 
                 HTML.div(
                     [
-                        "class": "\(Self.block)__spec-head"
+                        "class": "\(Self.block)__details"
                     ]
                 ) {
-                    HTML.h4 {
-                        HTML.text(
-                            product.specification.label
-                        )
+                    HTML.div(
+                        [
+                            "class": "\(Self.block)__spec-head"
+                        ]
+                    ) {
+                        HTML.h4 {
+                            HTML.text(
+                                product.specification.label
+                            )
+                        }
+
+                        HTML.span {
+                            HTML.text(
+                                product.experience.label
+                            )
+                        }
                     }
 
-                    HTML.span {
-                        HTML.text(
-                            product.experience.label
-                        )
-                    }
-                }
+                    HTML.el(
+                        "dl",
+                        [
+                            "class": "\(Self.block)__facts"
+                        ]
+                    ) {
+                        for row in rows {
+                            HTML.div(
+                                [
+                                    "class": "\(Self.block)__fact"
+                                ]
+                            ) {
+                                HTML.el("dt") {
+                                    HTML.text(row.label)
+                                }
 
-                HTML.el(
-                    "dl",
-                    [
-                        "class": "\(Self.block)__facts"
-                    ]
-                ) {
-                    for row in rows {
-                        HTML.div(
-                            [
-                                "class": "\(Self.block)__fact"
-                            ]
-                        ) {
-                            HTML.el("dt") {
-                                HTML.text(row.label)
-                            }
+                                HTML.el("dd") {
+                                    HTML.text(row.value)
 
-                            HTML.el("dd") {
-                                HTML.text(row.value)
-
-                                if let note = row.note,
-                                   !note.isEmpty
-                                {
-                                    HTML.span(
-                                        [
-                                            "class":
-                                                "\(Self.block)__fact-note"
-                                        ]
-                                    ) {
-                                        HTML.text(note)
+                                    if let note = row.note,
+                                       !note.isEmpty
+                                    {
+                                        HTML.span(
+                                            [
+                                                "class":
+                                                    "\(Self.block)__fact-note"
+                                            ]
+                                        ) {
+                                            HTML.text(note)
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                list(
-                    "Geschikt voor",
-                    product.suitableFor
-                )
-
-                list(
-                    "Minder geschikt voor",
-                    product.unsuitableFor
-                )
-
-                list(
-                    "Opmerkingen",
-                    product.notes
-                )
-
-                for disclosure in Array(
-                    Set(
-                        product
-                            .links
-                            .compactMap(
-                                \.referral?.disclosure
-                            )
+                    list(
+                        "Geschikt voor",
+                        product.suitableFor
                     )
-                ).sorted() {
-                    HTML.p(
-                        [
-                            "class":
-                                "\(Self.block)__disclosure"
-                        ]
-                    ) {
-                        HTML.text(disclosure)
+
+                    list(
+                        "Minder geschikt voor",
+                        product.unsuitableFor
+                    )
+
+                    list(
+                        "Opmerkingen",
+                        product.notes
+                    )
+
+                    for disclosure in Array(
+                        Set(
+                            product
+                                .links
+                                .compactMap(
+                                    \.referral?.disclosure
+                                )
+                        )
+                    ).sorted() {
+                        HTML.p(
+                            [
+                                "class":
+                                    "\(Self.block)__disclosure"
+                            ]
+                        ) {
+                            HTML.text(disclosure)
+                        }
                     }
                 }
 
@@ -1428,6 +1600,266 @@ public struct RecommendedProductCatalog:
                         "color",
                         "inherit"
                     )
+                ),
+
+                CSS.rule(
+                    "\(root)__heading",
+                    CSS.decl(
+                        "display",
+                        "grid"
+                    ),
+                    CSS.decl(
+                        "grid-template-columns",
+                        "minmax(0, 1fr) auto"
+                    ),
+                    CSS.decl(
+                        "align-items",
+                        "end"
+                    ),
+                    CSS.decl(
+                        "gap",
+                        "1rem"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)__view-control",
+                    CSS.decl(
+                        "display",
+                        "inline-flex"
+                    ),
+                    CSS.decl(
+                        "align-items",
+                        "center"
+                    ),
+                    CSS.decl(
+                        "gap",
+                        ".25rem"
+                    ),
+                    CSS.decl(
+                        "padding",
+                        ".25rem"
+                    ),
+                    CSS.decl(
+                        "border",
+                        "1px solid var(--border-subtle, #d7e2ec)"
+                    ),
+                    CSS.decl(
+                        "border-radius",
+                        "999px"
+                    ),
+                    CSS.decl(
+                        "background",
+                        "var(--surface-strong, #fff)"
+                    ),
+                    CSS.decl(
+                        "white-space",
+                        "nowrap"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)__view-label",
+                    CSS.decl(
+                        "padding",
+                        "0 .45rem"
+                    ),
+                    CSS.decl(
+                        "font-size",
+                        ".74rem"
+                    ),
+                    CSS.decl(
+                        "font-weight",
+                        "700"
+                    ),
+                    CSS.decl(
+                        "color",
+                        "var(--caption-ink, #6b7280)"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)__view-option",
+                    CSS.decl(
+                        "position",
+                        "relative"
+                    ),
+                    CSS.decl(
+                        "cursor",
+                        "pointer"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)__view-option input",
+                    CSS.decl(
+                        "position",
+                        "absolute"
+                    ),
+                    CSS.decl(
+                        "width",
+                        "1px"
+                    ),
+                    CSS.decl(
+                        "height",
+                        "1px"
+                    ),
+                    CSS.decl(
+                        "overflow",
+                        "hidden"
+                    ),
+                    CSS.decl(
+                        "clip",
+                        "rect(0 0 0 0)"
+                    ),
+                    CSS.decl(
+                        "clip-path",
+                        "inset(50%)"
+                    ),
+                    CSS.decl(
+                        "white-space",
+                        "nowrap"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)__view-option span",
+                    CSS.decl(
+                        "display",
+                        "block"
+                    ),
+                    CSS.decl(
+                        "padding",
+                        ".45rem .7rem"
+                    ),
+                    CSS.decl(
+                        "border-radius",
+                        "999px"
+                    ),
+                    CSS.decl(
+                        "font-size",
+                        ".78rem"
+                    ),
+                    CSS.decl(
+                        "font-weight",
+                        "700"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)__view-option input:checked + span",
+                    CSS.decl(
+                        "background",
+                        "var(--surface-soft, #e4edf4)"
+                    ),
+                    CSS.decl(
+                        "color",
+                        "var(--text, #0f1720)"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)__view-option input:focus-visible + span",
+                    CSS.decl(
+                        "outline",
+                        "3px solid var(--focus-ring, rgba(37,99,235,.35))"
+                    ),
+                    CSS.decl(
+                        "outline-offset",
+                        "2px"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)__details",
+                    CSS.decl(
+                        "display",
+                        "grid"
+                    ),
+                    CSS.decl(
+                        "gap",
+                        ".85rem"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)[data-presentation=\"compact\"] \(root)__details",
+                    CSS.decl(
+                        "display",
+                        "none"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)[data-presentation=\"compact\"] \(root)__card-body",
+                    CSS.decl(
+                        "gap",
+                        ".75rem"
+                    ),
+                    CSS.decl(
+                        "padding",
+                        "1rem"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)[data-presentation=\"compact\"] \(root)__product-summary",
+                    CSS.decl(
+                        "display",
+                        "-webkit-box"
+                    ),
+                    CSS.decl(
+                        "-webkit-box-orient",
+                        "vertical"
+                    ),
+                    CSS.decl(
+                        "-webkit-line-clamp",
+                        "4"
+                    ),
+                    CSS.decl(
+                        "overflow",
+                        "hidden"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)[data-presentation=\"compact\"] \(root)__media",
+                    CSS.decl(
+                        "aspect-ratio",
+                        "4 / 3"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)[data-presentation=\"compact\"] \(root)__image",
+                    CSS.decl(
+                        "object-fit",
+                        "contain"
+                    ),
+                    CSS.decl(
+                        "padding",
+                        ".75rem"
+                    ),
+                    CSS.decl(
+                        "box-sizing",
+                        "border-box"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)[data-presentation=\"compact\"] \(root)__link-role",
+                    CSS.decl(
+                        "display",
+                        "none"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)[data-presentation=\"compact\"] \(root)__link",
+                    CSS.decl(
+                        "padding",
+                        ".55rem .75rem"
+                    )
                 )
             ],
             media: [
@@ -1438,6 +1870,24 @@ public struct RecommendedProductCatalog:
                         CSS.decl(
                             "width",
                             "min(100% - 1rem, 1128px)"
+                        )
+                    ),
+                    CSS.rule(
+                        "\(root)__heading",
+                        CSS.decl(
+                            "grid-template-columns",
+                            "1fr"
+                        ),
+                        CSS.decl(
+                            "align-items",
+                            "start"
+                        )
+                    ),
+                    CSS.rule(
+                        "\(root)__view-control",
+                        CSS.decl(
+                            "max-width",
+                            "100%"
                         )
                     ),
                     CSS.rule(
