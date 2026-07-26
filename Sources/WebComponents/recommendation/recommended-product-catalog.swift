@@ -1999,12 +1999,20 @@ public struct RecommendedProductCatalog:
                     CSS.rule(
                         "\(root)[data-presentation=\"compact\"] \(root)__media",
                         CSS.decl(
-                            "aspect-ratio",
-                            "16 / 9"
+                            "width",
+                            "100%"
                         ),
                         CSS.decl(
-                            "max-height",
-                            "220px"
+                            "max-width",
+                            "none"
+                        ),
+                        CSS.decl(
+                            "height",
+                            "clamp(170px, 45vw, 220px)"
+                        ),
+                        CSS.decl(
+                            "aspect-ratio",
+                            "auto"
                         )
                     ),
                     CSS.rule(
