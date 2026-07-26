@@ -742,7 +742,7 @@ public struct RecommendedProductCatalog:
                     ),
                     CSS.decl(
                         "padding",
-                        "clamp(2rem, 5vw, 4rem) 0"
+                        "1rem 0 clamp(3rem, 5vw, 4rem)"
                     ),
                     CSS.decl(
                         "color",
@@ -762,7 +762,7 @@ public struct RecommendedProductCatalog:
                     ),
                     CSS.decl(
                         "margin-bottom",
-                        "1.25rem"
+                        "1rem"
                     )
                 ),
 
@@ -774,23 +774,31 @@ public struct RecommendedProductCatalog:
                     ),
                     CSS.decl(
                         "font-size",
-                        "clamp(2rem, 5vw, 3.5rem)"
+                        "clamp(1.9rem, 3vw, 2.35rem)"
                     ),
                     CSS.decl(
                         "line-height",
-                        "1.05"
+                        "1.08"
                     ),
                     CSS.decl(
                         "letter-spacing",
-                        "-.035em"
+                        "-.025em"
                     )
                 ),
 
                 CSS.rule(
                     "\(root)__intro",
                     CSS.decl(
+                        "max-width",
+                        "72ch"
+                    ),
+                    CSS.decl(
+                        "margin",
+                        ".65rem 0 0"
+                    ),
+                    CSS.decl(
                         "line-height",
-                        "1.7"
+                        "1.55"
                     ),
                     CSS.decl(
                         "color",
@@ -1626,11 +1634,11 @@ public struct RecommendedProductCatalog:
                     ),
                     CSS.decl(
                         "align-items",
-                        "end"
+                        "start"
                     ),
                     CSS.decl(
                         "gap",
-                        "1rem"
+                        "1rem 2rem"
                     )
                 ),
 
@@ -1643,6 +1651,10 @@ public struct RecommendedProductCatalog:
                     CSS.decl(
                         "align-items",
                         "center"
+                    ),
+                    CSS.decl(
+                        "align-self",
+                        "start"
                     ),
                     CSS.decl(
                         "justify-self",
@@ -1896,6 +1908,10 @@ public struct RecommendedProductCatalog:
                         CSS.decl(
                             "width",
                             "min(100% - 1rem, 1128px)"
+                        ),
+                        CSS.decl(
+                            "padding-top",
+                            ".75rem"
                         )
                     ),
                     CSS.rule(
@@ -1907,10 +1923,36 @@ public struct RecommendedProductCatalog:
                         CSS.decl(
                             "align-items",
                             "start"
+                        ),
+                        CSS.decl(
+                            "gap",
+                            ".9rem"
+                        )
+                    ),
+                    CSS.rule(
+                        "\(root)__title",
+                        CSS.decl(
+                            "font-size",
+                            "clamp(1.75rem, 8vw, 2rem)"
+                        )
+                    ),
+                    CSS.rule(
+                        "\(root)__intro",
+                        CSS.decl(
+                            "margin",
+                            ".6rem 0 0"
+                        ),
+                        CSS.decl(
+                            "line-height",
+                            "1.55"
                         )
                     ),
                     CSS.rule(
                         "\(root)__view-control",
+                        CSS.decl(
+                            "justify-self",
+                            "start"
+                        ),
                         CSS.decl(
                             "max-width",
                             "100%"
@@ -1933,6 +1975,14 @@ public struct RecommendedProductCatalog:
                         CSS.decl(
                             "scrollbar-width",
                             "thin"
+                        ),
+                        CSS.decl(
+                            "scroll-padding-inline",
+                            ".75rem"
+                        ),
+                        CSS.decl(
+                            "padding-right",
+                            "1.25rem"
                         )
                     ),
                     CSS.rule(
@@ -1944,6 +1994,24 @@ public struct RecommendedProductCatalog:
                         CSS.decl(
                             "padding",
                             ".75rem"
+                        )
+                    ),
+                    CSS.rule(
+                        "\(root)[data-presentation=\"compact\"] \(root)__media",
+                        CSS.decl(
+                            "aspect-ratio",
+                            "16 / 9"
+                        ),
+                        CSS.decl(
+                            "max-height",
+                            "220px"
+                        )
+                    ),
+                    CSS.rule(
+                        "\(root)[data-presentation=\"compact\"] \(root)__product-summary",
+                        CSS.decl(
+                            "-webkit-line-clamp",
+                            "3"
                         )
                     )
                 ),
