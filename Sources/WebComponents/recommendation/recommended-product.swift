@@ -101,6 +101,52 @@ public struct RecommendedProduct: Sendable {
         }
     }
 
+    public struct Rating: Sendable {
+        public let score: Int
+        public let maximum: Int
+        public let label: String
+        public let rationale: String?
+
+        public init(
+            score: Int,
+            maximum: Int = 10,
+            label: String = "Onze beoordeling",
+            rationale: String? = nil
+        ) {
+            precondition(
+                maximum > 0,
+                "A product rating maximum must be greater than zero."
+            )
+
+            precondition(
+                score >= 0 && score <= maximum,
+                "A product rating must fall between zero and its maximum."
+            )
+
+            self.score = score
+            self.maximum = maximum
+            self.label = label
+            self.rationale = rationale
+        }
+
+        public var displayValue: String {
+            "\(score)/\(maximum)"
+        }
+
+        public var percentage: Int {
+            Int(
+                (
+                    Double(score)
+                        / Double(maximum)
+                ) * 100
+            )
+        }
+
+        public var accessibilityLabel: String {
+            "\(label): \(score) van \(maximum)"
+        }
+    }
+
     public struct Fact: Sendable {
         public let label: String
         public let value: String
@@ -315,6 +361,7 @@ public struct RecommendedProduct: Sendable {
     public let summary: String
     public let recommendation: Recommendation
     public let experience: Experience
+    public let rating: Rating?
     public let image: Image?
     public let links: [Link]
     public let specification: Specification
@@ -329,6 +376,7 @@ public struct RecommendedProduct: Sendable {
         summary: String,
         recommendation: Recommendation = .recommended,
         experience: Experience = .notAssessed,
+        rating: Rating? = nil,
         image: Image? = nil,
         links: [Link],
         specification: Specification,
@@ -342,6 +390,7 @@ public struct RecommendedProduct: Sendable {
         self.summary = summary
         self.recommendation = recommendation
         self.experience = experience
+        self.rating = rating
         self.image = image
         self.links = links
         self.specification = specification

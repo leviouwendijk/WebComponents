@@ -80,6 +80,8 @@ public struct RecommendedProductCatalog:
     public let categories: [Category]
     public let specificationLimit: Int?
     public let presentation: Presentation
+    public let productInteraction:
+        ProductInteraction
     public let includeNavigation: Bool
     public let includeStyles: Bool
 
@@ -90,6 +92,8 @@ public struct RecommendedProductCatalog:
         categories: [Category],
         specificationLimit: Int? = 6,
         presentation: Presentation = .detailed,
+        productInteraction:
+            ProductInteraction = .none,
         includeNavigation: Bool = true,
         includeStyles: Bool = true
     ) {
@@ -97,10 +101,15 @@ public struct RecommendedProductCatalog:
         self.title = title
         self.intro = intro
         self.categories = categories
-        self.specificationLimit = specificationLimit
+        self.specificationLimit =
+            specificationLimit
         self.presentation = presentation
-        self.includeNavigation = includeNavigation
-        self.includeStyles = includeStyles
+        self.productInteraction =
+            productInteraction
+        self.includeNavigation =
+            includeNavigation
+        self.includeStyles =
+            includeStyles
     }
 
     public var nodes: ReusableComponentNodes {

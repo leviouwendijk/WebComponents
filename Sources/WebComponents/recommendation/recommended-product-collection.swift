@@ -64,6 +64,8 @@ public struct RecommendedProductCollection:
                     product.recommendation,
                 experience:
                     product.experience,
+                rating:
+                    product.rating,
                 image: product.image,
                 links: product.links,
                 specification:
@@ -121,6 +123,9 @@ public struct RecommendedProductCollection:
                 .switchable(
                     default: .compact
                 ),
+        productInteraction:
+            RecommendedProductCatalog.ProductInteraction =
+                .none,
         includeNavigation: Bool = true,
         includeStyles: Bool = true
     ) -> RecommendedProductCatalog {
@@ -180,6 +185,8 @@ public struct RecommendedProductCollection:
             specificationLimit:
                 specificationLimit,
             presentation: presentation,
+            productInteraction:
+                productInteraction,
             includeNavigation:
                 includeNavigation,
             includeStyles:
