@@ -564,6 +564,51 @@ public struct RecommendedProductCatalog:
                     HTML.div(
                         [
                             "class":
+                                "\(Self.block)__card-status"
+                        ]
+                    ) {
+                        HTML.span(
+                            [
+                                "class":
+                                    "\(Self.block)__badge",
+                                "data-recommendation":
+                                    product
+                                        .recommendation
+                                        .rawValue
+                            ]
+                        ) {
+                            HTML.text(
+                                product
+                                    .recommendation
+                                    .label
+                            )
+                        }
+
+                        if let rating =
+                            product.rating
+                        {
+                            HTML.span(
+                                [
+                                    "class":
+                                        "\(Self.block)__rating",
+                                    "aria-label":
+                                        rating
+                                            .accessibilityLabel,
+                                    "title":
+                                        rating.label
+                                ]
+                            ) {
+                                HTML.text(
+                                    rating
+                                        .displayValue
+                                )
+                            }
+                        }
+                    }
+
+                    HTML.div(
+                        [
+                            "class":
                                 "\(Self.block)__card-meta"
                         ]
                     ) {
@@ -582,58 +627,22 @@ public struct RecommendedProductCatalog:
                                             "\(Self.block)__brand"
                                     ]
                                 ) {
-                                    HTML.text(brand)
+                                    HTML.text(
+                                        brand
+                                    )
                                 }
                             }
                         }
 
-                        HTML.div(
-                            [
-                                "class":
-                                    "\(Self.block)__card-actions"
-                            ]
-                        ) {
-                            HTML.span(
+                        if productInteraction
+                            .sharingEnabled
+                        {
+                            HTML.div(
                                 [
                                     "class":
-                                        "\(Self.block)__badge",
-                                    "data-recommendation":
-                                        product
-                                            .recommendation
-                                            .rawValue
+                                        "\(Self.block)__card-actions"
                                 ]
                             ) {
-                                HTML.text(
-                                    product
-                                        .recommendation
-                                        .label
-                                )
-                            }
-
-                            if let rating =
-                                product.rating
-                            {
-                                HTML.span(
-                                    [
-                                        "class":
-                                            "\(Self.block)__rating",
-                                        "aria-label":
-                                            rating
-                                                .accessibilityLabel,
-                                        "title":
-                                            rating.label
-                                    ]
-                                ) {
-                                    HTML.text(
-                                        rating
-                                            .displayValue
-                                    )
-                                }
-                            }
-
-                            if productInteraction
-                                .sharingEnabled
-                            {
                                 HTML.button(
                                     [
                                         "type":
@@ -654,7 +663,9 @@ public struct RecommendedProductCatalog:
                                                 "true"
                                         ]
                                     ) {
-                                        HTML.text("⧉")
+                                        HTML.text(
+                                            "⧉"
+                                        )
                                     }
                                 }
 
@@ -674,6 +685,11 @@ public struct RecommendedProductCatalog:
                                             "Deel product"
                                     ]
                                 ) {
+                                    /*
+                                    // Previous share icon.
+                                    // Restore this span and remove the SVG
+                                    // below to roll back the icon only.
+
                                     HTML.span(
                                         [
                                             "aria-hidden":
@@ -681,6 +697,59 @@ public struct RecommendedProductCatalog:
                                         ]
                                     ) {
                                         HTML.text("↗")
+                                    }
+                                    */
+
+                                    HTML.el(
+                                        "svg",
+                                        [
+                                            "class":
+                                                "\(Self.block)__share-icon",
+                                            "viewBox":
+                                                "0 0 24 24",
+                                            "width":
+                                                "18",
+                                            "height":
+                                                "18",
+                                            "fill":
+                                                "none",
+                                            "stroke":
+                                                "currentColor",
+                                            "stroke-width":
+                                                "1.8",
+                                            "stroke-linecap":
+                                                "round",
+                                            "stroke-linejoin":
+                                                "round",
+                                            "aria-hidden":
+                                                "true",
+                                            "focusable":
+                                                "false"
+                                        ]
+                                    ) {
+                                        HTML.el(
+                                            "path",
+                                            [
+                                                "d":
+                                                    "M12 15.5V3"
+                                            ]
+                                        ) {}
+
+                                        HTML.el(
+                                            "path",
+                                            [
+                                                "d":
+                                                    "M7.5 7.5 12 3l4.5 4.5"
+                                            ]
+                                        ) {}
+
+                                        HTML.el(
+                                            "path",
+                                            [
+                                                "d":
+                                                    "M5 11.5v7A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5v-7"
+                                            ]
+                                        ) {}
                                     }
                                 }
                             }

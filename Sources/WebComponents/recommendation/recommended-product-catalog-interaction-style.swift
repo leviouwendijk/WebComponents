@@ -181,15 +181,23 @@ extension RecommendedProductCatalog {
                     ),
                     CSS.decl(
                         "gap",
-                        ".35rem"
+                        ".4rem"
+                    ),
+                    CSS.decl(
+                        "min-width",
+                        "0"
                     )
                 ),
 
                 CSS.rule(
-                    "\(root)__card-meta",
+                    "\(root)__card-status",
                     CSS.decl(
                         "display",
                         "flex"
+                    ),
+                    CSS.decl(
+                        "flex-wrap",
+                        "wrap"
                     ),
                     CSS.decl(
                         "align-items",
@@ -197,11 +205,39 @@ extension RecommendedProductCatalog {
                     ),
                     CSS.decl(
                         "justify-content",
-                        "space-between"
+                        "flex-start"
+                    ),
+                    CSS.decl(
+                        "gap",
+                        ".35rem"
+                    ),
+                    CSS.decl(
+                        "min-width",
+                        "0"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)__card-meta",
+                    CSS.decl(
+                        "display",
+                        "grid"
+                    ),
+                    CSS.decl(
+                        "grid-template-columns",
+                        "minmax(0, 1fr) auto"
+                    ),
+                    CSS.decl(
+                        "align-items",
+                        "center"
                     ),
                     CSS.decl(
                         "gap",
                         ".65rem"
+                    ),
+                    CSS.decl(
+                        "width",
+                        "100%"
                     ),
                     CSS.decl(
                         "min-width",
@@ -236,8 +272,16 @@ extension RecommendedProductCatalog {
                         "flex-end"
                     ),
                     CSS.decl(
+                        "justify-self",
+                        "end"
+                    ),
+                    CSS.decl(
                         "gap",
                         ".35rem"
+                    ),
+                    CSS.decl(
+                        "white-space",
+                        "nowrap"
                     )
                 ),
 
@@ -350,6 +394,30 @@ extension RecommendedProductCatalog {
                     CSS.decl(
                         "cursor",
                         "pointer"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)__share-icon",
+                    CSS.decl(
+                        "display",
+                        "block"
+                    ),
+                    CSS.decl(
+                        "width",
+                        "1.05rem"
+                    ),
+                    CSS.decl(
+                        "height",
+                        "1.05rem"
+                    ),
+                    CSS.decl(
+                        "overflow",
+                        "visible"
+                    ),
+                    CSS.decl(
+                        "pointer-events",
+                        "none"
                     )
                 ),
 
@@ -677,7 +745,7 @@ extension RecommendedProductCatalog {
                     ),
 
                     CSS.rule(
-                        "\(root)__card-badges",
+                        "\(root)__card-status",
                         CSS.decl(
                             "justify-content",
                             "flex-start"
