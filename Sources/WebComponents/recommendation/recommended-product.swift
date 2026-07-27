@@ -102,14 +102,14 @@ public struct RecommendedProduct: Sendable {
     }
 
     public struct Rating: Sendable {
-        public let score: Int
-        public let maximum: Int
+        public let score: Double
+        public let maximum: Double
         public let label: String
         public let rationale: String?
 
         public init(
-            score: Int,
-            maximum: Int = 10,
+            score: Double,
+            maximum: Double = 10,
             label: String = "Onze beoordeling",
             rationale: String? = nil
         ) {
@@ -130,20 +130,26 @@ public struct RecommendedProduct: Sendable {
         }
 
         public var displayValue: String {
-            "\(score)/\(maximum)"
+            "\(formatted(score))/\(formatted(maximum))"
         }
 
-        public var percentage: Int {
-            Int(
-                (
-                    Double(score)
-                        / Double(maximum)
-                ) * 100
-            )
+        public var percentage: Double {
+            (score / maximum) * 100
         }
 
         public var accessibilityLabel: String {
-            "\(label): \(score) van \(maximum)"
+            "\(label): \(formatted(score)) van \(formatted(maximum))"
+        }
+
+        private func formatted(
+            _ value: Double
+        ) -> String {
+            value.rounded() == value
+                ? String(Int(value))
+                : String(
+                    format: "%.1f",
+                    value
+                )
         }
     }
 

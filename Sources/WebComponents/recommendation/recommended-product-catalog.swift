@@ -121,50 +121,89 @@ public struct RecommendedProductCatalog:
             return .init()
         }
 
+        var stylesheets:
+            [CSSStyleSheet] = []
+
+        if includeStyles {
+            stylesheets.append(
+                Self.stylesheet()
+            )
+
+            stylesheets.append(
+                Self.interactionStylesheet()
+            )
+
+            if productInteraction
+                .detailSheetEnabled
+            {
+                stylesheets.append(
+                    RecommendedProductDetail
+                        .stylesheet()
+                )
+            }
+        }
+
         return .body(
             [
                 node()
             ],
-            stylesheets: includeStyles
-                ? [
-                    Self.stylesheet()
-                ]
-                : []
+            stylesheets:
+                stylesheets
         )
     }
 
     public func node() -> any HTMLNode {
-        HTML.section(
-            [
-                "id": id,
-                "class": Self.block,
-                "data-presentation":
-                    presentation.initialLevel.rawValue
-            ]
+        var attributes: HTMLAttribute = [
+            "id": id,
+            "class": Self.block,
+            "data-presentation":
+                presentation
+                    .initialLevel
+                    .rawValue
+        ]
+
+        if productInteraction.isEnabled {
+            attributes.merge(
+                .data(
+                    "product-parameter",
+                    productInteraction
+                        .queryParameter
+                )
+            )
+        }
+
+        return HTML.section(
+            attributes
         ) {
             HTML.header(
                 [
-                    "class": "\(Self.block)__header"
+                    "class":
+                        "\(Self.block)__header"
                 ]
             ) {
                 HTML.div(
                     [
-                        "class": "\(Self.block)__heading"
+                        "class":
+                            "\(Self.block)__heading"
                     ]
                 ) {
                     HTML.div {
                         HTML.h2(
                             [
-                                "class": "\(Self.block)__title"
+                                "class":
+                                    "\(Self.block)__title"
                             ]
                         ) {
                             HTML.text(title)
                         }
 
-                        if let intro, !intro.isEmpty {
+                        if let intro,
+                           !intro.isEmpty
+                        {
                             HTML.p(
                                 [
-                                    "class": "\(Self.block)__intro"
+                                    "class":
+                                        "\(Self.block)__intro"
                                 ]
                             ) {
                                 HTML.text(intro)
@@ -184,7 +223,8 @@ public struct RecommendedProductCatalog:
 
             HTML.div(
                 [
-                    "class": "\(Self.block)__categories"
+                    "class":
+                        "\(Self.block)__categories"
                 ]
             ) {
                 for category in categories
@@ -192,6 +232,11 @@ public struct RecommendedProductCatalog:
                 {
                     categoryNode(category)
                 }
+            }
+
+            if productInteraction.isEnabled {
+                interactionHost()
+                interactionScriptNode()
             }
         }
     }
@@ -475,55 +520,60 @@ public struct RecommendedProductCatalog:
             [
                 "id": product.id,
                 "class": "\(Self.block)__card",
-                "data-recommendation": product.recommendation.rawValue
+                "data-product-card": product.id,
+                "data-recommendation":
+                    product.recommendation.rawValue
             ]
         ) {
-            HTML.div(
-                [
-                    "class": "\(Self.block)__media"
-                ]
-            ) {
-                if let image = product.image {
-                    HTML.img(
-                        src: image.url.absoluteString,
-                        alt: image.alt,
-                        [
-                            "class": "\(Self.block)__image",
-                            "loading": "lazy",
-                            "decoding": "async"
-                        ]
-                    )
-                } else {
-                    HTML.div(
-                        [
-                            "class": "\(Self.block)__image-fallback",
-                            "aria-hidden": "true"
-                        ]
-                    ) {
-                        HTML.text(
-                            initials(product)
-                        )
-                    }
+            if productInteraction.detailSheetEnabled {
+                HTML.button(
+                    [
+                        "type": "button",
+                        "class":
+                            "\(Self.block)__media \(Self.block)__product-trigger",
+                        "data-product-open": product.id,
+                        "aria-label":
+                            "Bekijk \(product.name)"
+                    ]
+                ) {
+                    productMedia(product)
+                }
+            } else {
+                HTML.div(
+                    [
+                        "class":
+                            "\(Self.block)__media"
+                    ]
+                ) {
+                    productMedia(product)
                 }
             }
 
             HTML.div(
                 [
-                    "class": "\(Self.block)__card-body"
+                    "class":
+                        "\(Self.block)__card-body"
                 ]
             ) {
                 HTML.header(
                     [
-                        "class": "\(Self.block)__card-header"
+                        "class":
+                            "\(Self.block)__card-header"
                     ]
                 ) {
-                    HTML.div {
+                    HTML.div(
+                        [
+                            "class":
+                                "\(Self.block)__card-heading"
+                        ]
+                    ) {
                         if let brand = product.brand,
                            !brand.isEmpty
                         {
                             HTML.p(
                                 [
-                                    "class": "\(Self.block)__brand"
+                                    "class":
+                                        "\(Self.block)__brand"
                                 ]
                             ) {
                                 HTML.text(brand)
@@ -532,53 +582,116 @@ public struct RecommendedProductCatalog:
 
                         HTML.h3(
                             [
-                                "class": "\(Self.block)__card-title"
+                                "class":
+                                    "\(Self.block)__card-title"
                             ]
                         ) {
-                            HTML.text(product.name)
+                            if productInteraction
+                                .detailSheetEnabled
+                            {
+                                HTML.button(
+                                    [
+                                        "type": "button",
+                                        "class":
+                                            "\(Self.block)__title-trigger",
+                                        "data-product-open":
+                                            product.id
+                                    ]
+                                ) {
+                                    HTML.text(
+                                        product.name
+                                    )
+                                }
+                            } else {
+                                HTML.text(
+                                    product.name
+                                )
+                            }
                         }
                     }
 
-                    HTML.span(
+                    HTML.div(
                         [
-                            "class": "\(Self.block)__badge",
-                            "data-recommendation":
-                                product.recommendation.rawValue
+                            "class":
+                                "\(Self.block)__card-badges"
                         ]
                     ) {
-                        HTML.text(
-                            product.recommendation.label
-                        )
+                        HTML.span(
+                            [
+                                "class":
+                                    "\(Self.block)__badge",
+                                "data-recommendation":
+                                    product
+                                        .recommendation
+                                        .rawValue
+                            ]
+                        ) {
+                            HTML.text(
+                                product
+                                    .recommendation
+                                    .label
+                            )
+                        }
+
+                        if let rating =
+                            product.rating
+                        {
+                            HTML.span(
+                                [
+                                    "class":
+                                        "\(Self.block)__rating",
+                                    "aria-label":
+                                        rating
+                                            .accessibilityLabel,
+                                    "title":
+                                        rating.label
+                                ]
+                            ) {
+                                HTML.text(
+                                    rating
+                                        .displayValue
+                                )
+                            }
+                        }
                     }
                 }
 
                 HTML.p(
                     [
-                        "class": "\(Self.block)__product-summary"
+                        "class":
+                            "\(Self.block)__product-summary"
                     ]
                 ) {
-                    HTML.text(product.summary)
+                    HTML.text(
+                        product.summary
+                    )
                 }
 
                 HTML.div(
                     [
-                        "class": "\(Self.block)__details"
+                        "class":
+                            "\(Self.block)__details"
                     ]
                 ) {
                     HTML.div(
                         [
-                            "class": "\(Self.block)__spec-head"
+                            "class":
+                                "\(Self.block)__spec-head"
                         ]
                     ) {
                         HTML.h4 {
                             HTML.text(
-                                product.specification.label
+                                product
+                                    .specification
+                                    .label
                             )
                         }
 
                         HTML.span {
                             HTML.text(
-                                product.experience.label
+                                product
+                                    .experience
+                                    .label
                             )
                         }
                     }
@@ -586,23 +699,30 @@ public struct RecommendedProductCatalog:
                     HTML.el(
                         "dl",
                         [
-                            "class": "\(Self.block)__facts"
+                            "class":
+                                "\(Self.block)__facts"
                         ]
                     ) {
                         for row in rows {
                             HTML.div(
                                 [
-                                    "class": "\(Self.block)__fact"
+                                    "class":
+                                        "\(Self.block)__fact"
                                 ]
                             ) {
                                 HTML.el("dt") {
-                                    HTML.text(row.label)
+                                    HTML.text(
+                                        row.label
+                                    )
                                 }
 
                                 HTML.el("dd") {
-                                    HTML.text(row.value)
+                                    HTML.text(
+                                        row.value
+                                    )
 
-                                    if let note = row.note,
+                                    if let note =
+                                        row.note,
                                        !note.isEmpty
                                     {
                                         HTML.span(
@@ -611,7 +731,9 @@ public struct RecommendedProductCatalog:
                                                     "\(Self.block)__fact-note"
                                             ]
                                         ) {
-                                            HTML.text(note)
+                                            HTML.text(
+                                                note
+                                            )
                                         }
                                     }
                                 }
@@ -649,17 +771,52 @@ public struct RecommendedProductCatalog:
                                     "\(Self.block)__disclosure"
                             ]
                         ) {
-                            HTML.text(disclosure)
+                            HTML.text(
+                                disclosure
+                            )
                         }
                     }
                 }
 
                 HTML.footer(
                     [
-                        "class": "\(Self.block)__links",
-                        "aria-label": "Productlinks"
+                        "class":
+                            "\(Self.block)__links",
+                        "aria-label":
+                            "Productlinks"
                     ]
                 ) {
+                    if productInteraction
+                        .sharingEnabled
+                    {
+                        HTML.button(
+                            [
+                                "type": "button",
+                                "class":
+                                    "\(Self.block)__share",
+                                "data-product-share":
+                                    product.id,
+                                "data-product-title":
+                                    product.name,
+                                "aria-label":
+                                    "Deel \(product.name)"
+                            ]
+                        ) {
+                            HTML.span(
+                                [
+                                    "aria-hidden":
+                                        "true"
+                                ]
+                            ) {
+                                HTML.text("↗")
+                            }
+
+                            HTML.span {
+                                HTML.text("Delen")
+                            }
+                        }
+                    }
+
                     for link in product.links {
                         HTML.a(
                             link.url.absoluteString,
@@ -667,31 +824,87 @@ public struct RecommendedProductCatalog:
                                 "class": [
                                     "\(Self.block)__link",
                                     "\(Self.block)__link--\(link.kind.isPrimary ? "primary" : "secondary")"
-                                ].joined(separator: " "),
-                                "target": "_blank",
-                                "rel": link.referral == nil
-                                    ? "noopener noreferrer"
-                                    : "noopener noreferrer sponsored",
-                                "data-link-kind": link.kind.rawValue
+                                ].joined(
+                                    separator: " "
+                                ),
+                                "target":
+                                    "_blank",
+                                "rel":
+                                    link.referral == nil
+                                        ? "noopener noreferrer"
+                                        : "noopener noreferrer sponsored",
+                                "data-link-kind":
+                                    link.kind.rawValue
                             ]
                         ) {
                             HTML.span(
                                 [
-                                    "class": "\(Self.block)__link-role"
+                                    "class":
+                                        "\(Self.block)__link-role"
                                 ]
                             ) {
-                                HTML.text(link.kind.roleLabel)
+                                HTML.text(
+                                    link
+                                        .kind
+                                        .roleLabel
+                                )
                             }
 
                             HTML.span(
                                 [
-                                    "class": "\(Self.block)__link-label"
+                                    "class":
+                                        "\(Self.block)__link-label"
                                 ]
                             ) {
-                                HTML.text(link.label)
+                                HTML.text(
+                                    link.label
+                                )
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private func productMedia(
+        _ product: RecommendedProduct
+    ) -> any HTMLNode {
+        HTML.div(
+            [
+                "class":
+                    "\(Self.block)__media-inner"
+            ]
+        ) {
+            if let image = product.image {
+                HTML.img(
+                    src:
+                        image
+                            .url
+                            .absoluteString,
+                    alt:
+                        image.alt,
+                    [
+                        "class":
+                            "\(Self.block)__image",
+                        "loading":
+                            "lazy",
+                        "decoding":
+                            "async"
+                    ]
+                )
+            } else {
+                HTML.div(
+                    [
+                        "class":
+                            "\(Self.block)__image-fallback",
+                        "aria-hidden":
+                            "true"
+                    ]
+                ) {
+                    HTML.text(
+                        initials(product)
+                    )
                 }
             }
         }
