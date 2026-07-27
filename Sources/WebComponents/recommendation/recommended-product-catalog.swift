@@ -564,94 +564,132 @@ public struct RecommendedProductCatalog:
                     HTML.div(
                         [
                             "class":
-                                "\(Self.block)__card-heading"
+                                "\(Self.block)__card-meta"
                         ]
                     ) {
-                        if let brand = product.brand,
-                           !brand.isEmpty
-                        {
-                            HTML.p(
-                                [
-                                    "class":
-                                        "\(Self.block)__brand"
-                                ]
-                            ) {
-                                HTML.text(brand)
+                        HTML.div(
+                            [
+                                "class":
+                                    "\(Self.block)__card-brand"
+                            ]
+                        ) {
+                            if let brand = product.brand,
+                               !brand.isEmpty
+                            {
+                                HTML.p(
+                                    [
+                                        "class":
+                                            "\(Self.block)__brand"
+                                    ]
+                                ) {
+                                    HTML.text(brand)
+                                }
                             }
                         }
 
-                        HTML.h3(
+                        HTML.div(
                             [
                                 "class":
-                                    "\(Self.block)__card-title"
+                                    "\(Self.block)__card-actions"
                             ]
                         ) {
-                            if productInteraction
-                                .detailSheetEnabled
+                            HTML.span(
+                                [
+                                    "class":
+                                        "\(Self.block)__badge",
+                                    "data-recommendation":
+                                        product
+                                            .recommendation
+                                            .rawValue
+                                ]
+                            ) {
+                                HTML.text(
+                                    product
+                                        .recommendation
+                                        .label
+                                )
+                            }
+
+                            if let rating =
+                                product.rating
                             {
-                                HTML.button(
+                                HTML.span(
                                     [
-                                        "type": "button",
                                         "class":
-                                            "\(Self.block)__title-trigger",
-                                        "data-product-open":
-                                            product.id
+                                            "\(Self.block)__rating",
+                                        "aria-label":
+                                            rating
+                                                .accessibilityLabel,
+                                        "title":
+                                            rating.label
                                     ]
                                 ) {
                                     HTML.text(
-                                        product.name
+                                        rating
+                                            .displayValue
                                     )
                                 }
-                            } else {
-                                HTML.text(
-                                    product.name
-                                )
+                            }
+
+                            if productInteraction
+                                .sharingEnabled
+                            {
+                                HTML.button(
+                                    [
+                                        "type":
+                                            "button",
+                                        "class":
+                                            "\(Self.block)__share",
+                                        "data-product-share":
+                                            product.id,
+                                        "data-product-title":
+                                            product.name,
+                                        "aria-label":
+                                            "Deel \(product.name)",
+                                        "title":
+                                            "Deel product"
+                                    ]
+                                ) {
+                                    HTML.span(
+                                        [
+                                            "aria-hidden":
+                                                "true"
+                                        ]
+                                    ) {
+                                        HTML.text("↗")
+                                    }
+                                }
                             }
                         }
                     }
 
-                    HTML.div(
+                    HTML.h3(
                         [
                             "class":
-                                "\(Self.block)__card-badges"
+                                "\(Self.block)__card-title"
                         ]
                     ) {
-                        HTML.span(
-                            [
-                                "class":
-                                    "\(Self.block)__badge",
-                                "data-recommendation":
-                                    product
-                                        .recommendation
-                                        .rawValue
-                            ]
-                        ) {
-                            HTML.text(
-                                product
-                                    .recommendation
-                                    .label
-                            )
-                        }
-
-                        if let rating =
-                            product.rating
+                        if productInteraction
+                            .detailSheetEnabled
                         {
-                            HTML.span(
+                            HTML.button(
                                 [
+                                    "type":
+                                        "button",
                                     "class":
-                                        "\(Self.block)__rating",
-                                    "aria-label":
-                                        rating
-                                            .accessibilityLabel,
-                                    "title":
-                                        rating.label
+                                        "\(Self.block)__title-trigger",
+                                    "data-product-open":
+                                        product.id
                                 ]
                             ) {
                                 HTML.text(
-                                    rating
-                                        .displayValue
+                                    product.name
                                 )
                             }
+                        } else {
+                            HTML.text(
+                                product.name
+                            )
                         }
                     }
                 }
@@ -786,37 +824,6 @@ public struct RecommendedProductCatalog:
                             "Productlinks"
                     ]
                 ) {
-                    if productInteraction
-                        .sharingEnabled
-                    {
-                        HTML.button(
-                            [
-                                "type": "button",
-                                "class":
-                                    "\(Self.block)__share",
-                                "data-product-share":
-                                    product.id,
-                                "data-product-title":
-                                    product.name,
-                                "aria-label":
-                                    "Deel \(product.name)"
-                            ]
-                        ) {
-                            HTML.span(
-                                [
-                                    "aria-hidden":
-                                        "true"
-                                ]
-                            ) {
-                                HTML.text("↗")
-                            }
-
-                            HTML.span {
-                                HTML.text("Delen")
-                            }
-                        }
-                    }
-
                     for link in product.links {
                         HTML.a(
                             link.url.absoluteString,

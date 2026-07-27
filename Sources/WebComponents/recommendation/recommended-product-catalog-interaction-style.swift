@@ -174,14 +174,58 @@ extension RecommendedProductCatalog {
                 ),
 
                 CSS.rule(
-                    "\(root)__card-badges",
+                    "\(root)__card-header",
+                    CSS.decl(
+                        "display",
+                        "grid"
+                    ),
+                    CSS.decl(
+                        "gap",
+                        ".35rem"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)__card-meta",
                     CSS.decl(
                         "display",
                         "flex"
                     ),
                     CSS.decl(
-                        "flex-wrap",
-                        "wrap"
+                        "align-items",
+                        "center"
+                    ),
+                    CSS.decl(
+                        "justify-content",
+                        "space-between"
+                    ),
+                    CSS.decl(
+                        "gap",
+                        ".65rem"
+                    ),
+                    CSS.decl(
+                        "min-width",
+                        "0"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)__card-brand",
+                    CSS.decl(
+                        "min-width",
+                        "0"
+                    )
+                ),
+
+                CSS.rule(
+                    "\(root)__card-actions",
+                    CSS.decl(
+                        "display",
+                        "flex"
+                    ),
+                    CSS.decl(
+                        "flex",
+                        "0 0 auto"
                     ),
                     CSS.decl(
                         "align-items",
@@ -193,7 +237,7 @@ extension RecommendedProductCatalog {
                     ),
                     CSS.decl(
                         "gap",
-                        ".4rem"
+                        ".35rem"
                     )
                 ),
 
@@ -213,15 +257,15 @@ extension RecommendedProductCatalog {
                     ),
                     CSS.decl(
                         "min-height",
-                        "1.75rem"
+                        "1.6rem"
                     ),
                     CSS.decl(
                         "padding",
-                        ".25rem .55rem"
+                        ".2rem .48rem"
                     ),
                     CSS.decl(
                         "border",
-                        "1px solid var(--border-subtle, rgba(15, 23, 42, .14))"
+                        "1px solid var(--border-subtle, rgba(15, 23, 42, .12))"
                     ),
                     CSS.decl(
                         "border-radius",
@@ -229,7 +273,7 @@ extension RecommendedProductCatalog {
                     ),
                     CSS.decl(
                         "font-size",
-                        ".76rem"
+                        ".72rem"
                     ),
                     CSS.decl(
                         "font-weight",
@@ -245,7 +289,7 @@ extension RecommendedProductCatalog {
                     ),
                     CSS.decl(
                         "background",
-                        "var(--surface-soft, rgba(15, 23, 42, .05))"
+                        "var(--surface-soft, rgba(15, 23, 42, .04))"
                     )
                 ),
 
@@ -253,35 +297,31 @@ extension RecommendedProductCatalog {
                     "\(root)__share",
                     CSS.decl(
                         "display",
-                        "inline-flex"
+                        "inline-grid"
                     ),
                     CSS.decl(
-                        "align-items",
+                        "place-items",
                         "center"
                     ),
                     CSS.decl(
-                        "justify-content",
-                        "center"
+                        "width",
+                        "1.85rem"
                     ),
                     CSS.decl(
-                        "gap",
-                        ".4rem"
-                    ),
-                    CSS.decl(
-                        "min-height",
-                        "2.65rem"
+                        "height",
+                        "1.85rem"
                     ),
                     CSS.decl(
                         "padding",
-                        ".6rem .8rem"
+                        "0"
                     ),
                     CSS.decl(
                         "border",
-                        "1px solid var(--border-subtle, rgba(15, 23, 42, .16))"
+                        "1px solid transparent"
                     ),
                     CSS.decl(
                         "border-radius",
-                        ".7rem"
+                        "999px"
                     ),
                     CSS.decl(
                         "font",
@@ -289,15 +329,19 @@ extension RecommendedProductCatalog {
                     ),
                     CSS.decl(
                         "font-size",
-                        ".82rem"
+                        ".92rem"
                     ),
                     CSS.decl(
                         "font-weight",
                         "700"
                     ),
                     CSS.decl(
+                        "line-height",
+                        "1"
+                    ),
+                    CSS.decl(
                         "color",
-                        "inherit"
+                        "var(--caption-ink, #6b7280)"
                     ),
                     CSS.decl(
                         "background",
@@ -313,11 +357,15 @@ extension RecommendedProductCatalog {
                     "\(root)__share:hover",
                     CSS.decl(
                         "border-color",
-                        "var(--accent, #0081f8)"
+                        "var(--border-subtle, rgba(15, 23, 42, .14))"
                     ),
                     CSS.decl(
                         "color",
                         "var(--accent, #0081f8)"
+                    ),
+                    CSS.decl(
+                        "background",
+                        "var(--surface-soft, rgba(15, 23, 42, .04))"
                     )
                 ),
 
@@ -344,6 +392,18 @@ extension RecommendedProductCatalog {
                 CSS.rule(
                     "\(root)__dialog",
                     CSS.decl(
+                        "position",
+                        "fixed"
+                    ),
+                    CSS.decl(
+                        "inset",
+                        "0"
+                    ),
+                    CSS.decl(
+                        "box-sizing",
+                        "border-box"
+                    ),
+                    CSS.decl(
                         "width",
                         "min(1120px, calc(100% - 2rem))"
                     ),
@@ -354,6 +414,10 @@ extension RecommendedProductCatalog {
                     CSS.decl(
                         "max-height",
                         "calc(100dvh - 2rem)"
+                    ),
+                    CSS.decl(
+                        "margin",
+                        "auto"
                     ),
                     CSS.decl(
                         "padding",
