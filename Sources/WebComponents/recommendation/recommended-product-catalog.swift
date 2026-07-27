@@ -640,6 +640,30 @@ public struct RecommendedProductCatalog:
                                             "button",
                                         "class":
                                             "\(Self.block)__share",
+                                        "data-product-copy":
+                                            product.id,
+                                        "aria-label":
+                                            "Kopieer link naar \(product.name)",
+                                        "title":
+                                            "Kopieer productlink"
+                                    ]
+                                ) {
+                                    HTML.span(
+                                        [
+                                            "aria-hidden":
+                                                "true"
+                                        ]
+                                    ) {
+                                        HTML.text("⧉")
+                                    }
+                                }
+
+                                HTML.button(
+                                    [
+                                        "type":
+                                            "button",
+                                        "class":
+                                            "\(Self.block)__share",
                                         "data-product-share":
                                             product.id,
                                         "data-product-title":

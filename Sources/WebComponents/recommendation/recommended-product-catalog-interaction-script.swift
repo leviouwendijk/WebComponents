@@ -277,6 +277,25 @@ extension RecommendedProductCatalog {
                     input.remove();
                 }
 
+                async function copyProductURL(
+                    productID
+                ) {
+                    const url =
+                        productURL(productID);
+
+                    try {
+                        await copyURL(url);
+
+                        setStatus(
+                            'Productlink gekopieerd.'
+                        );
+                    } catch {
+                        setStatus(
+                            'De productlink kon niet worden gekopieerd.'
+                        );
+                    }
+                }
+
                 async function shareProduct(
                     productID,
                     productTitle
@@ -306,10 +325,8 @@ extension RecommendedProductCatalog {
                             return;
                         }
 
-                        await copyURL(url);
-
-                        setStatus(
-                            'Productlink gekopieerd.'
+                        await copyProductURL(
+                            productID
                         );
                     } catch (error) {
                         if (
@@ -319,17 +336,9 @@ extension RecommendedProductCatalog {
                             return;
                         }
 
-                        try {
-                            await copyURL(url);
-
-                            setStatus(
-                                'Productlink gekopieerd.'
-                            );
-                        } catch {
-                            setStatus(
-                                'De productlink kon niet worden gekopieerd.'
-                            );
-                        }
+                        await copyProductURL(
+                            productID
+                        );
                     }
                 }
 
@@ -348,6 +357,24 @@ extension RecommendedProductCatalog {
                                 openTrigger
                                     .dataset
                                     .productOpen
+                            );
+
+                            return;
+                        }
+
+                        const copyTrigger =
+                            event.target.closest(
+                                '[data-product-copy]'
+                            );
+
+                        if (copyTrigger) {
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            copyProductURL(
+                                copyTrigger
+                                    .dataset
+                                    .productCopy
                             );
 
                             return;
