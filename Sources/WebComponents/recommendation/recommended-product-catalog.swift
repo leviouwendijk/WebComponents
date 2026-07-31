@@ -130,6 +130,11 @@ public struct RecommendedProductCatalog:
             )
 
             stylesheets.append(
+                RecommendedProductGallery
+                    .stylesheet()
+            )
+
+            stylesheets.append(
                 Self.interactionStylesheet()
             )
 
@@ -525,7 +530,9 @@ public struct RecommendedProductCatalog:
                     product.recommendation.rawValue
             ]
         ) {
-            if productInteraction.detailSheetEnabled {
+            if productInteraction.detailSheetEnabled,
+               product.images.count <= 1
+            {
                 HTML.button(
                     [
                         "type": "button",
@@ -976,23 +983,18 @@ public struct RecommendedProductCatalog:
                     "\(Self.block)__media-inner"
             ]
         ) {
-            if let image = product.image {
-                HTML.img(
-                    src:
-                        image
-                            .url
-                            .absoluteString,
-                    alt:
-                        image.alt,
-                    [
-                        "class":
-                            "\(Self.block)__image",
-                        "loading":
-                            "lazy",
-                        "decoding":
-                            "async"
-                    ]
+            if !product.images.isEmpty {
+                RecommendedProductGallery(
+                    id:
+                        "\(id)-\(product.id)-gallery",
+                    label:
+                        "Productafbeeldingen van \(product.name)",
+                    images:
+                        product.images,
+                    imageClass:
+                        "\(Self.block)__image"
                 )
+                .node()
             } else {
                 HTML.div(
                     [

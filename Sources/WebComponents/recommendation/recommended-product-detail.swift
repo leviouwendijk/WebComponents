@@ -46,7 +46,9 @@ public struct RecommendedProductDetail:
             stylesheets:
                 includeStyles
                     ? [
-                        Self.stylesheet()
+                        Self.stylesheet(),
+                        RecommendedProductGallery
+                            .stylesheet()
                     ]
                     : []
         )
@@ -138,25 +140,18 @@ public struct RecommendedProductDetail:
                     "\(Self.block)__media"
             ]
         ) {
-            if let image =
-                product.image
-            {
-                HTML.img(
-                    src:
-                        image
-                            .url
-                            .absoluteString,
-                    alt:
-                        image.alt,
-                    [
-                        "class":
-                            "\(Self.block)__image",
-                        "loading":
-                            "lazy",
-                        "decoding":
-                            "async"
-                    ]
+            if !product.images.isEmpty {
+                RecommendedProductGallery(
+                    id:
+                        "\(product.id)-\(context.rawValue)-gallery",
+                    label:
+                        "Productafbeeldingen van \(product.name)",
+                    images:
+                        product.images,
+                    imageClass:
+                        "\(Self.block)__image"
                 )
+                .node()
             } else {
                 HTML.div(
                     [

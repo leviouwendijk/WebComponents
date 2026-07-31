@@ -66,7 +66,8 @@ public struct RecommendedProductCollection:
                     product.experience,
                 rating:
                     product.rating,
-                image: product.image,
+                images:
+                    product.images,
                 links: product.links,
                 specification:
                     product.specification,

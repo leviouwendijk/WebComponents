@@ -368,12 +368,16 @@ public struct RecommendedProduct: Sendable {
     public let recommendation: Recommendation
     public let experience: Experience
     public let rating: Rating?
-    public let image: Image?
+    public let images: [Image]
     public let links: [Link]
     public let specification: Specification
     public let suitableFor: [String]
     public let unsuitableFor: [String]
     public let notes: [String]
+
+    public var image: Image? {
+        images.first
+    }
 
     public init(
         id: String,
@@ -384,12 +388,18 @@ public struct RecommendedProduct: Sendable {
         experience: Experience = .notAssessed,
         rating: Rating? = nil,
         image: Image? = nil,
+        images: [Image] = [],
         links: [Link],
         specification: Specification,
         suitableFor: [String] = [],
         unsuitableFor: [String] = [],
         notes: [String] = []
     ) {
+        precondition(
+            image == nil || images.isEmpty,
+            "Use either image or images, not both."
+        )
+
         self.id = id
         self.name = name
         self.brand = brand
@@ -397,7 +407,7 @@ public struct RecommendedProduct: Sendable {
         self.recommendation = recommendation
         self.experience = experience
         self.rating = rating
-        self.image = image
+        self.images = image.map { [$0] } ?? images
         self.links = links
         self.specification = specification
         self.suitableFor = suitableFor
