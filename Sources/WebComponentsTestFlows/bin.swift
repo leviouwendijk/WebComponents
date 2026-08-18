@@ -7,9 +7,17 @@ import WebComponents
 enum WebComponentsFlowTestMain {
     static func main() async {
         await TestFlowCLI.run(
-            suite: WebComponentsPDFImageFlowSuite.self
+            suite: WebComponentsFlowSuite.self
         )
     }
+}
+
+enum WebComponentsFlowSuite: TestFlowRegistry {
+    static let title = "WebComponents flows"
+
+    static let flows: [TestFlow] =
+        WebComponentsPDFImageFlowSuite.flows
+        + LegalDocumentFlowSuite.flows
 }
 
 enum WebComponentsPDFImageFlowSuite: TestFlowRegistry {

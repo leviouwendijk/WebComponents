@@ -3,12 +3,12 @@
   "failed_names" : [
 
   ],
-  "generated_at" : "2026-06-29T18:12:07Z",
-  "passed" : 1,
+  "generated_at" : "2026-08-18T11:55:06Z",
+  "passed" : 2,
   "results" : [
     {
       "display_name" : "Hondenmeesters logomark converts to PDF RGB8",
-      "duration_seconds" : 4.633325934410095,
+      "duration_seconds" : 5.877570033073425,
       "name" : "hondenmeesters-logomark-rgb8",
       "status" : "passed",
       "tags" : [
@@ -17,9 +17,21 @@
         "pdf",
         "rgb8"
       ]
+    },
+    {
+      "display_name" : "Legal document resolves numbering and revision metadata",
+      "duration_seconds" : 0.005174994468688965,
+      "name" : "legal-document-resolution",
+      "status" : "passed",
+      "tags" : [
+        "document",
+        "legal",
+        "references",
+        "version"
+      ]
     }
   ],
   "skipped" : 0,
-  "title" : "WebComponents PDF image flows",
-  "total" : 1
+  "title" : "WebComponents flows",
+  "total" : 2
 }

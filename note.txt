@@ -1,4 +1,3 @@
 -> standardized Analytics initialization?
 -> easily instantiate analytics custom apis for site domain
 -> embed in JS scripts with if-present guarding
-

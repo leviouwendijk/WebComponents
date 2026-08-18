@@ -22,7 +22,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        // .package(url: "https://github.com/leviouwendijk/Primitives.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Primitives.git", branch: "master"),
         // .package(url: "https://github.com/leviouwendijk/Methods.git", branch: "master"),
         // .package(url: "https://github.com/leviouwendijk/Milieu.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/HTML.git", branch: "master"),
@@ -54,7 +54,7 @@ let package = Package(
         .target(
             name: "WebComponents",
             dependencies: [
-                // .product(name: "Primitives", package: "Primitives"),
+                .product(name: "Primitives", package: "Primitives"),
                 // .product(name: "Methods", package: "Methods"),
                 // .product(name: "Milieu", package: "Milieu"),
                 .product(name: "HTML", package: "HTML"),
