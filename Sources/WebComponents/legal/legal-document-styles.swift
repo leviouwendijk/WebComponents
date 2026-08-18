@@ -238,15 +238,11 @@ public extension LegalDocument {
                     ".\(block)__contents",
                     CSS.decl(
                         "margin",
-                        "34px 0 42px"
+                        "0 0 42px"
                     ),
                     CSS.decl(
                         "padding",
                         "22px 0 24px"
-                    ),
-                    CSS.decl(
-                        "border-top",
-                        "1px solid var(--wc-legal-border)"
                     ),
                     CSS.decl(
                         "border-bottom",
