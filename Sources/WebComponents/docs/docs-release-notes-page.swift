@@ -92,12 +92,37 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
         }
     }
 
+    public enum EntryError:
+        Swift.Error,
+        LocalizedError,
+        Sendable
+    {
+        case incompleteDate
+        case invalidYear(Int)
+
+        public var errorDescription: String? {
+            switch self {
+            case .incompleteDate:
+                return "Release note date must be a complete day-level date."
+
+            case .invalidYear(
+                let year
+            ):
+                return "Release note year must be greater than zero, got \(year)."
+            }
+        }
+    }
+
     public struct Entry: Sendable {
         public let release: ReleaseVersion
         public let date: PartialDate
         public let title: String
         public let summary: String
         public let changes: [Change]
+
+        private let dateYear: Int
+        private let dateMonth: Int
+        private let dateDay: Int
 
         public var version: ObjectVersion {
             release.version
@@ -119,23 +144,11 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
         }
 
         public var dateValue: String {
-            let parts = dateParts
-
-            return "\(parts.year)-\(Self.twoDigit(parts.month))-\(Self.twoDigit(parts.day))"
+            "\(dateYear)-\(Self.twoDigit(dateMonth))-\(Self.twoDigit(dateDay))"
         }
 
         public var dateLabel: String {
-            let parts = dateParts
-
-            return "\(parts.day) \(Self.monthName(parts.month)) \(parts.year)"
-        }
-
-        private var dateParts: (year: Int, month: Int, day: Int) {
-            do {
-                return try date.requireComplete()
-            } catch {
-                preconditionFailure("Release note dates must be complete day-level dates.")
-            }
+            "\(dateDay) \(Self.monthName(dateMonth)) \(dateYear)"
         }
 
         public init(
@@ -144,12 +157,33 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
             title: String,
             summary: String,
             changes: [Change]
-        ) {
+        ) throws {
+            let parts: (
+                year: Int,
+                month: Int,
+                day: Int
+            )
+
+            do {
+                parts = try date.requireComplete()
+            } catch {
+                throw EntryError.incompleteDate
+            }
+
+            guard parts.year > 0 else {
+                throw EntryError.invalidYear(
+                    parts.year
+                )
+            }
+
             self.release = release
-            self.date = Self.validated(date)
+            self.date = date
             self.title = title
             self.summary = summary
             self.changes = changes
+            self.dateYear = parts.year
+            self.dateMonth = parts.month
+            self.dateDay = parts.day
         }
 
         public init(
@@ -160,8 +194,8 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
             title: String,
             summary: String,
             changes: [Change]
-        ) {
-            self.init(
+        ) throws {
+            try self.init(
                 release: ReleaseVersion(
                     version: version,
                     maturity: maturity,
@@ -174,66 +208,12 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
             )
         }
 
-        private static func validated(
-            _ date: PartialDate
-        ) -> PartialDate {
-            let parts: (year: Int, month: Int, day: Int)
-
-            do {
-                parts = try date.requireComplete()
-            } catch {
-                preconditionFailure("Release note dates must be complete day-level dates.")
-            }
-
-            guard parts.year > 0 else {
-                preconditionFailure("Invalid release note year: \(parts.year).")
-            }
-
-            guard (1...12).contains(parts.month) else {
-                preconditionFailure("Invalid release note month: \(parts.month).")
-            }
-
-            guard (1...daysInMonth(year: parts.year, month: parts.month)).contains(parts.day) else {
-                preconditionFailure("Invalid release note day: \(parts.day) for \(parts.year)-\(parts.month).")
-            }
-
-            return date
-        }
-
-        private static func daysInMonth(
-            year: Int,
-            month: Int
-        ) -> Int {
-            switch month {
-            case 1, 3, 5, 7, 8, 10, 12:
-                return 31
-            case 4, 6, 9, 11:
-                return 30
-            case 2:
-                return isLeapYear(year) ? 29 : 28
-            default:
-                preconditionFailure("Invalid release note month: \(month).")
-            }
-        }
-
-        private static func isLeapYear(
-            _ year: Int
-        ) -> Bool {
-            if year.isMultiple(of: 400) {
-                return true
-            }
-
-            if year.isMultiple(of: 100) {
-                return false
-            }
-
-            return year.isMultiple(of: 4)
-        }
-
         private static func twoDigit(
             _ value: Int
         ) -> String {
-            value < 10 ? "0\(value)" : "\(value)"
+            value < 10
+                ? "0\(value)"
+                : "\(value)"
         }
 
         private static func monthName(
@@ -265,7 +245,7 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
             case 12:
                 return "december"
             default:
-                preconditionFailure("Invalid release note month: \(month).")
+                return "\(month)"
             }
         }
     }
