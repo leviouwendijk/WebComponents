@@ -302,7 +302,11 @@ public extension LegalDocument {
                     ),
                     CSS.decl(
                         "padding-left",
-                        "1.25rem"
+                        "0"
+                    ),
+                    CSS.decl(
+                        "list-style",
+                        "none"
                     )
                 ),
 
@@ -310,7 +314,7 @@ public extension LegalDocument {
                     ".\(block)__contents-list li",
                     CSS.decl(
                         "padding-left",
-                        "4px"
+                        "0"
                     ),
                     CSS.decl(
                         "color",
@@ -376,7 +380,11 @@ public extension LegalDocument {
                     ),
                     CSS.decl(
                         "grid-template-columns",
-                        "auto auto minmax(0, 1fr)"
+                        "auto minmax(0, 1fr)"
+                    ),
+                    CSS.decl(
+                        "column-gap",
+                        "18px"
                     ),
                     CSS.decl(
                         "align-items",
@@ -425,14 +433,6 @@ public extension LegalDocument {
                     CSS.decl(
                         "color",
                         "var(--wc-legal-muted)"
-                    )
-                ),
-
-                CSS.rule(
-                    ".\(block)__section-separator",
-                    CSS.decl(
-                        "white-space",
-                        "pre"
                     )
                 ),
 

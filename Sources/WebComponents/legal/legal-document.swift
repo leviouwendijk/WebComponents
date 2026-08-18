@@ -1308,20 +1308,6 @@ public struct LegalDocument:
                 HTML.span(
                     [
                         "class":
-                            "\(Self.block)__section-separator",
-                        "aria-hidden":
-                            "true",
-                    ]
-                ) {
-                    HTML.text(
-                        resolved
-                            .headingSeparator
-                    )
-                }
-
-                HTML.span(
-                    [
-                        "class":
                             "\(Self.block)__section-title"
                     ]
                 ) {
