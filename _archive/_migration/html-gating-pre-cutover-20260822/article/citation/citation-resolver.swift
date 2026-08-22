@@ -110,6 +110,11 @@ public enum CitationResolver {
                 inline.children.forEach(walk)
                 return
             }
+
+            if let gate = node as? HTMLGate {
+                gate.children.forEach(walk)
+                return
+            }
         }
 
         nodes.forEach(walk)
@@ -190,6 +195,14 @@ public enum CitationResolver {
             if let inline = node as? HTMLInlineGroup {
                 return HTMLInlineGroup(
                     inline.children.map(transform)
+                )
+            }
+
+            if let gate = node as? HTMLGate {
+                return HTMLGate(
+                    id: gate.id,
+                    allow: gate.allowed,
+                    children: gate.children.map(transform)
                 )
             }
 

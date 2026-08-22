@@ -29,6 +29,9 @@ public enum HeadingResolver {
             if let g = node as? HTMLInlineGroup {
                 g.children.forEach(walk)
             }
+            if let g = node as? HTMLGate {
+                g.children.forEach(walk)
+            }
         }
 
         nodes.forEach(walk)
