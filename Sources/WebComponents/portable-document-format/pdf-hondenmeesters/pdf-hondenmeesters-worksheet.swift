@@ -9,8 +9,6 @@ public extension HondenmeestersPortableDocumentFormat {
         public let title: String
         public let subtitle: String?
         public let blocks: [PortableDocumentFormatBlock]
-        public let includeStyles: Bool
-        public let includeScript: Bool
 
         public init(
             id: String,
@@ -18,9 +16,7 @@ public extension HondenmeestersPortableDocumentFormat {
             filename: String,
             title: String,
             subtitle: String? = nil,
-            blocks: [PortableDocumentFormatBlock],
-            includeStyles: Bool = true,
-            includeScript: Bool = true
+            blocks: [PortableDocumentFormatBlock]
         ) {
             self.id = id
             self.label = label
@@ -28,8 +24,6 @@ public extension HondenmeestersPortableDocumentFormat {
             self.title = title
             self.subtitle = subtitle
             self.blocks = blocks
-            self.includeStyles = includeStyles
-            self.includeScript = includeScript
         }
 
         public var nodes: ReusableComponentNodes {
@@ -37,9 +31,7 @@ public extension HondenmeestersPortableDocumentFormat {
                 id: id,
                 label: label,
                 filename: filename,
-                payload: payload,
-                includeStyles: includeStyles,
-                includeScript: includeScript
+                payload: payload
             ).nodes
         }
 

@@ -80,6 +80,18 @@ let package = Package(
             dependencies: [
                 "WebComponents",
                 .product(
+                    name: "Constructors",
+                    package: "Constructors"
+                ),
+                .product(
+                    name: "CSS",
+                    package: "CSS"
+                ),
+                .product(
+                    name: "JS",
+                    package: "JS"
+                ),
+                .product(
                     name: "Assets",
                     package: "Assets"
                 ),

@@ -253,23 +253,17 @@ public extension HondenmeestersPortableDocumentFormat {
         public let id: String
         public let label: String
         public let filename: String
-        public let includeStyles: Bool
-        public let includeScript: Bool
 
         public init(
             kind: Kind,
             id: String? = nil,
             label: String = "Download PDF",
-            filename: String? = nil,
-            includeStyles: Bool = true,
-            includeScript: Bool = true
+            filename: String? = nil
         ) {
             self.kind = kind
             self.id = id ?? kind.id
             self.label = label
             self.filename = filename ?? kind.filename
-            self.includeStyles = includeStyles
-            self.includeScript = includeScript
         }
 
         public var nodes: ReusableComponentNodes {
@@ -277,9 +271,7 @@ public extension HondenmeestersPortableDocumentFormat {
                 id: id,
                 label: label,
                 filename: filename,
-                payload: payload,
-                includeStyles: includeStyles,
-                includeScript: includeScript
+                payload: payload
             ).nodes
         }
 

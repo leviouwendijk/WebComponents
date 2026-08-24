@@ -42,8 +42,6 @@ public extension HondenmeestersPortableDocumentFormat {
         public let criteria: [String]
         public let exercises: [Exercise]
         public let notes: [String]
-        public let includeStyles: Bool
-        public let includeScript: Bool
 
         public init(
             id: String,
@@ -55,9 +53,7 @@ public extension HondenmeestersPortableDocumentFormat {
             goal: String,
             criteria: [String] = [],
             exercises: [Exercise] = [],
-            notes: [String] = [],
-            includeStyles: Bool = true,
-            includeScript: Bool = true
+            notes: [String] = []
         ) {
             self.id = id
             self.label = label
@@ -69,8 +65,6 @@ public extension HondenmeestersPortableDocumentFormat {
             self.criteria = criteria
             self.exercises = exercises
             self.notes = notes
-            self.includeStyles = includeStyles
-            self.includeScript = includeScript
         }
 
         public var nodes: ReusableComponentNodes {
@@ -78,9 +72,7 @@ public extension HondenmeestersPortableDocumentFormat {
                 id: id,
                 label: label,
                 filename: filename,
-                payload: payload,
-                includeStyles: includeStyles,
-                includeScript: includeScript
+                payload: payload
             ).nodes
         }
 

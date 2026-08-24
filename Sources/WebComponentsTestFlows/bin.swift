@@ -17,6 +17,7 @@ enum WebComponentsFlowSuite: TestFlowRegistry {
 
     static let flows: [TestFlow] =
         WebComponentsPDFImageFlowSuite.flows
+        + PortableDocumentFormatComponentFlowSuite.flows
         + LegalDocumentFlowSuite.flows
 }
 
