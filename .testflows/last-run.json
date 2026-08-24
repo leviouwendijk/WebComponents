@@ -3,12 +3,12 @@
   "failed_names" : [
 
   ],
-  "generated_at" : "2026-08-18T11:55:06Z",
+  "generated_at" : "2026-08-22T14:27:09Z",
   "passed" : 2,
   "results" : [
     {
       "display_name" : "Hondenmeesters logomark converts to PDF RGB8",
-      "duration_seconds" : 5.877570033073425,
+      "duration_seconds" : 6.3924800157547,
       "name" : "hondenmeesters-logomark-rgb8",
       "status" : "passed",
       "tags" : [
@@ -20,7 +20,7 @@
     },
     {
       "display_name" : "Legal document resolves numbering and revision metadata",
-      "duration_seconds" : 0.005174994468688965,
+      "duration_seconds" : 0.0007460117340087891,
       "name" : "legal-document-resolution",
       "status" : "passed",
       "tags" : [

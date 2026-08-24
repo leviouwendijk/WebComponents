@@ -34,7 +34,7 @@
       "location" : "https://github.com/leviouwendijk/Constructors.git",
       "state" : {
         "branch" : "master",
-        "revision" : "365395c691f4e3c0d3394c110373a9cb7fe37da8"
+        "revision" : "9c7f44cd494fdc1b4f998f4bb89f99df837d49a6"
       }
     },
     {
@@ -43,7 +43,7 @@
       "location" : "https://github.com/leviouwendijk/CSS.git",
       "state" : {
         "branch" : "master",
-        "revision" : "af30a940fe952a2a25d4d706487f762d2d72bd20"
+        "revision" : "5bf0a866fa0a8c8fa2a85efd643bf9a11b7dcfc9"
       }
     },
     {
@@ -106,7 +106,7 @@
       "location" : "https://github.com/leviouwendijk/JS.git",
       "state" : {
         "branch" : "master",
-        "revision" : "09b61d8c0f29a225569d280938f86c2e4f2407bc"
+        "revision" : "e8fb7326813098a03b2c4cb0fe00c07900b46a30"
       }
     },
     {
@@ -214,7 +214,7 @@
       "location" : "https://github.com/leviouwendijk/Terminal.git",
       "state" : {
         "branch" : "master",
-        "revision" : "95b8c4bbb8270018b9c2031119fcd486c0114696"
+        "revision" : "cc0917d387d78dec543959dbef05f13e76b1f7b5"
       }
     },
     {
