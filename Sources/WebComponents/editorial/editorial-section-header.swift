@@ -241,7 +241,7 @@ public extension EditorialSectionHeader {
         )
     }
 
-    public static func css() -> CSSStyleSheet {
+    static func css() -> CSSStyleSheet {
         styleContribution().content.sheet
     }
 }

@@ -286,7 +286,7 @@ public extension ExampleCodeBlock {
         )
     }
 
-    public static func css() -> CSSStyleSheet {
+    static func css() -> CSSStyleSheet {
         styleContribution().content.sheet
     }
 
