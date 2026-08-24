@@ -3,11 +3,18 @@ import Constructors
 import CSS
 import HTML
 
-public struct ExampleCodeBlock: SelectableComponent, Sendable {
+public struct ExampleCodeBlock:
+    ComponentOutputProviding,
+    SelectableComponent,
+    Sendable
+{
     public enum Namespace {}
     public typealias SelectorNamespace = Namespace
 
     public static let block = "wc-example-code"
+
+    private static let styleIdentifier: CSSContributionIdentifier =
+        "webcomponents.editorial.example-code.styles"
 
     public struct Selectors: Sendable {
         private let api = BlockSelectorAPI<Namespace>(
@@ -105,26 +112,24 @@ public struct ExampleCodeBlock: SelectableComponent, Sendable {
         self.model = model
     }
 
-    public var nodes: ReusableComponentNodes {
+    public var output: ComponentOutput {
         let s = Self.selectors
-
         let attrs = HTMLAttribute.class(s.root)
-
-        // if model.isCompact {
-        //     attrs.merge(.class(s.compact))
-        // }
-
         var codeAttrs = HTMLAttribute.class(s.code)
 
         if let language = model.language, !language.isEmpty {
             codeAttrs.merge(.data("language", language))
         }
 
-        return .body(
-            [
+        let headerOutput = model.header.map {
+            EditorialSectionHeader($0).output
+        }
+
+        let content = ComponentContent(
+            body: [
                 HTML.section(attrs) {
-                    if let header = model.header {
-                        EditorialSectionHeader(header).nodes.body
+                    if let headerOutput {
+                        headerOutput.content.body
                     }
 
                     if let intro = model.intro, !intro.isEmpty {
@@ -145,25 +150,48 @@ public struct ExampleCodeBlock: SelectableComponent, Sendable {
                         }
                     }
                 }
-            ],
-            stylesheets: [
-                EditorialSectionHeader.css(),
-                Self.css()
             ]
+        )
+
+        let ownDependencies = ComponentDependencies(
+            styles: CSSContributions([
+                Self.styleContribution()
+            ])
+        )
+
+        let dependencies = headerOutput?.dependencies.merging(ownDependencies)
+            ?? ownDependencies
+
+        return ComponentOutput(
+            content: content,
+            dependencies: dependencies
+        )
+    }
+
+    public var nodes: ReusableComponentNodes {
+        let semantic = output
+
+        return .body(
+            semantic.content.body,
+            stylesheets: semantic.dependencies.styles.contributions.map {
+                $0.content.sheet
+            },
+            scripts: semantic.dependencies.scripts.contributions.map(\.script)
         )
     }
 
     public func node() -> any HTMLNode {
-        nodes.body[0]
+        output.content.body[0]
     }
 
     public func sheet() -> CSSStyleSheet {
-        nodes.stylesheets[0]
+        Self.css()
     }
+
 }
 
 public extension ExampleCodeBlock {
-    static func css() -> CSSStyleSheet {
+    private static func authoredStylesheet() -> CSSStyleSheet {
         let s = Self.selectors
         let v = Self.vars
 
@@ -245,6 +273,23 @@ public extension ExampleCodeBlock {
             ]
         )
     }
+    private static func styleContribution() -> CSSContribution {
+        let sheet = authoredStylesheet()
+        let units =
+            sheet.rules.map { CSSContributionUnit.block(.rule($0)) }
+            + sheet.media.map { CSSContributionUnit.block(.media($0)) }
+            + sheet.keyframes.map { CSSContributionUnit.block(.keyframes($0)) }
+
+        return CSS.contribution(
+            styleIdentifier,
+            content: CSSContributionSet(units: units)
+        )
+    }
+
+    public static func css() -> CSSStyleSheet {
+        styleContribution().content.sheet
+    }
+
 }
 
 // public extension ExampleCodeBlock {

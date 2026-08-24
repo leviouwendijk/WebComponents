@@ -3,11 +3,18 @@ import Constructors
 import CSS
 import HTML
 
-public struct EditorialSectionHeader: SelectableComponent, Sendable {
+public struct EditorialSectionHeader:
+    ComponentOutputProviding,
+    SelectableComponent,
+    Sendable
+{
     public enum Namespace {}
     public typealias SelectorNamespace = Namespace
 
     public static let block = "wc-editorial-section-header"
+
+    private static let styleIdentifier: CSSContributionIdentifier =
+        "webcomponents.editorial.section-header.styles"
 
     public struct Selectors: Sendable {
         private let api = BlockSelectorAPI<Namespace>(
@@ -73,56 +80,74 @@ public struct EditorialSectionHeader: SelectableComponent, Sendable {
         self.model = model
     }
 
-    public var nodes: ReusableComponentNodes {
+    public var output: ComponentOutput {
         let s = Self.selectors
-
         var attrs = HTMLAttribute.class(s.root)
 
         if model.isCompact {
             attrs.merge(.class(s.compact))
         }
 
+        return ComponentOutput(
+            content: ComponentContent(
+                body: [
+                    HTML.header(attrs) {
+                        if let eyebrow = model.eyebrow, !eyebrow.isEmpty {
+                            HTML.p(.class(s.eyebrow)) {
+                                HTML.text(eyebrow)
+                            }
+                        }
+
+                        HTML.h2(.class(s.title)) {
+                            HTML.text(model.title)
+                        }
+
+                        if let subtitle = model.subtitle, !subtitle.isEmpty {
+                            HTML.div(.class(s.subtitle)) {
+                                subtitle
+                            }
+                        }
+
+                        if let note = model.note, !note.isEmpty {
+                            HTML.div(.class(s.note)) {
+                                note
+                            }
+                        }
+                    }
+                ]
+            ),
+            dependencies: ComponentDependencies(
+                styles: CSSContributions([
+                    Self.styleContribution()
+                ])
+            )
+        )
+    }
+
+    public var nodes: ReusableComponentNodes {
+        let semantic = output
+
         return .body(
-            [
-                HTML.header(attrs) {
-                    if let eyebrow = model.eyebrow, !eyebrow.isEmpty {
-                        HTML.p(.class(s.eyebrow)) {
-                            HTML.text(eyebrow)
-                        }
-                    }
-
-                    HTML.h2(.class(s.title)) {
-                        HTML.text(model.title)
-                    }
-
-                    if let subtitle = model.subtitle, !subtitle.isEmpty {
-                        HTML.div(.class(s.subtitle)) {
-                            subtitle
-                        }
-                    }
-
-                    if let note = model.note, !note.isEmpty {
-                        HTML.div(.class(s.note)) {
-                            note
-                        }
-                    }
-                }
-            ],
-            stylesheets: [Self.css()]
+            semantic.content.body,
+            stylesheets: semantic.dependencies.styles.contributions.map {
+                $0.content.sheet
+            },
+            scripts: semantic.dependencies.scripts.contributions.map(\.script)
         )
     }
 
     public func node() -> any HTMLNode {
-        nodes.body[0]
+        output.content.body[0]
     }
 
     public func sheet() -> CSSStyleSheet {
-        nodes.stylesheets[0]
+        Self.css()
     }
+
 }
 
 public extension EditorialSectionHeader {
-    static func css() -> CSSStyleSheet {
+    private static func authoredStylesheet() -> CSSStyleSheet {
         let s = Self.selectors
 
         let subtitleParagraphs = s.subtitle
@@ -201,5 +226,22 @@ public extension EditorialSectionHeader {
                 )
             ]
         )
+    }
+
+    private static func styleContribution() -> CSSContribution {
+        let sheet = authoredStylesheet()
+        let units =
+            sheet.rules.map { CSSContributionUnit.block(.rule($0)) }
+            + sheet.media.map { CSSContributionUnit.block(.media($0)) }
+            + sheet.keyframes.map { CSSContributionUnit.block(.keyframes($0)) }
+
+        return CSS.contribution(
+            styleIdentifier,
+            content: CSSContributionSet(units: units)
+        )
+    }
+
+    public static func css() -> CSSStyleSheet {
+        styleContribution().content.sheet
     }
 }
