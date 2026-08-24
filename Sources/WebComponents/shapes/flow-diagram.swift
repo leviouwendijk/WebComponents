@@ -3,11 +3,18 @@ import Constructors
 import HTML
 import CSS
 
-public struct FlowDiagram: SelectableComponent {
+public struct FlowDiagram:
+    ComponentOutputProviding,
+    SelectableComponent,
+    Sendable
+{
     public enum Namespace {}
     public typealias SelectorNamespace = Namespace
 
     public static let block = "wc-flow"
+
+    private static let styleIdentifier: CSSContributionIdentifier =
+        "webcomponents.shapes.flow-diagram.styles"
 
     public struct Selectors: Sendable {
         private let api = BlockSelectorAPI<Namespace>(
@@ -84,7 +91,7 @@ public struct FlowDiagram: SelectableComponent {
         self.items = items
     }
 
-    public var nodes: ReusableComponentNodes {
+    private var semanticBody: HTMLFragment {
         let s = selectors
 
         let axisClass: AnyHTMLClass = (axis == .row)
@@ -100,8 +107,7 @@ public struct FlowDiagram: SelectableComponent {
             attrs: attrs
         )
 
-        return .body(
-            [
+        return [
                 HTML.div(a) {
                     for item in items {
                         switch item {
@@ -113,8 +119,41 @@ public struct FlowDiagram: SelectableComponent {
                         }
                     }
                 }
-            ],
-            stylesheets: [Self.stylesheet()]
+        ]
+    }
+
+    public var output: ComponentOutput {
+        ComponentOutput(
+            content: ComponentContent(
+                body: semanticBody
+            ),
+            dependencies: ComponentDependencies(
+                styles: CSSContributions([
+                    Self.styleContribution()
+                ])
+            )
+        )
+    }
+
+    public var nodes: ReusableComponentNodes {
+        let semantic = output
+
+        return .body(
+            semantic.content.body,
+            stylesheets:
+                semantic
+                    .dependencies
+                    .styles
+                    .contributions
+                    .map {
+                        $0.content.sheet
+                    },
+            scripts:
+                semantic
+                    .dependencies
+                    .scripts
+                    .contributions
+                    .map(\.script)
         )
     }
 
@@ -219,11 +258,7 @@ extension FlowDiagram {
         }
     }
 
-    public static func css() -> CSSStyleSheet {
-        stylesheet()
-    }
-
-    public static func stylesheet() -> CSSStyleSheet {
+    private static func authoredStylesheet() -> CSSStyleSheet {
         let s = selectors
 
         let root = s.root.rawValue
@@ -695,3 +730,45 @@ extension FlowDiagram {
 //         )
 //     }
 // }
+
+private extension FlowDiagram {
+    static func styleContribution() -> CSSContribution {
+        let sheet = authoredStylesheet()
+
+        let units =
+            sheet.rules.map {
+                CSSContributionUnit.block(
+                    .rule($0)
+                )
+            }
+            + sheet.media.map {
+                CSSContributionUnit.block(
+                    .media($0)
+                )
+            }
+            + sheet.keyframes.map {
+                CSSContributionUnit.block(
+                    .keyframes($0)
+                )
+            }
+
+        return CSS.contribution(
+            styleIdentifier,
+            content:
+                CSSContributionSet(
+                    units:
+                        units
+                )
+        )
+    }
+}
+
+public extension FlowDiagram {
+    static func css() -> CSSStyleSheet {
+        styleContribution().content.sheet
+    }
+
+    static func stylesheet() -> CSSStyleSheet {
+        styleContribution().content.sheet
+    }
+}

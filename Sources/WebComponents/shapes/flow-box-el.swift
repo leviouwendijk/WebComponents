@@ -3,11 +3,18 @@ import Constructors
 import HTML
 import CSS
 
-public struct FlowBox: SelectableComponent, Sendable {
+public struct FlowBox:
+    ComponentOutputProviding,
+    SelectableComponent,
+    Sendable
+{
     public enum Namespace {}
     public typealias SelectorNamespace = Namespace
 
     public static let block = "wc-flow"
+
+    private static let styleIdentifier: CSSContributionIdentifier =
+        "webcomponents.shapes.flow-box.styles"
 
     public struct Selectors: Sendable {
         private let api = BlockSelectorAPI<Namespace>(
@@ -43,7 +50,7 @@ public struct FlowBox: SelectableComponent, Sendable {
         self.box = box
     }
 
-    public var nodes: ReusableComponentNodes {
+    private var semanticBody: HTMLFragment {
         let s = Self.selectors
 
         let alignClass: AnyHTMLClass = {
@@ -64,15 +71,47 @@ public struct FlowBox: SelectableComponent, Sendable {
         )
         a.merge(box.attrs)
 
-        return .body(
-            [
+        return [
                 HTML.div(a) {
                     HTML.div(.class(s.boxInner)) {
                         box.content()
                     }
                 }
-            ],
-            stylesheets: [Self.css()]
+        ]
+    }
+
+    public var output: ComponentOutput {
+        ComponentOutput(
+            content: ComponentContent(
+                body: semanticBody
+            ),
+            dependencies: ComponentDependencies(
+                styles: CSSContributions([
+                    Self.styleContribution()
+                ])
+            )
+        )
+    }
+
+    public var nodes: ReusableComponentNodes {
+        let semantic = output
+
+        return .body(
+            semantic.content.body,
+            stylesheets:
+                semantic
+                    .dependencies
+                    .styles
+                    .contributions
+                    .map {
+                        $0.content.sheet
+                    },
+            scripts:
+                semantic
+                    .dependencies
+                    .scripts
+                    .contributions
+                    .map(\.script)
         )
     }
 
@@ -86,7 +125,7 @@ public struct FlowBox: SelectableComponent, Sendable {
 }
 
 public extension FlowBox {
-    static func css() -> CSSStyleSheet {
+    private static func authoredStylesheet() -> CSSStyleSheet {
         let s = Self.selectors
 
         let darkModeBox = CSSSelector
@@ -194,5 +233,43 @@ public extension FlowBox {
                 )
             ]
         )
+    }
+}
+
+private extension FlowBox {
+    static func styleContribution() -> CSSContribution {
+        let sheet = authoredStylesheet()
+
+        let units =
+            sheet.rules.map {
+                CSSContributionUnit.block(
+                    .rule($0)
+                )
+            }
+            + sheet.media.map {
+                CSSContributionUnit.block(
+                    .media($0)
+                )
+            }
+            + sheet.keyframes.map {
+                CSSContributionUnit.block(
+                    .keyframes($0)
+                )
+            }
+
+        return CSS.contribution(
+            styleIdentifier,
+            content:
+                CSSContributionSet(
+                    units:
+                        units
+                )
+        )
+    }
+}
+
+public extension FlowBox {
+    static func css() -> CSSStyleSheet {
+        styleContribution().content.sheet
     }
 }

@@ -9,11 +9,18 @@ public enum ArrowDirection: Sendable {
     case both
 }
 
-public struct Arrow: SelectableComponent, Sendable {
+public struct Arrow:
+    ComponentOutputProviding,
+    SelectableComponent,
+    Sendable
+{
     public enum Namespace {}
     public typealias SelectorNamespace = Namespace
 
     public static let block = "wc-flow"
+
+    private static let styleIdentifier: CSSContributionIdentifier =
+        "webcomponents.shapes.arrow.styles"
 
     public struct Selectors: Sendable {
         private let api = BlockSelectorAPI<Namespace>(
@@ -62,7 +69,7 @@ public struct Arrow: SelectableComponent, Sendable {
         self.direction = direction
     }
 
-    public var nodes: ReusableComponentNodes {
+    private var semanticBody: HTMLFragment {
         let s = selectors
 
         var finalAttrs = HTMLAttribute()
@@ -86,8 +93,7 @@ public struct Arrow: SelectableComponent, Sendable {
             attrs: finalAttrs
         )
 
-        return .body(
-            [
+        return [
                 HTML.div(.class(s.arrowWrap)) {
                     HTML.span(a) {}
 
@@ -97,8 +103,41 @@ public struct Arrow: SelectableComponent, Sendable {
                         }
                     }
                 }
-            ],
-            stylesheets: [Self.css()]
+        ]
+    }
+
+    public var output: ComponentOutput {
+        ComponentOutput(
+            content: ComponentContent(
+                body: semanticBody
+            ),
+            dependencies: ComponentDependencies(
+                styles: CSSContributions([
+                    Self.styleContribution()
+                ])
+            )
+        )
+    }
+
+    public var nodes: ReusableComponentNodes {
+        let semantic = output
+
+        return .body(
+            semantic.content.body,
+            stylesheets:
+                semantic
+                    .dependencies
+                    .styles
+                    .contributions
+                    .map {
+                        $0.content.sheet
+                    },
+            scripts:
+                semantic
+                    .dependencies
+                    .scripts
+                    .contributions
+                    .map(\.script)
         )
     }
 
@@ -134,7 +173,7 @@ extension Arrow {
     //         .filter { !$0.isEmpty }
     // }
 
-    public static func css() -> CSSStyleSheet {
+    private static func authoredStylesheet() -> CSSStyleSheet {
         let s = Self.selectors
 
         let arrowWrap = s.arrowWrap.rawValue
@@ -419,3 +458,41 @@ extension Arrow {
 //         )
 //     }
 // }
+
+private extension Arrow {
+    static func styleContribution() -> CSSContribution {
+        let sheet = authoredStylesheet()
+
+        let units =
+            sheet.rules.map {
+                CSSContributionUnit.block(
+                    .rule($0)
+                )
+            }
+            + sheet.media.map {
+                CSSContributionUnit.block(
+                    .media($0)
+                )
+            }
+            + sheet.keyframes.map {
+                CSSContributionUnit.block(
+                    .keyframes($0)
+                )
+            }
+
+        return CSS.contribution(
+            styleIdentifier,
+            content:
+                CSSContributionSet(
+                    units:
+                        units
+                )
+        )
+    }
+}
+
+public extension Arrow {
+    static func css() -> CSSStyleSheet {
+        styleContribution().content.sheet
+    }
+}

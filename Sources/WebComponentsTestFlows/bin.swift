@@ -20,6 +20,7 @@ enum WebComponentsFlowSuite: TestFlowRegistry {
         + PortableDocumentFormatComponentFlowSuite.flows
         + EditorialComponentCompositionFlowSuite.flows
         + QuizComponentCompositionFlowSuite.flows
+        + ShapeFoundationSemanticFlowSuite.flows
         + LegalDocumentFlowSuite.flows
 }
 

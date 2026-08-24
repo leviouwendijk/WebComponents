@@ -3,7 +3,14 @@ import Constructors
 import HTML
 import CSS
 
-public struct ProcessTimeline: ReusableComponent, Sendable {
+public struct ProcessTimeline:
+    ComponentOutputProviding,
+    ReusableComponent,
+    Sendable
+{
+    private static let styleIdentifier: CSSContributionIdentifier =
+        "webcomponents.shapes.process-timeline.styles"
+
     private enum ClassName {
         static let root = "wc-process-timeline"
         static let step = "wc-process-timeline__step"
@@ -158,12 +165,11 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
         self.steps = steps
     }
 
-    public var nodes: ReusableComponentNodes {
+    private var semanticBody: HTMLFragment {
         var rootAttrs = HTMLAttribute.class([ClassName.root] + classes)
         rootAttrs.merge(attrs)
 
-        return .body(
-            [
+        return [
                 HTML.div(rootAttrs) {
                     for offset in steps.indices {
                         let step = steps[offset]
@@ -364,10 +370,41 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                         }
                     }
                 }
-            ],
-            stylesheets: [
-                Self.css()
-            ]
+        ]
+    }
+
+    public var output: ComponentOutput {
+        ComponentOutput(
+            content: ComponentContent(
+                body: semanticBody
+            ),
+            dependencies: ComponentDependencies(
+                styles: CSSContributions([
+                    Self.styleContribution()
+                ])
+            )
+        )
+    }
+
+    public var nodes: ReusableComponentNodes {
+        let semantic = output
+
+        return .body(
+            semantic.content.body,
+            stylesheets:
+                semantic
+                    .dependencies
+                    .styles
+                    .contributions
+                    .map {
+                        $0.content.sheet
+                    },
+            scripts:
+                semantic
+                    .dependencies
+                    .scripts
+                    .contributions
+                    .map(\.script)
         )
     }
 
@@ -383,7 +420,7 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
         return String(format: "%0\(safeWidth)d", value)
     }
 
-    public static func css() -> CSSStyleSheet {
+    private static func authoredStylesheet() -> CSSStyleSheet {
         CSSStyleSheet(
             rules: [
                 CSS.rule(
@@ -893,5 +930,43 @@ public struct ProcessTimeline: ReusableComponent, Sendable {
                 )
             ]
         )
+    }
+}
+
+private extension ProcessTimeline {
+    static func styleContribution() -> CSSContribution {
+        let sheet = authoredStylesheet()
+
+        let units =
+            sheet.rules.map {
+                CSSContributionUnit.block(
+                    .rule($0)
+                )
+            }
+            + sheet.media.map {
+                CSSContributionUnit.block(
+                    .media($0)
+                )
+            }
+            + sheet.keyframes.map {
+                CSSContributionUnit.block(
+                    .keyframes($0)
+                )
+            }
+
+        return CSS.contribution(
+            styleIdentifier,
+            content:
+                CSSContributionSet(
+                    units:
+                        units
+                )
+        )
+    }
+}
+
+public extension ProcessTimeline {
+    static func css() -> CSSStyleSheet {
+        styleContribution().content.sheet
     }
 }
