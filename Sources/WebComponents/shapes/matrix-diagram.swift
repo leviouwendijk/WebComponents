@@ -3,11 +3,23 @@ import Constructors
 import HTML
 import CSS
 
-public struct MatrixDiagram: SelectableComponent {
+public struct MatrixDiagram:
+    ComponentOutputProviding,
+    SelectableComponent,
+    Sendable
+{
     public enum Namespace {}
     public typealias SelectorNamespace = Namespace
 
     public static let block = "wc-matrix"
+
+    private enum Contribution:
+        String,
+        CSSContributionIdentifying
+    {
+        case styles =
+            "webcomponents.shapes.matrix-diagram.styles"
+    }
 
     public struct Selectors: Sendable {
         private let api = BlockSelectorAPI<Namespace>(
@@ -121,22 +133,50 @@ public struct MatrixDiagram: SelectableComponent {
         self.attrs = attrs
     }
 
-    public var nodes: ReusableComponentNodes {
+    public var output: ComponentOutput {
         let s = selectors
 
-        let hasColHeaders = (columnHeaders?.isEmpty == false)
-        let hasRowHeaders = (rowHeaders?.isEmpty == false)
+        let hasColHeaders =
+            columnHeaders?.isEmpty
+                == false
 
-        var baseClasses: [AnyHTMLClass] = [s.root.erased]
-        if hasColHeaders { baseClasses.append(s.colHeaders.erased) }
-        if hasRowHeaders { baseClasses.append(s.rowHeaders.erased) }
-        if showsCrosshair { baseClasses.append(s.rootCrosshair.erased) }
+        let hasRowHeaders =
+            rowHeaders?.isEmpty
+                == false
 
-        var a = makeAttrs(
-            baseClasses: baseClasses,
-            classes: classes,
-            attrs: attrs
-        )
+        var baseClasses:
+            [AnyHTMLClass] =
+                [
+                    s.root.erased
+                ]
+
+        if hasColHeaders {
+            baseClasses.append(
+                s.colHeaders.erased
+            )
+        }
+
+        if hasRowHeaders {
+            baseClasses.append(
+                s.rowHeaders.erased
+            )
+        }
+
+        if showsCrosshair {
+            baseClasses.append(
+                s.rootCrosshair.erased
+            )
+        }
+
+        var a =
+            makeAttrs(
+                baseClasses:
+                    baseClasses,
+                classes:
+                    classes,
+                attrs:
+                    attrs
+            )
 
         a.merge(
             .style(
@@ -144,70 +184,203 @@ public struct MatrixDiagram: SelectableComponent {
             )
         )
 
-        return .body(
-            [
-                HTML.div(.class(s.wrap)) {
-                    if let yAxisLabel {
-                        HTML.div(.class([s.axis, s.axisY])) {
-                            yAxisLabel()
-                        }
+        let childOutputs =
+            renderedCellsInOrder()
+                .compactMap {
+                    cell
+                        -> ComponentOutput?
+                    in
+
+                    guard
+                        case .box(
+                            let box
+                        ) =
+                            cell
+                    else {
+                        return nil
                     }
 
-                    HTML.div(a) {
-                        if hasColHeaders {
-                            if hasRowHeaders {
-                                renderCell(
-                                    cornerHeader ?? .empty,
-                                    wrapperClasses: [s.cell, s.cellHeader]
-                                )
-                            }
-
-                            for h in (columnHeaders ?? []) {
-                                renderCell(
-                                    h,
-                                    wrapperClasses: [s.cell, s.cellHeader]
-                                )
-                            }
-                        }
-
-                        for r in 0..<rows {
-                            if hasRowHeaders {
-                                let rh: Cell = (rowHeaders?.count ?? 0) > r
-                                    ? (rowHeaders?[r] ?? .empty)
-                                    : .empty
-
-                                renderCell(
-                                    rh,
-                                    wrapperClasses: [s.cell, s.cellHeader]
-                                )
-                            }
-
-                            let rowCells: [Cell] = (cells.count > r) ? cells[r] : []
-
-                            for c in 0..<columns {
-                                let cell: Cell = (rowCells.count > c)
-                                    ? rowCells[c]
-                                    : .empty
-
-                                renderCell(
-                                    cell,
-                                    wrapperClasses: [s.cell]
-                                )
-                            }
-                        }
-                    }
-
-                    if let xAxisLabel {
-                        HTML.div(.class([s.axis, s.axisX])) {
-                            xAxisLabel()
-                        }
-                    }
+                    return
+                        FlowBox(
+                            box
+                        )
+                        .output
                 }
-            ],
-            stylesheets: [
-                FlowBox.css(),
-                Self.css()
-            ]
+
+        let childDependencies =
+            childOutputs.reduce(
+                ComponentDependencies.empty
+            ) {
+                partial,
+                child in
+
+                partial.merging(
+                    child.dependencies
+                )
+            }
+
+        let ownDependencies =
+            ComponentDependencies(
+                styles:
+                    CSSContributions([
+                        Self.styleContribution()
+                    ])
+            )
+
+        return ComponentOutput(
+            content:
+                ComponentContent(
+                    body: [
+                        HTML.div(
+                            .class(
+                                s.wrap
+                            )
+                        ) {
+                            if let yAxisLabel {
+                                HTML.div(
+                                    .class([
+                                        s.axis,
+                                        s.axisY
+                                    ])
+                                ) {
+                                    yAxisLabel()
+                                }
+                            }
+
+                            HTML.div(a) {
+                                if hasColHeaders {
+                                    if hasRowHeaders {
+                                        renderCell(
+                                            cornerHeader
+                                                ?? .empty,
+                                            wrapperClasses: [
+                                                s.cell,
+                                                s.cellHeader
+                                            ]
+                                        )
+                                    }
+
+                                    for h in columnHeaders ?? [] {
+                                        renderCell(
+                                            h,
+                                            wrapperClasses: [
+                                                s.cell,
+                                                s.cellHeader
+                                            ]
+                                        )
+                                    }
+                                }
+
+                                for r in 0..<rows {
+                                    if hasRowHeaders {
+                                        let rowHeader:
+                                            Cell =
+                                                (
+                                                    rowHeaders?
+                                                        .count
+                                                        ?? 0
+                                                )
+                                                > r
+                                                ? (
+                                                    rowHeaders?[
+                                                        r
+                                                    ]
+                                                    ?? .empty
+                                                )
+                                                : .empty
+
+                                        renderCell(
+                                            rowHeader,
+                                            wrapperClasses: [
+                                                s.cell,
+                                                s.cellHeader
+                                            ]
+                                        )
+                                    }
+
+                                    let rowCells:
+                                        [Cell] =
+                                            cells.count
+                                                > r
+                                            ? cells[
+                                                r
+                                            ]
+                                            : []
+
+                                    for c in 0..<columns {
+                                        let cell:
+                                            Cell =
+                                                rowCells.count
+                                                    > c
+                                                ? rowCells[
+                                                    c
+                                                ]
+                                                : .empty
+
+                                        renderCell(
+                                            cell,
+                                            wrapperClasses: [
+                                                s.cell
+                                            ]
+                                        )
+                                    }
+                                }
+                            }
+
+                            if let xAxisLabel {
+                                HTML.div(
+                                    .class([
+                                        s.axis,
+                                        s.axisX
+                                    ])
+                                ) {
+                                    xAxisLabel()
+                                }
+                            }
+                        }
+                    ]
+                ),
+            dependencies:
+                childDependencies
+                    .merging(
+                        ownDependencies
+                    )
+        )
+    }
+
+    public var nodes: ReusableComponentNodes {
+        let semantic =
+            output
+
+        let resolvedStyles:
+            ResolvedCSSContributions
+
+        do {
+            resolvedStyles =
+                try semantic
+                    .dependencies
+                    .styles
+                    .resolve()
+        } catch {
+            preconditionFailure(
+                "MatrixDiagram semantic CSS conflict: \(error)"
+            )
+        }
+
+        return .body(
+            semantic.content.body,
+            stylesheets:
+                resolvedStyles
+                    .contributions
+                    .map {
+                        $0.content.sheet
+                    },
+            scripts:
+                semantic
+                    .dependencies
+                    .scripts
+                    .contributions
+                    .map(\.script)
         )
     }
 
@@ -236,36 +409,97 @@ extension MatrixDiagram {
             ) {}
 
         case .box(let b):
-            return HTML.div(.class(wrapperClasses)) {
-                FlowBox(b).node()
+            let child =
+                FlowBox(
+                    b
+                )
+                .output
+
+            return HTML.div(
+                .class(
+                    wrapperClasses
+                )
+            ) {
+                child.content.body
             }
         }
     }
 
-    private func boxHTML(_ b: Box) -> any HTMLNode {
-        let alignClass: AnyHTMLClass = {
-            switch b.align {
-            case .center:
-                return AnyHTMLClass("wc-flow__box--center")
-            case .start:
-                return AnyHTMLClass("wc-flow__box--start")
+    private func renderedCellsInOrder()
+        -> [Cell]
+    {
+        let hasColHeaders =
+            columnHeaders?.isEmpty
+                == false
+
+        let hasRowHeaders =
+            rowHeaders?.isEmpty
+                == false
+
+        var result:
+            [Cell] =
+                []
+
+        if hasColHeaders {
+            if hasRowHeaders {
+                result.append(
+                    cornerHeader
+                        ?? .empty
+                )
             }
-        }()
 
-        let a = makeAttrs(
-            baseClasses: [
-                AnyHTMLClass("wc-flow__box"),
-                alignClass
-            ],
-            classes: b.classes,
-            attrs: b.attrs
-        )
+            result.append(
+                contentsOf:
+                    columnHeaders
+                        ?? []
+            )
+        }
 
-        return HTML.div(a) {
-            HTML.div(.class("wc-flow__box-inner")) {
-                b.content()
+        for r in 0..<rows {
+            if hasRowHeaders {
+                let rowHeader:
+                    Cell =
+                        (
+                            rowHeaders?
+                                .count
+                                ?? 0
+                        )
+                        > r
+                        ? (
+                            rowHeaders?[
+                                r
+                            ]
+                            ?? .empty
+                        )
+                        : .empty
+
+                result.append(
+                    rowHeader
+                )
+            }
+
+            let rowCells:
+                [Cell] =
+                    cells.count
+                        > r
+                    ? cells[
+                        r
+                    ]
+                    : []
+
+            for c in 0..<columns {
+                result.append(
+                    rowCells.count
+                        > c
+                    ? rowCells[
+                        c
+                    ]
+                    : .empty
+                )
             }
         }
+
+        return result
     }
 
     private func makeAttrs(
@@ -281,7 +515,7 @@ extension MatrixDiagram {
         return out
     }
 
-    public static func css() -> CSSStyleSheet {
+    private static func authoredStylesheet() -> CSSStyleSheet {
         let s = Self.selectors
 
         let wrap = s.wrap.rawValue
@@ -506,6 +740,37 @@ extension MatrixDiagram {
             ]
         )
     }
+    private static func styleContribution() -> CSSContribution {
+        let sheet = authoredStylesheet()
+
+        let units =
+            sheet.rules.map {
+                CSSContributionUnit.block(
+                    .rule($0)
+                )
+            }
+            + sheet.media.map {
+                CSSContributionUnit.block(
+                    .media($0)
+                )
+            }
+            + sheet.keyframes.map {
+                CSSContributionUnit.block(
+                    .keyframes($0)
+                )
+            }
+
+        return CSS.contribution(
+            Contribution.styles
+        ) {
+            units
+        }
+    }
+
+    public static func css() -> CSSStyleSheet {
+        styleContribution().content.sheet
+    }
+
 }
 
 // public struct MatrixDiagram: WebComponent {

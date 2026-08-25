@@ -21,6 +21,7 @@ enum WebComponentsFlowSuite: TestFlowRegistry {
         + EditorialComponentCompositionFlowSuite.flows
         + QuizComponentCompositionFlowSuite.flows
         + ShapeFoundationSemanticFlowSuite.flows
+        + ShapeParentSemanticFlowSuite.flows
         + LegalDocumentFlowSuite.flows
 }
 

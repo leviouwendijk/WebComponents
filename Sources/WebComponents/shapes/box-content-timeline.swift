@@ -2,7 +2,19 @@ import Constructors
 import HTML
 import CSS
 
-public struct BoxContentTimeline: ReusableComponent, Sendable {
+public struct BoxContentTimeline:
+    ComponentOutputProviding,
+    ReusableComponent,
+    Sendable
+{
+    private enum Contribution:
+        String,
+        CSSContributionIdentifying
+    {
+        case styles =
+            "webcomponents.shapes.box-content-timeline.styles"
+    }
+
     private enum ClassName {
         static let root = "wc-box-content-timeline"
         static let step = "wc-box-content-timeline__step"
@@ -41,42 +53,158 @@ public struct BoxContentTimeline: ReusableComponent, Sendable {
         self.steps = steps
     }
 
-    public var nodes: ReusableComponentNodes {
-        var rootAttrs = HTMLAttribute.class([ClassName.root] + classes)
-        rootAttrs.merge(attrs)
+    public var output: ComponentOutput {
+        var rootAttrs =
+            HTMLAttribute.class(
+                [ClassName.root]
+                    + classes
+            )
 
-        return .body(
-            [
-                HTML.div(rootAttrs) {
-                    for index in steps.indices {
-                        let step = steps[index]
+        rootAttrs.merge(
+            attrs
+        )
 
-                        HTML.div(HTMLAttribute.class(ClassName.step)) {
-                            HTML.div(HTMLAttribute.class(ClassName.boxCell)) {
-                                FlowBox(step.box).node()
-                            }
+        let childOutputs =
+            steps.map {
+                FlowBox(
+                    $0.box
+                )
+                .output
+            }
 
-                            HTML.div(HTMLAttribute.class(ClassName.contentCell)) {
-                                step.content()
-                            }
-                        }
+        let childDependencies =
+            childOutputs.reduce(
+                ComponentDependencies.empty
+            ) {
+                partial,
+                child in
 
-                        if index < steps.index(before: steps.endIndex) {
-                            HTML.div(HTMLAttribute.class(ClassName.connector)) {
-                                HTML.div(HTMLAttribute.class(ClassName.connectorBoxCell)) {
-                                    HTML.span(HTMLAttribute.class(ClassName.arrow)) {}
+                partial.merging(
+                    child.dependencies
+                )
+            }
+
+        let ownDependencies =
+            ComponentDependencies(
+                styles:
+                    CSSContributions([
+                        Self.styleContribution()
+                    ])
+            )
+
+        return ComponentOutput(
+            content:
+                ComponentContent(
+                    body: [
+                        HTML.div(rootAttrs) {
+                            for index in steps.indices {
+                                let step =
+                                    steps[
+                                        index
+                                    ]
+
+                                let child =
+                                    childOutputs[
+                                        index
+                                    ]
+
+                                HTML.div(
+                                    HTMLAttribute.class(
+                                        ClassName.step
+                                    )
+                                ) {
+                                    HTML.div(
+                                        HTMLAttribute.class(
+                                            ClassName.boxCell
+                                        )
+                                    ) {
+                                        child.content.body
+                                    }
+
+                                    HTML.div(
+                                        HTMLAttribute.class(
+                                            ClassName.contentCell
+                                        )
+                                    ) {
+                                        step.content()
+                                    }
                                 }
 
-                                HTML.div(HTMLAttribute.class(ClassName.connectorContentCell)) {}
+                                if index
+                                    < steps.index(
+                                        before:
+                                            steps.endIndex
+                                    )
+                                {
+                                    HTML.div(
+                                        HTMLAttribute.class(
+                                            ClassName.connector
+                                        )
+                                    ) {
+                                        HTML.div(
+                                            HTMLAttribute.class(
+                                                ClassName.connectorBoxCell
+                                            )
+                                        ) {
+                                            HTML.span(
+                                                HTMLAttribute.class(
+                                                    ClassName.arrow
+                                                )
+                                            ) {}
+                                        }
+
+                                        HTML.div(
+                                            HTMLAttribute.class(
+                                                ClassName.connectorContentCell
+                                            )
+                                        ) {}
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-            ],
-            stylesheets: [
-                FlowBox.css(),
-                Self.css()
-            ]
+                    ]
+                ),
+            dependencies:
+                childDependencies
+                    .merging(
+                        ownDependencies
+                    )
+        )
+    }
+
+    public var nodes: ReusableComponentNodes {
+        let semantic =
+            output
+
+        let resolvedStyles:
+            ResolvedCSSContributions
+
+        do {
+            resolvedStyles =
+                try semantic
+                    .dependencies
+                    .styles
+                    .resolve()
+        } catch {
+            preconditionFailure(
+                "BoxContentTimeline semantic CSS conflict: \(error)"
+            )
+        }
+
+        return .body(
+            semantic.content.body,
+            stylesheets:
+                resolvedStyles
+                    .contributions
+                    .map {
+                        $0.content.sheet
+                    },
+            scripts:
+                semantic
+                    .dependencies
+                    .scripts
+                    .contributions
+                    .map(\.script)
         )
     }
 
@@ -84,7 +212,7 @@ public struct BoxContentTimeline: ReusableComponent, Sendable {
         nodes.body[0]
     }
 
-    public static func css() -> CSSStyleSheet {
+    private static func authoredStylesheet() -> CSSStyleSheet {
         CSSStyleSheet(
             rules: [
                 CSS.rule(
@@ -195,4 +323,35 @@ public struct BoxContentTimeline: ReusableComponent, Sendable {
             ]
         )
     }
+    private static func styleContribution() -> CSSContribution {
+        let sheet = authoredStylesheet()
+
+        let units =
+            sheet.rules.map {
+                CSSContributionUnit.block(
+                    .rule($0)
+                )
+            }
+            + sheet.media.map {
+                CSSContributionUnit.block(
+                    .media($0)
+                )
+            }
+            + sheet.keyframes.map {
+                CSSContributionUnit.block(
+                    .keyframes($0)
+                )
+            }
+
+        return CSS.contribution(
+            Contribution.styles
+        ) {
+            units
+        }
+    }
+
+    public static func css() -> CSSStyleSheet {
+        styleContribution().content.sheet
+    }
+
 }

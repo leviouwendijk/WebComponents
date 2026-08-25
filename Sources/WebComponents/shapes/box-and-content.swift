@@ -3,11 +3,23 @@ import Constructors
 import HTML
 import CSS
 
-public struct BoxAndContent: SelectableComponent {
+public struct BoxAndContent:
+    ComponentOutputProviding,
+    SelectableComponent,
+    Sendable
+{
     public enum Namespace {}
     public typealias SelectorNamespace = Namespace
 
     public static let block = "wc-box-and-content"
+
+    private enum Contribution:
+        String,
+        CSSContributionIdentifying
+    {
+        case styles =
+            "webcomponents.shapes.box-and-content.styles"
+    }
 
     public enum Layout: Sendable {
         case boxLeft
@@ -35,7 +47,7 @@ public struct BoxAndContent: SelectableComponent {
         self.content = content
     }
 
-    public var nodes: ReusableComponentNodes {
+    public var output: ComponentOutput {
         let s = selectors
 
         let layoutClass: AnyHTMLClass = {
@@ -56,26 +68,85 @@ public struct BoxAndContent: SelectableComponent {
             attrs: attrs
         )
 
-        return .body(
-            [
-                HTML.div(a) {
-                    HTML.div(
-                        HTMLAttribute.class(s.element("box"))
-                    ) {
-                        boxHTML(box)
-                    }
+        let childOutput =
+            FlowBox(
+                box
+            )
+            .output
 
-                    HTML.div(
-                        HTMLAttribute.class(s.element("content"))
-                    ) {
-                        content()
-                    }
-                }
-            ],
-            stylesheets: [
-                FlowBox.css(),
-                Self.css()
-            ]
+        let ownDependencies =
+            ComponentDependencies(
+                styles:
+                    CSSContributions([
+                        Self.styleContribution()
+                    ])
+            )
+
+        return ComponentOutput(
+            content:
+                ComponentContent(
+                    body: [
+                        HTML.div(a) {
+                            HTML.div(
+                                HTMLAttribute.class(
+                                    s.element("box")
+                                )
+                            ) {
+                                childOutput.content.body
+                            }
+
+                            HTML.div(
+                                HTMLAttribute.class(
+                                    s.element("content")
+                                )
+                            ) {
+                                content()
+                            }
+                        }
+                    ]
+                ),
+            dependencies:
+                childOutput
+                    .dependencies
+                    .merging(
+                        ownDependencies
+                    )
+        )
+    }
+
+    public var nodes: ReusableComponentNodes {
+        let semantic =
+            output
+
+        let resolvedStyles:
+            ResolvedCSSContributions
+
+        do {
+            resolvedStyles =
+                try semantic
+                    .dependencies
+                    .styles
+                    .resolve()
+        } catch {
+            preconditionFailure(
+                "BoxAndContent semantic CSS conflict: \(error)"
+            )
+        }
+
+        return .body(
+            semantic.content.body,
+            stylesheets:
+                resolvedStyles
+                    .contributions
+                    .map {
+                        $0.content.sheet
+                    },
+            scripts:
+                semantic
+                    .dependencies
+                    .scripts
+                    .contributions
+                    .map(\.script)
         )
     }
 
@@ -91,12 +162,6 @@ public struct BoxAndContent: SelectableComponent {
 }
 
 extension BoxAndContent {
-    private func boxHTML(
-        _ b: Box
-    ) -> any HTMLNode {
-        FlowBox(b).node()
-    }
-
     private func makeAttrs(
         baseClasses: [AnyHTMLClass],
         classes: [HTMLClassToken],
@@ -117,7 +182,7 @@ extension BoxAndContent {
     //         .filter { !$0.isEmpty }
     // }
 
-    public static func css() -> CSSStyleSheet {
+    private static func authoredStylesheet() -> CSSStyleSheet {
         let s = Self.selectors
 
         let root = s.root.rawValue
@@ -171,6 +236,37 @@ extension BoxAndContent {
             ]
         )
     }
+    private static func styleContribution() -> CSSContribution {
+        let sheet = authoredStylesheet()
+
+        let units =
+            sheet.rules.map {
+                CSSContributionUnit.block(
+                    .rule($0)
+                )
+            }
+            + sheet.media.map {
+                CSSContributionUnit.block(
+                    .media($0)
+                )
+            }
+            + sheet.keyframes.map {
+                CSSContributionUnit.block(
+                    .keyframes($0)
+                )
+            }
+
+        return CSS.contribution(
+            Contribution.styles
+        ) {
+            units
+        }
+    }
+
+    public static func css() -> CSSStyleSheet {
+        styleContribution().content.sheet
+    }
+
 }
 
 // public struct BoxAndContent: WebComponent {
