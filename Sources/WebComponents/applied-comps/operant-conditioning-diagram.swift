@@ -233,7 +233,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                         }
 
                         HTML.div(["class": ClassName.matrix]) {
-                            Self.matrix().nodes.body
+                            Self.matrix().output.content.body
                         }
                     }
 
@@ -853,7 +853,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
             caption: caption
         ) {
             [
-                matrix().nodes.body[0]
+                matrix().output.content.body[0]
             ]
         }
     }
@@ -924,7 +924,7 @@ public struct OperantConditioningDiagram: ReusableComponent, Sendable {
                             quadrant_cell(quadrant)
                         ]
                     ]
-                ).nodes.body[0]
+                ).output.content.body[0]
             ]
         }
     }

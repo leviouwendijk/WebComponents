@@ -81,39 +81,9 @@ public struct QuizCardList:
     }
 
     public var nodes: ReusableComponentNodes {
-        let semantic =
-            output
-
-        let resolvedStyles:
-            ResolvedCSSContributions
-
-        do {
-            resolvedStyles =
-                try semantic
-                    .dependencies
-                    .styles
-                    .resolve()
-        } catch {
-            preconditionFailure(
-                "QuizCardList semantic CSS conflict: \(error)"
-            )
+        get throws {
+            try output.legacyNodes()
         }
-
-        return .body(
-            semantic.content.body,
-            stylesheets:
-                resolvedStyles
-                    .contributions
-                    .map {
-                        $0.content.sheet
-                    },
-            scripts:
-                semantic
-                    .dependencies
-                    .scripts
-                    .contributions
-                    .map(\.script)
-        )
     }
 
     private static func authoredStylesheet()

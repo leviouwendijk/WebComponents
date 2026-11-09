@@ -349,49 +349,19 @@ public struct MatrixDiagram:
     }
 
     public var nodes: ReusableComponentNodes {
-        let semantic =
-            output
-
-        let resolvedStyles:
-            ResolvedCSSContributions
-
-        do {
-            resolvedStyles =
-                try semantic
-                    .dependencies
-                    .styles
-                    .resolve()
-        } catch {
-            preconditionFailure(
-                "MatrixDiagram semantic CSS conflict: \(error)"
-            )
+        get throws {
+            try output.legacyNodes()
         }
-
-        return .body(
-            semantic.content.body,
-            stylesheets:
-                resolvedStyles
-                    .contributions
-                    .map {
-                        $0.content.sheet
-                    },
-            scripts:
-                semantic
-                    .dependencies
-                    .scripts
-                    .contributions
-                    .map(\.script)
-        )
     }
 
-    @available(*, deprecated, message: "use nodes.body")
+    @available(*, deprecated, message: "use output.content.body")
     public func html() -> HTMLFragment {
-        nodes.body
+        output.content.body
     }
 
-    @available(*, deprecated, message: "use nodes.stylesheets")
-    public func styles() -> [CSSStyleSheet] {
-        nodes.stylesheets
+    @available(*, deprecated, message: "use try nodes.stylesheets")
+    public func styles() throws -> [CSSStyleSheet] {
+        try nodes.stylesheets
     }
 }
 

@@ -626,6 +626,8 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
             return "−"
         case .separator:
             return "…"
+        case .endOfFile:
+            return ""
         }
     }
 
@@ -645,6 +647,8 @@ public struct DocsReleaseNotesPage: ReusableComponent, Sendable {
             return "delete"
         case .separator:
             return "separator"
+        case .endOfFile:
+            return "end-of-file"
         }
     }
 

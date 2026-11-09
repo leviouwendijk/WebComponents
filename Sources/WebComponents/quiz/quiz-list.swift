@@ -30,6 +30,7 @@ public struct QuizList: ReusableComponent, Sendable {
     }
 
     public var nodes: ReusableComponentNodes {
+        get throws {
         let heroNodes = QuizHero(
             eyebrow: eyebrow,
             title: set.title,
@@ -40,7 +41,7 @@ public struct QuizList: ReusableComponent, Sendable {
             itemCount: set.items.count
         ).nodes
 
-        let cardListNodes = QuizCardList(
+        let cardListNodes = try QuizCardList(
             items: set.items
         ).nodes
 
@@ -87,6 +88,7 @@ public struct QuizList: ReusableComponent, Sendable {
                 : [],
             scripts: script ? QuizScript().nodes.scripts : []
         )
+        }
     }
 
     public static func stylesheet() -> CSSStyleSheet {

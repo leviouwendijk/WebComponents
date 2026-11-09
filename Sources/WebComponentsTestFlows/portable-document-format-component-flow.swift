@@ -212,7 +212,7 @@ enum PortableDocumentFormatComponentFlowSuite:
                 let component =
                     firstFixture()
 
-                proveLegacyComponent(
+                try proveLegacyComponent(
                     component
                 )
 
@@ -364,11 +364,11 @@ where
 private func proveLegacyComponent<Component>(
     _ component:
         Component
-)
+) throws
 where
     Component:
         ReusableComponent
 {
     _ =
-        component.nodes
+        try component.nodes
 }

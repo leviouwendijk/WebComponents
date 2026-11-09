@@ -311,7 +311,7 @@ where
         component.output
 
     let legacy =
-        component.nodes
+        try component.nodes
 
     try Expect.equal(
         legacy
