@@ -1,5 +1,5 @@
 .DS_Store
-/.build
+.build/
 /Packages
 xcuserdata/
 DerivedData/
@@ -9,3 +9,5 @@ DerivedData/
 
 buf
 buf.md
+**/.testflows/*
+!**/.testflows/snapshots/

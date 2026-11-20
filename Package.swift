@@ -14,12 +14,6 @@ let package = Package(
             name: "WebComponents",
             targets: ["WebComponents"]
         ),
-        .executable(
-            name: "webctest",
-            targets: [
-                "WebComponentsTestFlows"
-            ]
-        ),
     ],
     dependencies: [
         .package(url: "https://github.com/leviouwendijk/Primitives.git", branch: "master"),
@@ -36,17 +30,6 @@ let package = Package(
         .package(url: "https://github.com/leviouwendijk/Difference.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/References.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Assets.git", branch: "master"),
-
-        // .package(url: "https://github.com/leviouwendijk/Milieu.git", branch: "master"),
-        // .package(url: "https://github.com/leviouwendijk/Writers.git", branch: "master"),
-        // .package(url: "https://github.com/leviouwendijk/Version.git", branch: "master"),
-        // .package(url: "https://github.com/leviouwendijk/Path.git", branch: "master"),
-        // .package(url: "https://github.com/leviouwendijk/ProtocolComponents.git", branch: "master"),
-
-        .package(
-            url: "https://github.com/leviouwendijk/TestFlows.git",
-            branch: "master"
-        )
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -74,32 +57,6 @@ let package = Package(
                 // .product(name: "Path", package: "Path"),
                 // .product(name: "ProtocolComponents", package: "ProtocolComponents"),
             ],
-        ),
-        .executableTarget(
-            name: "WebComponentsTestFlows",
-            dependencies: [
-                "WebComponents",
-                .product(
-                    name: "Constructors",
-                    package: "Constructors"
-                ),
-                .product(
-                    name: "CSS",
-                    package: "CSS"
-                ),
-                .product(
-                    name: "JS",
-                    package: "JS"
-                ),
-                .product(
-                    name: "Assets",
-                    package: "Assets"
-                ),
-                .product(
-                    name: "TestFlows",
-                    package: "TestFlows"
-                ),
-            ]
         ),
     ]
 )
